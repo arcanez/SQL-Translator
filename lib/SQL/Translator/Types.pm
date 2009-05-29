@@ -1,13 +1,13 @@
 package SQL::Translator::Types;
-use MooseX::Types -declare => [qw(Column Constraint Index Procedure Schema Table Trigger View)];
+use MooseX::Types -declare, [qw(Column Constraint Index Procedure Schema Table Trigger View)];
 
-subtype Column => as 'SQL::Translator::Object::Column';
-subtype Constraint => as 'SQL::Translator:Object::Constraint';
-subtype Index => as 'SQL::Translator:Object::Index';
-subtype Procedure => as 'SQL::Translator:Object::Procedure';
-subtype Schema => as 'SQL::Translator:Object::Schema';
-subtype Table => as 'SQL::Translator::Object::Table';
-subtype Trigger => as 'SQL::Translator:Object::Trigger';
-subtype View => as 'SQL::Translator:Object::View';
+class_type Column, { class => 'SQL::Translator::Object::Column' };
+class_type Constraint, { class => 'SQL::Translator:Object::Constraint' };
+class_type Index, { class => 'SQL::Translator:Object::Index' };
+class_type Procedure, { class => 'SQL::Translator:Object::Procedure' };
+class_type Schema, { class => 'SQL::Translator:Object::Schema' };
+class_type Table, { class => 'SQL::Translator::Object::Table' };
+class_type Trigger, { class => 'SQL::Translator:Object::Trigger' };
+class_type View, { class => 'SQL::Translator:Object::View' };
 
 1;
