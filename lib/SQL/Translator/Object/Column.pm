@@ -2,6 +2,7 @@ package SQL::Translator::Object::Column;
 use Moose;
 use MooseX::Types::Moose qw(Bool Int Str);
 use SQL::Translator::Types qw(Trigger);
+extends 'SQL::Translator::Object';
 
 has 'name' => (is => 'ro', isa => Str, required => 1);
 has 'type' => (is => 'ro', isa => Str, required => 1);

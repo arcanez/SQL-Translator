@@ -3,6 +3,7 @@ use Moose;
 use MooseX::Types::Moose qw(Str);
 use SQL::Translator::Types qw();
 use SQL::Translator::Object::Schema;
+extends 'SQL::Translator::Object';
 
 has 'name' => (is => 'ro', isa => Str, required => 1);
 has 'contents' => (is => 'ro', isa => Str, required => 1);

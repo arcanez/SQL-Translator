@@ -1,4 +1,5 @@
 package SQL::Translator::Object;
-use base 'SQL::Translator';
+use Moose;
+extends 'SQL::Translator';
 
 1;
