@@ -1,4 +1,4 @@
-package SQL::Translator::Parser::Oracle;
+package SQL::Translator::Parser::DDL;
 use Moose;
 extends 'SQL::Translator::Parser';
 
