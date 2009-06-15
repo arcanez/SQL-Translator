@@ -1,11 +1,25 @@
 package SQL::Translator::Object::Index;
 use Moose;
-use MooseX::Types::Moose qw(ArrayRef Str);
+use MooseX::Types::Moose qw(HashRef Str);
 use SQL::Translator::Types qw(Column);
 extends 'SQL::Translator::Object';
 
-has 'name' => (is => 'ro', isa => Str, required => 1);
-has 'columns' => (is => 'ro', isa => ArrayRef[Column], required => 1);
-has 'type' => (is => 'ro', isa => Str, required => 1);
+has 'name' => (
+  is => 'rw',
+  isa => Str,
+  required => 1
+);
+
+has 'columns' => (
+  is => 'rw',
+  isa => HashRef[Column],
+  required => 1
+);
+
+has 'type' => (
+  is => 'rw',
+  isa => Str,
+  required => 1
+);
 
 1;
