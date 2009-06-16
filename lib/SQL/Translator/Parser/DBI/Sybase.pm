@@ -1,5 +1,15 @@
 package SQL::Translator::Parser::DBI::Sybase;
 use Moose;
-extends 'SQL::Translator::Parser::DBI';
+with 'SQL::Translator::Parser::DBI::Dialect';
+
+sub make_create_string {
+   print "Sybase!\n";
+   # .....
+}
+
+sub make_update_string {
+   print "Sybase!\n";
+}
+
 
 1;
