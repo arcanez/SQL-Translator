@@ -1,6 +1,6 @@
 package SQL::Translator::Object::Column;
 use Moose;
-use MooseX::Types::Moose qw(Bool Int Str);
+use MooseX::Types::Moose qw(Bool Int Maybe Str);
 use SQL::Translator::Types qw(Trigger);
 extends 'SQL::Translator::Object';
 
@@ -10,7 +10,7 @@ has 'name' => (
   required => 1
 );
 
-has 'type' => (
+has 'data_type' => (
   is => 'rw',
   isa => Str,
   required => 1
@@ -18,7 +18,7 @@ has 'type' => (
 
 has 'size' => (
   is => 'rw',
-  isa => Int,
+  isa => Maybe[Int],
   required => 1
 );
 
@@ -30,27 +30,6 @@ has 'is_nullable' => (
 );
 
 has 'is_auto_increment' => (
-  is => 'rw',
-  isa => Bool,
-  required => 1,
-  default => 0
-);
-
-has 'is_primary_key' => (
-  is => 'rw',
-  isa => Bool,
-  required => 1,
-  default => 0
-);
-
-has 'is_foriegn_key' => (
-  is => 'rw',
-  isa => Bool,
-  required => 1,
-  default => 0
-);
-
-has 'is_unique' => (
   is => 'rw',
   isa => Bool,
   required => 1,

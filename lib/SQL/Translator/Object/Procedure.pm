@@ -1,6 +1,6 @@
 package SQL::Translator::Object::Procedure;
 use Moose;
-use MooseX::Types::Moose qw(HashRef Int Str);
+use MooseX::Types::Moose qw(HashRef Int Maybe Str);
 use SQL::Translator::Types qw();
 use SQL::Translator::Object::Schema;
 extends 'SQL::Translator::Object';
