@@ -2,8 +2,11 @@ package SQL::Translator::Parser::DBI;
 use Class::MOP;
 use Moose;
 use MooseX::Types::Moose qw(Str);
-use SQL::Translator::Types qw(DBIHandle);
 use DBI::Const::GetInfoType;
+use DBI::Const::GetInfo::ANSI;
+use DBI::Const::GetInfoReturn;
+use SQL::Translator::Types qw(DBIHandle Schema);
+use Data::Dumper; 
 extends 'SQL::Translator::Parser';
 
 has 'dbh' => (
@@ -17,30 +20,23 @@ has 'translator' => (
   does => 'SQL::Translator::Parser::DBI::Dialect',
   handles => {
     make_create_string => 'make_create_string',
-    make_update_string => 'make_update_string'
+    make_update_string => 'make_update_string',
+    _tables_list => '_tables_list',
+    _table_columns => '_table_columns',
+    _table_pk_info => '_table_pk_info',
+    _table_uniq_info => '_table_uniq_info',
+    _table_fk_info => '_table_fk_info',
+    _columns_info_for => '_columns_info_for',
+    _extra_column_info => '_extra_column_info',
   }
 );
 
-has 'db_schema' => (
+has 'schema' => (
   is => 'rw',
-  isa => Str,
+  isa => Schema,
   lazy => 1,
   required => 1,
-  default => sub { shift->translator->db_schema }
-);
-
-has 'quoter' => (
-  is => 'rw',
-  isa => Str,
-  requried => 1,
-  default => q{"}
-);
-
-has 'namesep' => (
-  is => 'rw',
-  isa => Str,
-  required => 1,
-  default => '.'
+  default => sub { shift->translator->schema }
 );
 
 sub BUILD {
@@ -56,19 +52,19 @@ sub BUILD {
     my $translator = $class->new( dbh => $self->dbh );
     $self->translator($translator);
 
-    $self->quoter( $self->dbh->get_info(29) || q{"} );
-    $self->namesep( $self->dbh->get_info(41) || q{.} );
-}
+    my $tables = $self->_tables_list;
 
-sub _tables_list {
-    my $self = shift;
+    $self->schema->tables($self->_tables_list);
+    $self->schema->get_table($_)->columns($self->_columns_info_for($_)) for keys %$tables;
 
-    my $dbh = $self->dbh;
-    my @tables = $dbh->tables(undef, $self->db_schema, '%', '%');
-    s/\Q$self->quoter\E//g for @tables;
-    s/^.*\Q$self->namesep\E// for @tables;
+#    foreach my $table (keys %$tables) {
+#        my $columns = $self->_columns_info_for($table);
+#        my $table = $self->schema->get_table($key);
+#        $table->columns($columns);
+#         $self->schema->get_table($key)->columns($columns);
+#    }
 
-    return @tables;
+    print Dumper($self->schema);
 }
 
 1;

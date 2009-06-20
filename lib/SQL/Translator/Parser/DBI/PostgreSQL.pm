@@ -1,17 +1,8 @@
 package SQL::Translator::Parser::DBI::PostgreSQL;
 use Moose;
-use MooseX::Types::Moose qw(Str);
+use SQL::Translator::Types qw(Schema);
 with 'SQL::Translator::Parser::DBI::Dialect';
 
-has 'db_schema' => (is => 'ro', isa => Str, default => 'public');
-
-sub make_create_string { 
-   print "HELLO WORLD\n";
-   # ..... 
-}
-
-sub make_update_string {
-   print "WOOT\n";
-}
+has 'schema' => (is => 'ro', isa => Schema, default => sub { SQL::Translator::Object::Schema->new({ name => 'public' }); } );
 
 1;

@@ -2,14 +2,6 @@ package SQL::Translator::Parser::DBI::Oracle;
 use Moose;
 with 'SQL::Translator::Parser::DBI::Dialect';
 
-sub make_create_string {
-   print "Oracle!\n";
-   # .....
-}
-
-sub make_update_string {
-   print "Oracle!\n";
-}
-
+has 'schema' => (is => 'ro', isa => Str, default => { sub { SQL::Translator::Object::Schema->new( { name => '' }));
 
 1;
