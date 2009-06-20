@@ -38,7 +38,19 @@ has 'is_auto_increment' => (
 
 has 'default_value' => (
   is => 'rw',
-  isa => Str,
+  isa => Maybe[Str],
+  required => 0
+);
+
+has 'index' => (
+  is => 'rw',
+  isa => Maybe[Int],
+  required => 1
+);
+
+has 'remarks' => (
+  is => 'rw',
+  isa => Maybe[Str],
   required => 0
 );
 
@@ -46,12 +58,6 @@ has 'trigger' => (
   is => 'rw',
   isa => Trigger,
   required => 0
-);
-
-has 'index' => (
-  is => 'rw',
-  isa => Int,
-  required => 1
 );
 
 1;

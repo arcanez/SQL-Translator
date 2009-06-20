@@ -1,6 +1,7 @@
 package SQL::Translator::Object::Procedure;
 use Moose;
 use MooseX::Types::Moose qw(HashRef Int Maybe Str);
+use MooseX::AttributeHelpers;
 use SQL::Translator::Types qw();
 use SQL::Translator::Object::Schema;
 extends 'SQL::Translator::Object';
@@ -18,8 +19,15 @@ has 'contents' => (
 );
 
 has 'parameters' => (
+  metaclass => 'Collection::Hash',
   is => 'rw',
   isa => Maybe[HashRef[Int|Str]],
+  provides => {
+    exists => 'exists_parameter',
+    keys   => 'parameter_ids',
+    get    => 'get_parameter',
+    set    => 'set_parameter',
+  },
   required => 0
 );
 
