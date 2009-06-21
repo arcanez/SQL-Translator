@@ -1,7 +1,8 @@
 package SQL::Translator::Parser::DBI::MySQL;
 use Moose;
+use SQL::Translator::Types qw(Schema);
 with 'SQL::Translator::Parser::DBI::Dialect';
 
-has 'schema' => (is => 'ro', isa => Str, default => { sub { SQL::Translator::Object::Schema->new( { name => '' }));
+has 'schema' => (is => 'ro', isa => Schema, default => sub { SQL::Translator::Object::Schema->new( { name => '' }) });
 
 1;

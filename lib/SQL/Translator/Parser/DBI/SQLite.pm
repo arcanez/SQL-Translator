@@ -1,25 +1,25 @@
 package SQL::Translator::Parser::DBI::SQLite;
 use Moose;
-use MooseX::Types::Moose qw(Str);
-use SQL::Translator::Types qw(DBIHandle);
+use SQL::Translator::Types qw(Schema);
+use SQL::Translator::Object::Table;
 with 'SQL::Translator::Parser::DBI::Dialect';
 
-has 'schema' => (is => 'ro', isa => Str, default => { sub { SQL::Translator::Object::Schema->new( { name => '' }));
+has 'schema' => (is => 'ro', isa => Schema, default => sub { SQL::Translator::Object::Schema->new( { name => '' }) });
 
 sub _tables_list {
     my $self = shift;
 
     my $dbh = $self->dbh;
-    my $sth = $dbh->prepare("SELECT * FROM sqlite_master");
+    my $sth = $dbh->prepare("SELECT * FROM sqlite_master WHERE type = 'table'");
     $sth->execute;
-    my @tables;
+
+    my %tables;
     while ( my $row = $sth->fetchrow_hashref ) {
-        next unless lc( $row->{type} ) eq 'table';
         next if $row->{tbl_name} =~ /^sqlite_/;
-        push @tables, $row->{tbl_name};
+        $tables{$row->{tbl_name}} = SQL::Translator::Object::Table->new( { name => $row->{tbl_name}, schema => $self->schema } );
     }
     $sth->finish;
-    return @tables;
+    return \%tables;
 }
 
 1;
