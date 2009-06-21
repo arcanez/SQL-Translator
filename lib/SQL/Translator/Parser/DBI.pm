@@ -22,8 +22,8 @@ has 'translator' => (
     _tables_list => '_tables_list',
     _table_columns => '_table_columns',
     _table_pk_info => '_table_pk_info',
-    _table_uniq_info => '_table_uniq_info',
     _table_fk_info => '_table_fk_info',
+    _table_uniq_info => '_table_uniq_info',
     _columns_info_for => '_columns_info_for',
     _extra_column_info => '_extra_column_info',
   }
@@ -50,19 +50,15 @@ sub BUILD {
     my $translator = $class->new( dbh => $self->dbh );
     $self->translator($translator);
 
-    my $tables = $self->_tables_list;
+    my $tables = $self->_tables_list; print Dumper($tables);
 
-    $self->schema->tables($self->_tables_list);
-    $self->schema->get_table($_)->columns($self->_columns_info_for($_)) for keys %$tables;
+    $self->schema->tables($tables);
 
-#    foreach my $table (keys %$tables) {
-#        my $columns = $self->_columns_info_for($table);
-#        my $table = $self->schema->get_table($key);
-#        $table->columns($columns);
-#         $self->schema->get_table($key)->columns($columns);
-#    }
-
-    print Dumper($self->schema);
+    foreach my $table (keys %$tables) {
+        my $columns = $self->_columns_info_for($table);
+        $self->schema->get_table($table)->columns($columns);
+    }
+#    print Dumper($self->schema);
 }
 
 1;
