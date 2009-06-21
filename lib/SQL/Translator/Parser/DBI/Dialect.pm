@@ -77,10 +77,8 @@ sub _table_pk_info {
     s/\Q$quoter\E//g for @primary;
 
     my $sth = $dbh->primary_key_info('', $self->schema->name, $table);
-    use Data::Dumper;
     while ( my $info = $sth->fetchrow_hashref() ) {
 #        my $column = SQL::Translator::Object::Column->new( { name => $info->{COLUMN_NAME}, size => undef, data_type => $info->{
-        print Dumper($info);
     }
 
     return \@primary;
