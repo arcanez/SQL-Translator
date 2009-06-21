@@ -16,20 +16,19 @@ has 'quoter' => (
   is => 'rw',
   isa => Str,
   requried => 1,
-  default => q{"}
+  lazy => 1,
+  default => sub { shift->dbh->get_info(29) || q{"} }
 );
 
 has 'namesep' => (
   is => 'rw',
   isa => Str,
   required => 1,
-  default => '.'
+  lazy => 1,
+  default => sub { shift->dbh->get_info(41) || '.' }
 );
 
 sub BUILD {
-    my $self = shift;
-    $self->quoter( $self->dbh->get_info(29) || q{"} );
-    $self->namesep( $self->dbh->get_info(41) || q{.} );
 }
 
 sub _tables_list {
@@ -61,6 +60,7 @@ sub _table_columns {
 
     my $sth = $dbh->prepare("SELECT * FROM $table WHERE 1 = 0");
     $sth->execute;
+
     my $retval = \@{$sth->{NAME_lc}};
     $sth->finish;
 
@@ -71,11 +71,57 @@ sub _table_pk_info {
     my ($self, $table) = @_;
 
     my $dbh = $self->dbh;
+    my $quoter = $self->quoter;
 
     my @primary = map { lc } $dbh->primary_key('', $self->schema->name, $table);
-    s/\Q$self->quoter\E//g for @primary;
+    s/\Q$quoter\E//g for @primary;
+
+    my $sth = $dbh->primary_key_info('', $self->schema->name, $table);
+    use Data::Dumper;
+    while ( my $info = $sth->fetchrow_hashref() ) {
+#        my $column = SQL::Translator::Object::Column->new( { name => $info->{COLUMN_NAME}, size => undef, data_type => $info->{
+        print Dumper($info);
+    }
 
     return \@primary;
+}
+
+sub _table_fk_info {
+    my ($self, $table) = @_;
+
+    my $dbh = $self->dbh;
+    my $quoter = $self->quoter;
+    my $sth = $dbh->foreign_key_info( '', $self->schema, '',
+                                      '', $self->schema, $table );
+    return [] if !$sth;
+
+    my %rels;
+
+    my $i = 1; # for unnamed rels, which hopefully have only 1 column ...
+    while(my $raw_rel = $sth->fetchrow_arrayref) {
+        my $uk_tbl  = $raw_rel->[2];
+        my $uk_col  = lc $raw_rel->[3];
+        my $fk_col  = lc $raw_rel->[7];
+        my $relid   = ($raw_rel->[11] || ( "__dcsld__" . $i++ ));
+        $uk_tbl =~ s/\Q$quoter\E//g;
+        $uk_col =~ s/\Q$quoter\E//g;
+        $fk_col =~ s/\Q$quoter\E//g;
+        $relid  =~ s/\Q$quoter\E//g;
+        $rels{$relid}->{tbl} = $uk_tbl;
+        $rels{$relid}->{cols}->{$uk_col} = $fk_col;
+    }
+    $sth->finish;
+
+    my @rels;
+    foreach my $relid (keys %rels) {
+        push(@rels, {
+            remote_columns => [ keys   %{$rels{$relid}->{cols}} ],
+            local_columns  => [ values %{$rels{$relid}->{cols}} ],
+            remote_table   => $rels{$relid}->{tbl},
+        });
+    }
+
+    return \@rels;
 }
 
 sub _table_uniq_info {
