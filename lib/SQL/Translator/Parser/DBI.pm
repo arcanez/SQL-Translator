@@ -1,64 +1,124 @@
 package SQL::Translator::Parser::DBI;
-use Class::MOP;
-use Moose;
-use MooseX::Types::Moose qw(Str);
+use Moose::Role;
+use MooseX::Types::Moose qw(Maybe Str);
 use DBI::Const::GetInfoType;
 use DBI::Const::GetInfo::ANSI;
 use DBI::Const::GetInfoReturn;
-use SQL::Translator::Types qw(DBIHandle Schema);
-use Data::Dumper; 
-extends 'SQL::Translator::Parser';
+use SQL::Translator::Object::Column;
+use SQL::Translator::Object::Index;
+use SQL::Translator::Object::Table;
+use SQL::Translator::Object::View;
 
-has 'dbh' => (
+has 'quoter' => (
   is => 'rw',
-  isa => DBIHandle,
-  required => 1
-);
-
-has 'translator' => (
-  is => 'rw', 
-  does => 'SQL::Translator::Parser::DBI::Dialect',
-  handles => {
-    _tables_list => '_tables_list',
-    _table_columns => '_table_columns',
-    _table_pk_info => '_table_pk_info',
-    _table_fk_info => '_table_fk_info',
-    _table_uniq_info => '_table_uniq_info',
-    _columns_info_for => '_columns_info_for',
-    _extra_column_info => '_extra_column_info',
-  }
-);
-
-has 'schema' => (
-  is => 'rw',
-  isa => Schema,
+  isa => Str,
+  requried => 1,
   lazy => 1,
-  required => 1,
-  default => sub { shift->translator->schema }
+  default => sub { shift->dbh->get_info(29) || q{"} }
 );
 
-sub BUILD {
+has 'namesep' => (
+  is => 'rw',
+  isa => Str,
+  required => 1,
+  lazy => 1,
+  default => sub { shift->dbh->get_info(41) || '.' }
+);
+
+has 'schema_name' => (
+  is => 'rw',
+  isa => Maybe[Str],
+  required => 1,
+  lazy => 1,
+  default => sub { undef }
+);
+
+has 'catalog_name' => (
+  is => 'rw',
+  isa => Maybe[Str],
+  required => 1,
+  lazy => 1,
+  default => sub { undef }
+);
+
+no Moose;
+
+sub _subclass {
     my $self = shift;
 
-    local $self->dbh->{RaiseError} = 1;
-    local $self->dbh->{PrintError} = 0;
+    my $dbtype = $self->dbh->get_info($GetInfoType{SQL_DBMS_NAME}) || $self->dbh->{Driver}{Name};
 
-    my $dbtypename = $self->dbh->get_info( $GetInfoType{SQL_DBMS_NAME} ) || $self->dbh->{Driver}{Name};
+    my $class = __PACKAGE__ . '::'. $dbtype;
+    Class::MOP::load_class($class);
+    $class->meta->apply($self);
+}
 
-    my $class = 'SQL::Translator::Parser::DBI::' . $dbtypename;
-    Class::MOP::load_class( $class );    
-    my $translator = $class->new( dbh => $self->dbh );
-    $self->translator($translator);
+sub _add_tables {
+    my $self = shift;
+    my $schema = shift;
 
-    my $tables = $self->_tables_list; print Dumper($tables);
-
-    $self->schema->tables($tables);
-
-    foreach my $table (keys %$tables) {
-        my $columns = $self->_columns_info_for($table);
-        $self->schema->get_table($table)->columns($columns);
+    my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', 'TABLE,VIEW');
+    while (my $table_info = $sth->fetchrow_hashref) {
+        if ($table_info->{TABLE_TYPE} eq 'TABLE') {
+            my $table = SQL::Translator::Object::Table->new({ name => $table_info->{TABLE_NAME} });
+            $schema->add_table($table);
+            $self->_add_columns($table);
+            $self->_add_primary_key($table);
+        }
+        elsif ($table_info->{TABLE_TYPE} eq 'VIEW') {
+            my $sql = $self->_get_view_sql($table_info->{TABLE_NAME});
+            $schema->add_view(SQL::Translator::Object::View->new({ name => $table_info->{TABLE_NAME}, sql => $sql }));
+        }
     }
-#    print Dumper($self->schema);
+}
+
+sub _add_columns {
+    my $self  = shift;
+    my $table = shift;
+
+    my $sth = $self->dbh->column_info($self->catalog_name, $self->schema_name, $table->name, '%');
+    while (my $col_info = $sth->fetchrow_hashref) {
+        my $column = SQL::Translator::Object::Column->new({ name => $col_info->{COLUMN_NAME},
+                                                            data_type => $col_info->{TYPE_NAME},
+                                                            size => $col_info->{COLUMN_SIZE},
+                                                            default_value => $col_info->{COLUMN_DEF},
+                                                            is_nullable => $col_info->{NULLABLE}, });
+        $table->add_column($column);
+
+    }
+}
+
+sub _add_primary_key {
+    my $self = shift;
+    my $table = shift;
+
+    my $pk_info = $self->dbh->primary_key_info($self->catalog_name, $self->schema_name, $table->name);
+#    use Data::Dumper;
+    my ($pk_name, @pk_cols);
+    while (my $pk_col = $pk_info->fetchrow_hashref) {
+        $pk_name = $pk_col->{PK_NAME};
+        push @pk_cols, $pk_col->{COLUMN_NAME};
+#        print Dumper($pk_col);
+=cut
+$VAR1 = {
+          'PK_NAME' => 'tester_pkey',
+          'pg_column' => 'tester_pkey',
+          'pg_table' => 'tester',
+          'COLUMN_NAME' => 'id',
+          'pg_tablespace_name' => undef,
+          'pg_tablespace_location' => undef,
+          'TABLE_CAT' => undef,
+          'TABLE_NAME' => 'tester',
+          'DATA_TYPE' => 'int4',
+          'pg_schema' => 'public',
+          'TABLE_SCHEM' => 'public',
+          'KEY_SEQ' => '1'
+        };
+=cut
+    }
+    my $index = SQL::Translator::Object::Index->new({ name => $pk_name, type => 'PRIMARY_KEY' });
+    $index->add_column($table->get_column($_)) for @pk_cols;
+    $table->add_index($index);
 }
 
 1;
