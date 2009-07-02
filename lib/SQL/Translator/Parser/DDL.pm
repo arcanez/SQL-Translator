@@ -1,5 +1,6 @@
 package SQL::Translator::Parser::DDL;
-use Moose;
-extends 'SQL::Translator::Parser';
+use Moose::Role;
+
+no Moose;
 
 1;
