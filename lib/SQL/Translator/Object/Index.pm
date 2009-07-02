@@ -19,9 +19,11 @@ has 'columns' => (
     exists => 'exists_column',
     keys   => 'column_ids',
     get    => 'get_column',
-    set    => 'set_column',
+#    set    => 'set_column',
   },
-  required => 1
+  curries => { set => { add_column => sub { my ($self, $body, $column) = @_; $self->$body($column->name, $column); } } },
+  default => sub { {} },
+  required => 0 
 );
 
 has 'type' => (
@@ -29,5 +31,8 @@ has 'type' => (
   isa => Str,
   required => 1
 );
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;

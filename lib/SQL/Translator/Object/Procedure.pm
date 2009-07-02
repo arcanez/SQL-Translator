@@ -50,4 +50,7 @@ has 'schema' => (
   default => sub { SQL::Translator::Object::Schema->new }
 );
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;

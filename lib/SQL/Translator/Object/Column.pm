@@ -42,11 +42,13 @@ has 'default_value' => (
   required => 0
 );
 
+=cut
 has 'index' => (
   is => 'rw',
   isa => Maybe[Int],
   required => 1
 );
+=cut
 
 has 'remarks' => (
   is => 'rw',
@@ -59,5 +61,8 @@ has 'trigger' => (
   isa => Trigger,
   required => 0
 );
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
