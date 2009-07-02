@@ -42,14 +42,6 @@ has 'default_value' => (
   required => 0
 );
 
-=cut
-has 'index' => (
-  is => 'rw',
-  isa => Maybe[Int],
-  required => 1
-);
-=cut
-
 has 'remarks' => (
   is => 'rw',
   isa => Maybe[Str],

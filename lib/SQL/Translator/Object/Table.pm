@@ -20,7 +20,6 @@ has 'columns' => (
     exists => 'exists_column',
     keys   => 'column_ids',
     get    => 'get_column',
-#    set    => 'set_column',
   },
   curries => { set => { add_column => sub { my ($self, $body, $column) = @_; $self->$body($column->name, $column); } } },
   default => sub { {} },
@@ -35,7 +34,6 @@ has 'indexes' => (
     exists => 'exists_index',
     keys   => 'index_ids',
     get    => 'get_index',
-#    set    => 'set_index',
   },
   curries => { set => { add_index => sub { my ($self, $body, $index) = @_; $self->$body($index->name, $index); } } },
   default => sub { {} },
@@ -50,20 +48,12 @@ has 'constraints' => (
     exists => 'exists_constraint',
     keys   => 'constraint_ids',
     get    => 'get_constraint',
-    set    => 'set_constraint',
   },
+  curries => { set => { add_constraint => sub { my ($self, $body, $constraint) = @_; $self->$body($constraint->name, $constraint); } } },
   default => sub { {} },
   required => 0
 );
 
-=cut
-has 'schema' => (
-  is => 'rw',
-  isa => Schema,
-  required => 0,
-  default => sub { SQL::Translator::Object::Schema->new }
-);
-=cut
 no Moose;
 __PACKAGE__->meta()->make_immutable;
 

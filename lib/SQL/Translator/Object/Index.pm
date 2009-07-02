@@ -19,7 +19,6 @@ has 'columns' => (
     exists => 'exists_column',
     keys   => 'column_ids',
     get    => 'get_column',
-#    set    => 'set_column',
   },
   curries => { set => { add_column => sub { my ($self, $body, $column) = @_; $self->$body($column->name, $column); } } },
   default => sub { {} },

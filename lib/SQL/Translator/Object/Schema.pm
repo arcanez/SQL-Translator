@@ -20,7 +20,6 @@ has 'tables' => (
     exists => 'exists_table',
     keys   => 'table_ids',
     get    => 'get_table',
-#    set    => 'add_table',
   },
   curries => { set => { add_table => sub { my ($self, $body, $table) = @_; $self->$body($table->name, $table); } } },
   default => sub { {} },
@@ -35,7 +34,6 @@ has 'views' => (
     exists => 'exists_view',
     keys   => 'view_ids',
     get    => 'get_view',
-#    set    => 'set_view',
   },
   curries => { set => { add_view => sub { my ($self, $body, $view) = @_; $self->$body($view->name, $view); } } },
   default => sub { {} },
@@ -50,8 +48,8 @@ has 'procedures' => (
     exists => 'exists_procedure',
     keys   => 'procedure_ids',
     get    => 'get_procedure',
-    set    => 'set_procedure',
   },
+  curries => { set => { add_procedure => sub { my ($self, $body, $procedure) = @_; $self->$body($procedure->name, $procedure); } } },
   default => sub { {} },
   required => 0
 );
