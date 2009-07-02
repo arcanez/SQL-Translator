@@ -28,20 +28,20 @@ has 'namesep' => (
 has 'schema_name' => (
   is => 'rw',
   isa => Maybe[Str],
-  required => 1,
+  required => 0,
   lazy => 1,
-  default => sub { undef }
+  default => undef
 );
 
 has 'catalog_name' => (
   is => 'rw',
   isa => Maybe[Str],
-  required => 1,
+  required => 0,
   lazy => 1,
-  default => sub { undef }
+  default => undef
 );
 
-no Moose;
+no Moose::Role;
 
 sub _subclass {
     my $self = shift;
@@ -84,7 +84,6 @@ sub _add_columns {
                                                             default_value => $col_info->{COLUMN_DEF},
                                                             is_nullable => $col_info->{NULLABLE}, });
         $table->add_column($column);
-
     }
 }
 
@@ -93,28 +92,10 @@ sub _add_primary_key {
     my $table = shift;
 
     my $pk_info = $self->dbh->primary_key_info($self->catalog_name, $self->schema_name, $table->name);
-#    use Data::Dumper;
     my ($pk_name, @pk_cols);
     while (my $pk_col = $pk_info->fetchrow_hashref) {
         $pk_name = $pk_col->{PK_NAME};
         push @pk_cols, $pk_col->{COLUMN_NAME};
-#        print Dumper($pk_col);
-=cut
-$VAR1 = {
-          'PK_NAME' => 'tester_pkey',
-          'pg_column' => 'tester_pkey',
-          'pg_table' => 'tester',
-          'COLUMN_NAME' => 'id',
-          'pg_tablespace_name' => undef,
-          'pg_tablespace_location' => undef,
-          'TABLE_CAT' => undef,
-          'TABLE_NAME' => 'tester',
-          'DATA_TYPE' => 'int4',
-          'pg_schema' => 'public',
-          'TABLE_SCHEM' => 'public',
-          'KEY_SEQ' => '1'
-        };
-=cut
     }
     my $index = SQL::Translator::Object::Index->new({ name => $pk_name, type => 'PRIMARY_KEY' });
     $index->add_column($table->get_column($_)) for @pk_cols;

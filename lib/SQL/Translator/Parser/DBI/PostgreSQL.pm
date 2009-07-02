@@ -10,7 +10,7 @@ has 'schema_name' => (
   default => 'public'
 );
 
-no Moose;
+no Moose::Role;
 
 sub _get_view_sql {
     my $self = shift;

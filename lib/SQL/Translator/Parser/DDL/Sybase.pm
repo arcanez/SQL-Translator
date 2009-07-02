@@ -1,6 +1,6 @@
 package SQL::Translator::Parser::DDL::Sybase;
 use Moose::Role;
 
-no Moose;
+no Moose::Role;
 
 1;
