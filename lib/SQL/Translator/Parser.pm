@@ -1,4 +1,5 @@
 package SQL::Translator::Parser;
+use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(Str);
 use SQL::Translator::Types qw(DBIHandle);
@@ -38,6 +39,6 @@ after BUILD => sub {
     print Dumper($schema);
 };
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
+
 1;

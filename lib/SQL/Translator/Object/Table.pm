@@ -1,4 +1,5 @@
 package SQL::Translator::Object::Table;
+use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(HashRef Str);
 use MooseX::AttributeHelpers;
@@ -54,7 +55,6 @@ has 'constraints' => (
   required => 0
 );
 
-no Moose;
 __PACKAGE__->meta()->make_immutable;
 
 1;

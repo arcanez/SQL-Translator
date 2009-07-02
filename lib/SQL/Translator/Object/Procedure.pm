@@ -1,4 +1,5 @@
 package SQL::Translator::Object::Procedure;
+use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(HashRef Int Maybe Str);
 use MooseX::AttributeHelpers;
@@ -50,7 +51,6 @@ has 'schema' => (
   default => sub { SQL::Translator::Object::Schema->new }
 );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

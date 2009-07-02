@@ -1,4 +1,5 @@
 package SQL::Translator::Object::Column;
+use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(Bool Int Maybe Str);
 use SQL::Translator::Types qw(Trigger);
@@ -54,7 +55,6 @@ has 'trigger' => (
   required => 0
 );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -1,4 +1,5 @@
 package SQL::Translator::Parser::DBI;
+use namespace::autoclean;
 use Moose::Role;
 use MooseX::Types::Moose qw(Maybe Str);
 use DBI::Const::GetInfoType;
@@ -40,8 +41,6 @@ has 'catalog_name' => (
   lazy => 1,
   default => undef
 );
-
-no Moose::Role;
 
 sub _subclass {
     my $self = shift;

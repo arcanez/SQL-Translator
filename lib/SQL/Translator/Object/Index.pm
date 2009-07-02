@@ -1,4 +1,5 @@
 package SQL::Translator::Object::Index;
+use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(HashRef Str);
 use MooseX::AttributeHelpers;
@@ -31,7 +32,6 @@ has 'type' => (
   required => 1
 );
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -1,6 +1,5 @@
 package SQL::Translator::Parser::DDL::Oracle;
+use namespace::autoclean;
 use Moose::Role;
-
-no Moose::Role;
 
 1;

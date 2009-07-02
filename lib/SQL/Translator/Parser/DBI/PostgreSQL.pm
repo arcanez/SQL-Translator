@@ -1,16 +1,14 @@
 package SQL::Translator::Parser::DBI::PostgreSQL;
+use namespace::autoclean;
 use Moose::Role;
 use MooseX::Types::Moose qw(Str);
 
-has 'schema_name' => (
-  is => 'rw',
+has '+schema_name' => (
   isa => Str,
   required => 1,
   lazy => 1,
   default => 'public'
 );
-
-no Moose::Role;
 
 sub _get_view_sql {
     my $self = shift;
