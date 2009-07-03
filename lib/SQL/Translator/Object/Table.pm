@@ -3,7 +3,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(HashRef Str);
 use MooseX::AttributeHelpers;
-use SQL::Translator::Types qw(Column Constraint Index Schema);
+use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
 use SQL::Translator::Object::Schema;
 extends 'SQL::Translator::Object';
 
@@ -55,6 +55,20 @@ has 'constraints' => (
   required => 0
 );
 
-__PACKAGE__->meta()->make_immutable;
+has 'sequences' => (
+  metaclass => 'Collection::Hash',
+  is => 'rw',
+  isa => HashRef[Sequence],
+  provides => {
+    exists => 'exists_sequence',
+    keys   => 'sequence_ids',
+    get    => 'get_sequence',
+  },
+  curries => { set => { add_sequence => sub { my ($self, $body, $sequence) = @_; $self->$body($sequence->name, $sequence); } } },
+  default => sub { {} },
+  required => 0
+);
+
+__PACKAGE__->meta->make_immutable;
 
 1;
