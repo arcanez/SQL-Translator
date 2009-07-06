@@ -4,22 +4,17 @@ use Moose;
 use MooseX::Types::Moose qw(Str);
 use SQL::Translator::Types qw(Schema);
 
-use Data::Dumper;
-
 has 'schema' => (
-  isa => Schema,
-  is => 'rw',
-  required => 1
+    isa => Schema,
+    is => 'rw',
+    required => 1
 );
 
 sub produce {
     my $self = shift;
     my $schema = $self->schema;
 
-    my $tables = $schema->tables;
-    foreach my $tname (keys %$tables) {
-        $self->_create_table($tables->{$tname});
-    }
+    $self->_create_table($_) for values %{$schema->tables};
 }
 
 sub _create_table {
@@ -31,21 +26,25 @@ sub _create_table {
     my $sqlite_version = 0;
 
     my $create_table;
+    my (@column_defs, @index_defs, @constraint_defs);
 
-    $create_table .= 'DROP TABLE ' . $table->name . ";\n" if $add_drop_table;
-    $create_table .= "CREATE TABLE " . $table->name . " (\n";
+    $create_table .= 'DROP TABLE '   . $table->name . ";\n" if $add_drop_table;
+    $create_table .= 'CREATE TABLE ' . $table->name . " (\n";
 
-    my $columns = $table->columns;
-    foreach my $cname (keys %$columns) {
-        my $column = $columns->{$cname};
-        $create_table .= '    ' . $column->name . ' ' . $column->data_type;
-        $create_table .= '(' . $column->size . ')' if $column->size;
-        $create_table .= ' NOT NULL' unless $column->is_nullable;
-        $create_table .= ",\n";
-    }
-    $create_table =~ s/,$//;
-    $create_table .= ");";
+    push @column_defs, $self->_create_column($_) for values %{$table->columns};
+    $create_table .= join(",\n", map { '  ' . $_ } @column_defs ) . "\n)";
     print $create_table . "\n";
+}
+
+sub _create_column {
+    my $self = shift;
+    my $column = shift;
+
+    my $column_def;
+    $column_def  = $column->name . ' ' . $column->data_type;
+    $column_def .= '(' . $column->size . ')' if $column->size;
+    $column_def .= ' NOT NULL' unless $column->is_nullable;
+    $column_def;
 }
 
 __PACKAGE__->meta->make_immutable;

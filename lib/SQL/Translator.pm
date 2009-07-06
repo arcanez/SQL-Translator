@@ -5,17 +5,17 @@ use MooseX::Types::Moose qw(Str);
 use SQL::Translator::Types qw(DBIHandle);
 
 has 'parser' => (
-  isa => Str,
-  is => 'ro',
-  init_arg => 'from',
-  required => 1,
+    isa => Str,
+    is => 'ro',
+    init_arg => 'from',
+    required => 1,
 );
 
 has 'producer' => (
-  isa => Str,
-  is => 'ro',
-  init_arg => 'to',
-  required => 1,
+    isa => Str,
+    is => 'ro',
+    init_arg => 'to',
+    required => 1,
 );
 
 has 'dbh' => (

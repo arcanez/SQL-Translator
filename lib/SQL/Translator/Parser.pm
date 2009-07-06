@@ -3,6 +3,7 @@ use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(Str);
 use SQL::Translator::Types qw(DBIHandle);
+use aliased 'SQL::Translator::Object::Schema';
 
 my $apply_role_dbi = sub {
     my $self = shift;
@@ -28,11 +29,9 @@ has 'filename' => (
     trigger => $apply_role_ddl,
 );
 
-sub BUILD {}
-
 sub parse {
     my $self = shift;
-    my $schema = SQL::Translator::Object::Schema->new({ name => $self->schema_name });
+    my $schema = Schema->new({ name => $self->schema_name });
     $self->_add_tables($schema);
     $schema;
 }
