@@ -18,4 +18,22 @@ sub _get_view_sql {
     return $sql;
 }
 
+sub _is_auto_increment {
+    my $self = shift;
+    my $column_info = shift;
+
+    return $column_info->{COLUMN_DEF} && $column_info->{COLUMN_DEF} =~ /^nextval\(/ ? 1 : 0;
+}
+
+sub _column_default_value {
+    my $self = shift;
+    my $column_info = shift;
+    my $default_value = $column_info->{COLUMN_DEF};
+
+    if (defined $default_value) {
+        $default_value =~ s/::.*$//
+    }
+    return $default_value;
+}
+
 1;

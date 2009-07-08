@@ -13,7 +13,7 @@ use aliased 'SQL::Translator::Object::View';
 has 'quoter' => (
     is => 'rw',
     isa => Str,
-    requried => 1,
+    required => 1,
     lazy => 1,
     default => sub { shift->dbh->get_info(29) || q{"} }
 );
@@ -52,6 +52,15 @@ sub _subclass {
     $class->meta->apply($self);
 }
 
+sub _is_auto_increment { 0 }
+
+sub _column_default_value {
+    my $self = shift;
+    my $column_info = shift;
+
+    return $column_info->{COLUMN_DEF};
+}
+
 sub _add_tables {
     my $self = shift;
     my $schema = shift;
@@ -78,12 +87,14 @@ sub _add_columns {
     my $table = shift;
 
     my $sth = $self->dbh->column_info($self->catalog_name, $self->schema_name, $table->name, '%');
-    while (my $col_info = $sth->fetchrow_hashref) {
-        my $column = Column->new({ name => $col_info->{COLUMN_NAME},
-                                   data_type => $col_info->{TYPE_NAME},
-                                   size => $col_info->{COLUMN_SIZE},
-                                   default_value => $col_info->{COLUMN_DEF},
-                                   is_nullable => $col_info->{NULLABLE}, });
+    while (my $column_info = $sth->fetchrow_hashref) {
+        my $column = Column->new({ name => $column_info->{COLUMN_NAME},
+                                   data_type => $column_info->{DATA_TYPE},
+                                   size => $column_info->{COLUMN_SIZE},
+                                   default_value => $self->_column_default_value($column_info),
+                                   is_auto_increment => $self->_is_auto_increment($column_info),
+                                   is_nullable => $column_info->{NULLABLE},
+                                 });
         $table->add_column($column);
     }
 }
