@@ -13,7 +13,7 @@ has 'name' => (
 
 has 'data_type' => (
     is => 'rw',
-    isa => Str,
+    isa => Int,
     required => 1
 );
 
