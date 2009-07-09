@@ -31,7 +31,6 @@ has 'columns' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 has 'indexes' => (
@@ -52,7 +51,6 @@ has 'indexes' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 has 'constraints' => (
@@ -73,7 +71,6 @@ has 'constraints' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 has 'sequences' => (
@@ -94,7 +91,6 @@ has 'sequences' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 __PACKAGE__->meta->make_immutable;

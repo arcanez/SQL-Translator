@@ -29,7 +29,6 @@ has 'parameters' => (
         get    => 'get_parameter',
         set    => 'set_parameter',
     },
-    required => 0
 );
 
 has 'owner' => (
@@ -41,7 +40,6 @@ has 'owner' => (
 has 'comments' => (
     is => 'rw',
     isa => Str,
-    required => 0
 );
 
 has 'schema' => (

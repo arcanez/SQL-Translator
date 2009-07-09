@@ -30,7 +30,6 @@ has 'columns' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 has 'sql' => (

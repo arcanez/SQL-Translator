@@ -31,7 +31,6 @@ has 'tables' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 has 'views' => (
@@ -52,7 +51,6 @@ has 'views' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 has 'procedures' => (
@@ -73,7 +71,6 @@ has 'procedures' => (
         }
     },
     default => sub { {} },
-    required => 0
 );
 
 __PACKAGE__->meta->make_immutable;
