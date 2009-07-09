@@ -29,7 +29,6 @@ has 'namesep' => (
 has 'schema_name' => (
     is => 'rw',
     isa => Maybe[Str],
-    required => 0,
     lazy => 1,
     default => undef
 );
@@ -37,7 +36,6 @@ has 'schema_name' => (
 has 'catalog_name' => (
     is => 'rw',
     isa => Maybe[Str],
-    required => 0,
     lazy => 1,
     default => undef
 );
