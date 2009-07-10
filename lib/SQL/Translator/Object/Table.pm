@@ -5,6 +5,7 @@ use MooseX::Types::Moose qw(HashRef Str);
 use MooseX::AttributeHelpers;
 use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
 use SQL::Translator::Object::Schema;
+use Tie::IxHash;
 extends 'SQL::Translator::Object';
 
 has 'name' => (
@@ -30,7 +31,7 @@ has 'columns' => (
             }
         }
     },
-    default => sub { {} },
+    default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
 );
 
 has 'indexes' => (
