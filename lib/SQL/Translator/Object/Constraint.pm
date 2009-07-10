@@ -29,7 +29,7 @@ has 'columns' => (
             }
         }
     },
-    required => 1
+    default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
 );
 
 has 'type' => (
