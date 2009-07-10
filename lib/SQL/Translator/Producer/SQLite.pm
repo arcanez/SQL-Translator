@@ -9,6 +9,7 @@ my %data_type_mapping = (
     SQL_INTEGER()     => 'integer',
     SQL_CHAR()        => 'character',
     SQL_VARCHAR()     => 'varchar',
+    SQL_BIGINT()      => 'integer',
 );
 
 sub _create_table {
