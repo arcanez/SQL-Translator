@@ -5,7 +5,6 @@ use MooseX::Types::Moose qw(Str);
 
 has '+schema_name' => (
   isa => Str,
-  required => 1,
   lazy => 1,
   default => 'public'
 );

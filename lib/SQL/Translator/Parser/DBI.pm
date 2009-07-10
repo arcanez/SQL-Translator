@@ -13,7 +13,6 @@ use aliased 'SQL::Translator::Object::View';
 has 'quoter' => (
     is => 'rw',
     isa => Str,
-    required => 1,
     lazy => 1,
     default => sub { shift->dbh->get_info(29) || q{"} }
 );
@@ -21,7 +20,6 @@ has 'quoter' => (
 has 'namesep' => (
     is => 'rw',
     isa => Str,
-    required => 1,
     lazy => 1,
     default => sub { shift->dbh->get_info(41) || '.' }
 );
