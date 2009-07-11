@@ -1,10 +1,12 @@
 package SQL::Translator::Types;
 use MooseX::Types::Moose qw(ArrayRef CodeRef Str);
-use MooseX::Types -declare, [qw(Column Constraint Index Procedure Schema Sequence Table Trigger View DBIHandle)];
+use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View DBIHandle)];
 
 class_type Column, { class => 'SQL::Translator::Object::Column' };
 class_type Constraint, { class => 'SQL::Translator::Object::Constraint' };
+class_type ForeignKey, { class => 'SQL::Translator::Object::ForeignKey' };
 class_type Index, { class => 'SQL::Translator::Object::Index' };
+class_type PrimaryKey, { class => 'SQL::Translator::Object::PrimaryKey' };
 class_type Procedure, { class => 'SQL::Translator::Object::Procedure' };
 class_type Schema, { class => 'SQL::Translator::Object::Schema' };
 class_type Sequence, { class=> 'SQL::Translator::Object::Sequence' };
