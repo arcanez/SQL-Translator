@@ -7,6 +7,7 @@ use DBI::Const::GetInfo::ANSI;
 use DBI::Const::GetInfoReturn;
 use aliased 'SQL::Translator::Object::Column';
 use aliased 'SQL::Translator::Object::ForeignKey';
+use aliased 'SQL::Translator::Object::Index';
 use aliased 'SQL::Translator::Object::PrimaryKey';
 use aliased 'SQL::Translator::Object::Table';
 use aliased 'SQL::Translator::Object::View';
@@ -69,6 +70,7 @@ sub _add_tables {
             $schema->add_table($table);
             $self->_add_columns($table);
             $self->_add_primary_key($table);
+            $self->_add_indexes($table);
         }
         elsif ($table_info->{TABLE_TYPE} eq 'VIEW') {
             my $sql = $self->_get_view_sql($table_info->{TABLE_NAME});
@@ -134,6 +136,23 @@ sub _add_foreign_keys {
         $fk->add_column($schema->get_table($fk_data->{$fk_name}{table})->get_column($_)) for @{$fk_data->{$fk_name}{columns}};
         $table->add_constraint($fk);
     }
+}
+
+sub _add_indexes {
+    my $self = shift;
+    my $table = shift;
+
+    my $index_info = $self->dbh->statistics_info($self->catalog_name, $self->schema_name, $table->name, 1, 0);
+
+    my ($index_name, $index_type, @index_cols);
+    while (my $index_col = $index_info->fetchrow_hashref) {
+        $index_name = $index_col->{INDEX_NAME};
+        $index_type = $index_col->{NON_UNIQUE} ? 'NON_UNIQUE' : 'UNIQUE';
+        push @index_cols, $index_col->{COLUMN_NAME};
+    }
+    my $index = Index->new({ name => $index_name, type => $index_type });
+    $index->add_column($table->get_column($_)) for @index_cols;
+    $table->add_index($index);
 }
 
 1;
