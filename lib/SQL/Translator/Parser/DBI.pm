@@ -6,7 +6,8 @@ use DBI::Const::GetInfoType;
 use DBI::Const::GetInfo::ANSI;
 use DBI::Const::GetInfoReturn;
 use aliased 'SQL::Translator::Object::Column';
-use aliased 'SQL::Translator::Object::Index';
+use aliased 'SQL::Translator::Object::ForeignKey';
+use aliased 'SQL::Translator::Object::PrimaryKey';
 use aliased 'SQL::Translator::Object::Table';
 use aliased 'SQL::Translator::Object::View';
 
@@ -76,6 +77,7 @@ sub _add_tables {
             $self->_add_columns($view);
         }
     }
+    $self->_add_foreign_key($schema->get_table($_), $schema) for $schema->table_ids;
 }
 
 sub _add_columns {
@@ -105,9 +107,33 @@ sub _add_primary_key {
         $pk_name = $pk_col->{PK_NAME};
         push @pk_cols, $pk_col->{COLUMN_NAME};
     }
-    my $index = Index->new({ name => $pk_name, type => 'PRIMARY_KEY' });
-    $index->add_column($table->get_column($_)) for @pk_cols;
-    $table->add_index($index);
+    my $pk = PrimaryKey->new({ name => $pk_name });
+    $pk->add_column($table->get_column($_)) for @pk_cols;
+    $table->add_index($pk);
+}
+
+sub _add_foreign_key {
+    my $self = shift;
+    my $table = shift;
+    my $schema = shift;
+
+    my $fk_info = $self->dbh->foreign_key_info($self->catalog_name, $self->schema_name, $table->name, $self->catalog_name, $self->schema_name, undef);
+    return unless $fk_info;
+
+    my $fk_data;
+    while (my $fk_col = $fk_info->fetchrow_hashref) {
+        my $fk_name = $fk_col->{FK_NAME}; 
+
+        push @{$fk_data->{$fk_name}{columns}}, $fk_col->{FK_COLUMN_NAME};
+        $fk_data->{$fk_name}{table} = $fk_col->{FK_TABLE_NAME};
+        $fk_data->{$fk_name}{uk} = $schema->get_table($fk_col->{UK_TABLE_NAME})->get_index($fk_col->{UK_NAME});
+    }
+
+    foreach my $fk_name (keys %$fk_data) {
+        my $fk = ForeignKey->new({ name => $fk_name, references => $fk_data->{$fk_name}{uk} });
+        $fk->add_column($schema->get_table($fk_data->{$fk_name}{table})->get_column($_)) for @{$fk_data->{$fk_name}{columns}};
+        $table->add_constraint($fk);
+    }
 }
 
 1;
