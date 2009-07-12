@@ -1,13 +1,27 @@
 package SQL::Translator::Producer;
 use namespace::autoclean;
 use Moose;
-use MooseX::Types::Moose qw(Str);
+use MooseX::Types::Moose qw(Bool Str);
 use SQL::Translator::Types qw(Schema);
 
 has 'schema' => (
     isa => Schema,
     is => 'rw',
     required => 1
+);
+
+has 'no_comments' => (
+    isa => Bool,
+    is => 'rw',
+    lazy => 1, 
+    default => 0
+);
+
+has 'drop_table' => (
+    isa => Bool,
+    is => 'rw',
+    lazy => 1,
+    default => 1
 );
 
 sub produce {

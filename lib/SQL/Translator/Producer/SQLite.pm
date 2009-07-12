@@ -16,14 +16,13 @@ sub _create_table {
     my $self = shift;
     my $table = shift;
 
-    my $no_comments    = 0;
-    my $add_drop_table = 1;
+    my $no_comments    = $self->no_comments;
     my $sqlite_version = 0;
 
     my $create_table;
     my (@create, @column_defs, @index_defs, @constraint_defs);
 
-    $create_table .= 'DROP TABLE '   . $table->name . ";\n" if $add_drop_table;
+    $create_table .= 'DROP TABLE '   . $table->name . ";\n" if $self->drop_table;
     $create_table .= 'CREATE TABLE ' . $table->name . " (\n";
 
     push @column_defs, $self->_create_column($_) for values %{$table->columns};
