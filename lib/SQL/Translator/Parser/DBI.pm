@@ -147,7 +147,7 @@ sub _add_indexes {
     my ($index_name, $index_type, @index_cols);
     while (my $index_col = $index_info->fetchrow_hashref) {
         $index_name = $index_col->{INDEX_NAME};
-        $index_type = $index_col->{NON_UNIQUE} ? 'NON_UNIQUE' : 'UNIQUE';
+        $index_type = $index_col->{NON_UNIQUE} ? 'NORMAL' : 'UNIQUE';
         push @index_cols, $index_col->{COLUMN_NAME};
     }
     my $index = Index->new({ name => $index_name, type => $index_type });
