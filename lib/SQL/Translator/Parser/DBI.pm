@@ -150,6 +150,7 @@ sub _add_indexes {
         $index_type = $index_col->{NON_UNIQUE} ? 'NORMAL' : 'UNIQUE';
         push @index_cols, $index_col->{COLUMN_NAME};
     }
+    return if $table->exists_index($index_name);
     my $index = Index->new({ name => $index_name, type => $index_type });
     $index->add_column($table->get_column($_)) for @index_cols;
     $table->add_index($index);
