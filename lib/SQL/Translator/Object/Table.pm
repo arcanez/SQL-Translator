@@ -1,7 +1,7 @@
 package SQL::Translator::Object::Table;
 use namespace::autoclean;
 use Moose;
-use MooseX::Types::Moose qw(HashRef Str);
+use MooseX::Types::Moose qw(Bool HashRef Str);
 use MooseX::AttributeHelpers;
 use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
 use SQL::Translator::Object::Schema;
@@ -91,6 +91,12 @@ has 'sequences' => (
         }
     },
     default => sub { {} },
+);
+
+has 'temporary' => (
+    is => 'rw',
+    isa => Bool,
+    default => 0
 );
 
 __PACKAGE__->meta->make_immutable;
