@@ -77,7 +77,7 @@ sub _add_tables {
             $self->_add_columns($view);
         }
     }
-    $self->_add_foreign_key($schema->get_table($_), $schema) for $schema->table_ids;
+    $self->_add_foreign_keys($schema->get_table($_), $schema) for $schema->table_ids;
 }
 
 sub _add_columns {
@@ -112,7 +112,7 @@ sub _add_primary_key {
     $table->add_index($pk);
 }
 
-sub _add_foreign_key {
+sub _add_foreign_keys {
     my $self = shift;
     my $table = shift;
     my $schema = shift;
