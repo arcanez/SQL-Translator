@@ -63,10 +63,11 @@ sub _add_tables {
     my $self = shift;
     my $schema = shift;
 
-    my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', 'TABLE,VIEW');
+    my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', "TABLE,VIEW,'LOCAL TEMPORARY','GLOBAL TEMPORARY'");
     while (my $table_info = $sth->fetchrow_hashref) {
-        if ($table_info->{TABLE_TYPE} eq 'TABLE') {
-            my $table = Table->new({ name => $table_info->{TABLE_NAME} });
+        if ($table_info->{TABLE_TYPE} =~ /^(TABLE|LOCAL TEMPORARY|GLOBAL TEMPORARY)$/) {
+            my $temp = $table_info->{TABLE_TYPE} =~ /TEMPORARY$/ ? 1 : 0;
+            my $table = Table->new({ name => $table_info->{TABLE_NAME}, temporary => $temp });
             $schema->add_table($table);
             $self->_add_columns($table);
             $self->_add_primary_key($table);
