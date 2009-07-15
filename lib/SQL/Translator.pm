@@ -2,7 +2,7 @@ package SQL::Translator;
 use namespace::autoclean;
 use Moose;
 use MooseX::Types::Moose qw(Str);
-use SQL::Translator::Types qw(DBIHandle);
+use SQL::Translator::Types qw(DBIHandle Parser Producer);
 
 has 'parser' => (
     isa => Str,
@@ -18,6 +18,20 @@ has 'producer' => (
     required => 1,
 );
 
+has '_parser' => (
+    isa => Parser,
+    is => 'rw',
+    lazy_build => 1,
+    handles => [ qw(parse) ],
+);
+
+has '_producer' => (
+    isa => Producer,
+    is => 'rw',
+    lazy_build => 1,
+    handles => [ qw(produce) ],
+);
+
 has 'dbh' => (
     isa => DBIHandle,
     is => 'ro',
@@ -30,26 +44,35 @@ has 'filename' => (
     predicate => 'has_ddl',
 );
 
-sub BUILD {}
-
-after BUILD => sub {
+sub _build__parser {
     my $self = shift;
+    my $class = 'SQL::Translator::Parser';
 
-    my $parser_class = 'SQL::Translator::Parser'; 
-    my $producer_class = 'SQL::Translator::Producer';
-    my $producer_role  = $producer_class . '::' . $self->producer;
+    Class::MOP::load_class($class);
 
-    Class::MOP::load_class($parser_class);
+    my $parser = $class->new({ dbh => $self->dbh });
 
-    my $parser = $parser_class->new({ dbh => $self->dbh });
+    return $parser;
+}
 
-    Class::MOP::load_class($producer_class);
-    Class::MOP::load_class($producer_role);
+sub _build__producer {
+    my $self = shift;
+    my $class = 'SQL::Translator::Producer';
+    my $role = $class . '::' . $self->producer;
 
-    my $producer = $producer_class->new({ schema => $parser->parse });
-    $producer_role->meta->apply($producer);
-    $producer->produce;
-};
+    Class::MOP::load_class($class);
+    eval { Class::MOP::load_class($role); };
+    if ($@) {
+        $role = $class . '::SQL::' . $self->producer;
+        eval { Class::MOP::load_class($role); };
+        die $@ if $@;
+    }
+
+    my $producer = $class->new({ schema => $self->parse });
+    $role->meta->apply($producer);
+
+    return $producer;
+}
 
 __PACKAGE__->meta->make_immutable;
 
