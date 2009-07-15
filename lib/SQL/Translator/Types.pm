@@ -1,6 +1,6 @@
 package SQL::Translator::Types;
 use MooseX::Types::Moose qw(ArrayRef CodeRef Str);
-use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View DBIHandle)];
+use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View DBIHandle Parser Producer)];
 
 class_type Column, { class => 'SQL::Translator::Object::Column' };
 class_type Constraint, { class => 'SQL::Translator::Object::Constraint' };
@@ -13,6 +13,9 @@ class_type Sequence, { class=> 'SQL::Translator::Object::Sequence' };
 class_type Table, { class => 'SQL::Translator::Object::Table' };
 class_type Trigger, { class => 'SQL::Translator::Object::Trigger' };
 class_type View, { class => 'SQL::Translator::Object::View' };
+
+class_type Parser, { class => 'SQL::Translator::Parser' };
+class_type Producer, { class => 'SQL::Translator::Producer' };
 
 subtype DBIHandle, as 'DBI::db';
 
