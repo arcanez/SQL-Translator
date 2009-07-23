@@ -1,160 +1,143 @@
-package SQL::Translator::Parser::DBI;
-use namespace::autoclean;
-use Moose::Role;
-use MooseX::Types::Moose qw(Maybe Str);
-use DBI::Const::GetInfoType;
-use DBI::Const::GetInfo::ANSI;
-use DBI::Const::GetInfoReturn;
-use aliased 'SQL::Translator::Object::Column';
-use aliased 'SQL::Translator::Object::ForeignKey';
-use aliased 'SQL::Translator::Object::Index';
-use aliased 'SQL::Translator::Object::PrimaryKey';
-use aliased 'SQL::Translator::Object::Table';
-use aliased 'SQL::Translator::Object::View';
+use MooseX::Declare;
+role SQL::Translator::Parser::DBI {
+    use DBI::Const::GetInfoType;
+    use DBI::Const::GetInfo::ANSI;
+    use DBI::Const::GetInfoReturn;
 
-has 'quoter' => (
-    is => 'rw',
-    isa => Str,
-    lazy => 1,
-    default => sub { shift->dbh->get_info(29) || q{"} }
-);
+    use MooseX::Types::Moose qw(HashRef Maybe Str);
 
-has 'namesep' => (
-    is => 'rw',
-    isa => Str,
-    lazy => 1,
-    default => sub { shift->dbh->get_info(41) || '.' }
-);
+    use SQL::Translator::Object::Column;
+    use SQL::Translator::Object::ForeignKey;
+    use SQL::Translator::Object::Index;
+    use SQL::Translator::Object::PrimaryKey;
+    use SQL::Translator::Object::Table;
+    use SQL::Translator::Object::View;
 
-has 'schema_name' => (
-    is => 'rw',
-    isa => Maybe[Str],
-    lazy => 1,
-    default => undef
-);
+    use SQL::Translator::Types qw(Schema Table);
 
-has 'catalog_name' => (
-    is => 'rw',
-    isa => Maybe[Str],
-    lazy => 1,
-    default => undef
-);
+    has 'quoter' => (
+        is => 'rw',
+        isa => Str,
+        lazy => 1,
+        default => sub { shift->dbh->get_info(29) || q{"} }
+    );
 
-sub _subclass {
-    my $self = shift;
+    has 'namesep' => (
+        is => 'rw',
+        isa => Str,
+        lazy => 1,
+        default => sub { shift->dbh->get_info(41) || '.' }
+    );
 
-    my $dbtype = $self->dbh->get_info($GetInfoType{SQL_DBMS_NAME}) || $self->dbh->{Driver}{Name};
+    has 'schema_name' => (
+        is => 'rw',
+        isa => Maybe[Str],
+        lazy => 1,
+        default => undef
+    );
 
-    my $class = __PACKAGE__ . '::'. $dbtype;
-    Class::MOP::load_class($class);
-    $class->meta->apply($self);
-}
+    has 'catalog_name' => (
+        is => 'rw',
+        isa => Maybe[Str],
+        lazy => 1,
+        default => undef
+    );
 
-sub _is_auto_increment { 0 }
+     method _subclass {
+        my $dbtype = $self->dbh->get_info($GetInfoType{SQL_DBMS_NAME}) || $self->dbh->{Driver}{Name};
 
-sub _column_default_value {
-    my $self = shift;
-    my $column_info = shift;
+        my $class = __PACKAGE__ . '::'. $dbtype;
+        Class::MOP::load_class($class);
+        $class->meta->apply($self);
+    }
 
-    return $column_info->{COLUMN_DEF};
-}
+    method _is_auto_increment { 0 }
 
-sub _add_tables {
-    my $self = shift;
-    my $schema = shift;
+    method _column_default_value(HashRef $column_info) { return $column_info->{COLUMN_DEF}; }
 
-    my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', "TABLE,VIEW,'LOCAL TEMPORARY','GLOBAL TEMPORARY'");
-    while (my $table_info = $sth->fetchrow_hashref) {
-        if ($table_info->{TABLE_TYPE} =~ /^(TABLE|LOCAL TEMPORARY|GLOBAL TEMPORARY)$/) {
-            my $temp = $table_info->{TABLE_TYPE} =~ /TEMPORARY$/ ? 1 : 0;
-            my $table = Table->new({ name => $table_info->{TABLE_NAME}, temporary => $temp });
-            $schema->add_table($table);
-            $self->_add_columns($table);
-            $self->_add_primary_key($table);
-            $self->_add_indexes($table);
+    method _add_tables(Schema $schema) {
+        my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', "TABLE,VIEW,'LOCAL TEMPORARY','GLOBAL TEMPORARY'");
+        while (my $table_info = $sth->fetchrow_hashref) {
+            if ($table_info->{TABLE_TYPE} =~ /^(TABLE|LOCAL TEMPORARY|GLOBAL TEMPORARY)$/) {
+                my $temp = $table_info->{TABLE_TYPE} =~ /TEMPORARY$/ ? 1 : 0;
+                my $table = SQL::Translator::Object::Table->new({ name => $table_info->{TABLE_NAME}, temporary => $temp });
+                $schema->add_table($table);
+
+                $self->_add_columns($table);
+                $self->_add_primary_key($table);
+                $self->_add_indexes($table);
+            }
+            elsif ($table_info->{TABLE_TYPE} eq 'VIEW') {
+                my $sql = $self->_get_view_sql($table_info->{TABLE_NAME});
+                my $view = SQL::Translator::Object::View->new({ name => $table_info->{TABLE_NAME}, sql => $sql });
+                $schema->add_view($view);
+                $self->_add_columns($view);
+            }
         }
-        elsif ($table_info->{TABLE_TYPE} eq 'VIEW') {
-            my $sql = $self->_get_view_sql($table_info->{TABLE_NAME});
-            my $view = View->new({ name => $table_info->{TABLE_NAME}, sql => $sql });
-            $schema->add_view($view);
-            $self->_add_columns($view);
+        $self->_add_foreign_keys($schema->get_table($_), $schema) for $schema->table_ids;
+    }
+
+    method _add_columns(Table $table) {
+        my $sth = $self->dbh->column_info($self->catalog_name, $self->schema_name, $table->name, '%');
+        while (my $column_info = $sth->fetchrow_hashref) {
+            my $column = SQL::Translator::Object::Column->new({ name => $column_info->{COLUMN_NAME},
+                                                                data_type => $column_info->{DATA_TYPE},
+                                                                size => $column_info->{COLUMN_SIZE},
+                                                                default_value => $self->_column_default_value($column_info),
+                                                                is_auto_increment => $self->_is_auto_increment($column_info),
+                                                                is_nullable => $column_info->{NULLABLE},
+                                                              });
+            $table->add_column($column);
         }
     }
-    $self->_add_foreign_keys($schema->get_table($_), $schema) for $schema->table_ids;
-}
 
-sub _add_columns {
-    my $self  = shift;
-    my $table = shift;
+    method _add_primary_key(Table $table) {
+        my $pk_info = $self->dbh->primary_key_info($self->catalog_name, $self->schema_name, $table->name);
 
-    my $sth = $self->dbh->column_info($self->catalog_name, $self->schema_name, $table->name, '%');
-    while (my $column_info = $sth->fetchrow_hashref) {
-        my $column = Column->new({ name => $column_info->{COLUMN_NAME},
-                                   data_type => $column_info->{DATA_TYPE},
-                                   size => $column_info->{COLUMN_SIZE},
-                                   default_value => $self->_column_default_value($column_info),
-                                   is_auto_increment => $self->_is_auto_increment($column_info),
-                                   is_nullable => $column_info->{NULLABLE},
-                                 });
-        $table->add_column($column);
-    }
-}
+        my ($pk_name, @pk_cols);
+        while (my $pk_col = $pk_info->fetchrow_hashref) {
+            $pk_name = $pk_col->{PK_NAME};
+            push @pk_cols, $pk_col->{COLUMN_NAME};
+        }
+        return unless $pk_name;
 
-sub _add_primary_key {
-    my $self = shift;
-    my $table = shift;
-
-    my $pk_info = $self->dbh->primary_key_info($self->catalog_name, $self->schema_name, $table->name);
-    my ($pk_name, @pk_cols);
-    while (my $pk_col = $pk_info->fetchrow_hashref) {
-        $pk_name = $pk_col->{PK_NAME};
-        push @pk_cols, $pk_col->{COLUMN_NAME};
-    }
-    my $pk = PrimaryKey->new({ name => $pk_name });
-    $pk->add_column($table->get_column($_)) for @pk_cols;
-    $table->add_index($pk);
-}
-
-sub _add_foreign_keys {
-    my $self = shift;
-    my $table = shift;
-    my $schema = shift;
-
-    my $fk_info = $self->dbh->foreign_key_info($self->catalog_name, $self->schema_name, $table->name, $self->catalog_name, $self->schema_name, undef);
-    return unless $fk_info;
-
-    my $fk_data;
-    while (my $fk_col = $fk_info->fetchrow_hashref) {
-        my $fk_name = $fk_col->{FK_NAME}; 
-
-        push @{$fk_data->{$fk_name}{columns}}, $fk_col->{FK_COLUMN_NAME};
-        $fk_data->{$fk_name}{table} = $fk_col->{FK_TABLE_NAME};
-        $fk_data->{$fk_name}{uk} = $schema->get_table($fk_col->{UK_TABLE_NAME})->get_index($fk_col->{UK_NAME});
+        my $pk = SQL::Translator::Object::PrimaryKey->new({ name => $pk_name });
+        $pk->add_column($table->get_column($_)) for @pk_cols;
+        $table->add_index($pk);
     }
 
-    foreach my $fk_name (keys %$fk_data) {
-        my $fk = ForeignKey->new({ name => $fk_name, references => $fk_data->{$fk_name}{uk} });
-        $fk->add_column($schema->get_table($fk_data->{$fk_name}{table})->get_column($_)) for @{$fk_data->{$fk_name}{columns}};
-        $table->add_constraint($fk);
+    method _add_foreign_keys(Table $table, Schema $schema) {
+        my $fk_info = $self->dbh->foreign_key_info($self->catalog_name, $self->schema_name, $table->name, $self->catalog_name, $self->schema_name, undef);
+        return unless $fk_info;
+
+        my $fk_data;
+        while (my $fk_col = $fk_info->fetchrow_hashref) {
+            my $fk_name = $fk_col->{FK_NAME}; 
+
+            push @{$fk_data->{$fk_name}{columns}}, $fk_col->{FK_COLUMN_NAME};
+            $fk_data->{$fk_name}{table} = $fk_col->{FK_TABLE_NAME};
+            $fk_data->{$fk_name}{uk} = $schema->get_table($fk_col->{UK_TABLE_NAME})->get_index($fk_col->{UK_NAME});
+        }
+
+        foreach my $fk_name (keys %$fk_data) {
+            my $fk = SQL::Translator::Object::ForeignKey->new({ name => $fk_name, references => $fk_data->{$fk_name}{uk} });
+            $fk->add_column($schema->get_table($fk_data->{$fk_name}{table})->get_column($_)) for @{$fk_data->{$fk_name}{columns}};
+            $table->add_constraint($fk);
+        }
+    }
+
+    method _add_indexes(Table $table) {
+        my $index_info = $self->dbh->statistics_info($self->catalog_name, $self->schema_name, $table->name, 1, 0);
+
+        my ($index_name, $index_type, @index_cols);
+        while (my $index_col = $index_info->fetchrow_hashref) {
+            $index_name = $index_col->{INDEX_NAME};
+            $index_type = $index_col->{NON_UNIQUE} ? 'NORMAL' : 'UNIQUE';
+            push @index_cols, $index_col->{COLUMN_NAME};
+        }
+        return if $table->exists_index($index_name);
+        my $index = SQL::Translator::Object::Index->new({ name => $index_name, type => $index_type });
+        $index->add_column($table->get_column($_)) for @index_cols;
+        $table->add_index($index);
     }
 }
-
-sub _add_indexes {
-    my $self = shift;
-    my $table = shift;
-
-    my $index_info = $self->dbh->statistics_info($self->catalog_name, $self->schema_name, $table->name, 1, 0);
-
-    my ($index_name, $index_type, @index_cols);
-    while (my $index_col = $index_info->fetchrow_hashref) {
-        $index_name = $index_col->{INDEX_NAME};
-        $index_type = $index_col->{NON_UNIQUE} ? 'NORMAL' : 'UNIQUE';
-        push @index_cols, $index_col->{COLUMN_NAME};
-    }
-    return if $table->exists_index($index_name);
-    my $index = Index->new({ name => $index_name, type => $index_type });
-    $index->add_column($table->get_column($_)) for @index_cols;
-    $table->add_index($index);
-}
-
-1;

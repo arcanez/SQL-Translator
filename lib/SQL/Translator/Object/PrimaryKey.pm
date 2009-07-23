@@ -1,9 +1,8 @@
-package SQL::Translator::Object::PrimaryKey;
-use Moose;
-extends 'SQL::Translator::Object::Index';
+use MooseX::Declare;
+class SQL::Translator::Object::PrimaryKey {
+    extends 'SQL::Translator::Object::Index';
 
-has '+type' => (
-    default => 'PRIMARY_KEY',
-);
-
-1;
+    has '+type' => (
+        default => 'PRIMARY_KEY',
+    );
+}

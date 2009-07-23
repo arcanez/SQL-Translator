@@ -1,5 +1,3 @@
-package SQL::Translator::Parser::DDL::PostgreSQL;
-use namespace::autoclean;
-use Moose::Role;
-
-1;
+use MooseX::Declare;
+role SQL::Translator::Parser::DDL::PostgreSQL {
+}
