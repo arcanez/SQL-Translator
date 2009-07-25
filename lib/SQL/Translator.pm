@@ -1,6 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator {
     use MooseX::Types::Moose qw(Str);
+    use TryCatch;
     use SQL::Translator::Types qw(DBIHandle Parser Producer);
     
     has 'parser' => (
@@ -58,12 +59,7 @@ class SQL::Translator {
         my $role = $class . '::' . $self->producer;
     
         Class::MOP::load_class($class);
-        eval { Class::MOP::load_class($role); };
-        if ($@) {
-            $role = $class . '::SQL::' . $self->producer;
-            eval { Class::MOP::load_class($role); };
-            die $@ if $@;
-        }
+        try { Class::MOP::load_class($role) } catch ($e) { $role = $class . '::SQL::' . $self->producer; Class::MOP::load_class($role) }
     
         my $producer = $class->new({ schema => $self->parse });
         $role->meta->apply($producer);
