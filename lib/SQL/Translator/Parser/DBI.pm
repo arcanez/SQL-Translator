@@ -51,7 +51,7 @@ role SQL::Translator::Parser::DBI {
         $class->meta->apply($self);
     }
 
-    method _is_auto_increment { 0 }
+    method _is_auto_increment(HashRef $column_info) { 0 }
 
     method _column_default_value(HashRef $column_info) { return $column_info->{COLUMN_DEF}; }
 
