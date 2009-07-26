@@ -43,7 +43,7 @@ role SQL::Translator::Parser::DBI {
         default => undef
     );
 
-     method _subclass {
+    method _subclass {
         my $dbtype = $self->dbh->get_info($GetInfoType{SQL_DBMS_NAME}) || $self->dbh->{Driver}{Name};
 
         my $class = __PACKAGE__ . '::'. $dbtype;
@@ -54,6 +54,8 @@ role SQL::Translator::Parser::DBI {
     method _is_auto_increment(HashRef $column_info) { 0 }
 
     method _column_default_value(HashRef $column_info) { return $column_info->{COLUMN_DEF}; }
+
+    method _column_data_type(HashRef $column_info) { return $column_info->{DATA_TYPE}; }
 
     method _add_tables(Schema $schema) {
         my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', "TABLE,VIEW,'LOCAL TEMPORARY','GLOBAL TEMPORARY'");
@@ -81,7 +83,7 @@ role SQL::Translator::Parser::DBI {
         my $sth = $self->dbh->column_info($self->catalog_name, $self->schema_name, $table->name, '%');
         while (my $column_info = $sth->fetchrow_hashref) {
             my $column = SQL::Translator::Object::Column->new({ name => $column_info->{COLUMN_NAME},
-                                                                data_type => $column_info->{DATA_TYPE},
+                                                                data_type => $self->_column_data_type($column_info),
                                                                 size => $column_info->{COLUMN_SIZE},
                                                                 default_value => $self->_column_default_value($column_info),
                                                                 is_auto_increment => $self->_is_auto_increment($column_info),
@@ -128,6 +130,8 @@ role SQL::Translator::Parser::DBI {
 
     method _add_indexes(Table $table) {
         my $index_info = $self->dbh->statistics_info($self->catalog_name, $self->schema_name, $table->name, 1, 0);
+
+        return unless defined $index_info;
 
         my ($index_name, $index_type, @index_cols);
         while (my $index_col = $index_info->fetchrow_hashref) {
