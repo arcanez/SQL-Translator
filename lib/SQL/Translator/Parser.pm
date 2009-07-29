@@ -6,13 +6,18 @@ class SQL::Translator::Parser {
 
     my $apply_role_dbi = sub {
         my $self = shift;
-        my $class = __PACKAGE__ . '::DBI';
-        Class::MOP::load_class($class);
-        $class->meta->apply($self);
+        my $role = __PACKAGE__ . '::DBI';
+        Class::MOP::load_class($role);
+        $role->meta->apply($self);
         $self->_subclass();
     };
 
-    my $apply_role_ddl = sub { };
+    my $apply_role_ddl = sub {
+        my $self = shift;
+        my $role =  __PACKAGE__ . '::DDL::' . $self->type;
+        Class::MOP::load_class($role);
+        $role->meta->apply($self);
+    };
 
     has 'dbh' => (
         isa => DBIHandle,
@@ -26,6 +31,11 @@ class SQL::Translator::Parser {
         is => 'ro',
         predicate => 'has_ddl',
         trigger => $apply_role_ddl,
+    );
+
+    has 'type' => (
+        isa => Str,
+        is => 'ro',
     );
 
     method parse {
