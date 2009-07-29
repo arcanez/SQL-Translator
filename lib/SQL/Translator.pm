@@ -49,7 +49,14 @@ class SQL::Translator {
     
         Class::MOP::load_class($class);
     
-        my $parser = $class->new({ dbh => $self->dbh });
+        my $parser;
+        if ($self->has_dbh) {
+            $parser = $class->new({ dbh => $self->dbh });
+        } elsif ($self->has_ddl) {
+            $parser = $class->new({ filename => $self->filename, type => $self->parser });
+        } else {
+            die "dbh or filename is required!";
+        }
     
         return $parser;
     }
@@ -66,5 +73,4 @@ class SQL::Translator {
     
         return $producer;
     }
-    
 } 
