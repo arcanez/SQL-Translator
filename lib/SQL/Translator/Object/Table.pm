@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Table {
-    use MooseX::Types::Moose qw(Bool HashRef Str);
+    use MooseX::Types::Moose qw(Bool HashRef Maybe Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
     use SQL::Translator::Object::Schema;
@@ -90,6 +90,11 @@ class SQL::Translator::Object::Table {
             }
         },
         default => sub { {} },
+    );
+
+    has 'comments' => (
+        is => 'rw',
+        isa => Maybe[Str],
     );
     
     has 'temporary' => (
