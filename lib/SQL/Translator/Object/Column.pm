@@ -41,7 +41,7 @@ class SQL::Translator::Object::Column {
         isa => Maybe[Str],
     );
     
-    has 'remarks' => (
+    has 'comments' => (
         is => 'rw',
         isa => Maybe[Str],
     );
