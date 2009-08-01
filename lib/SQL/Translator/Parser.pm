@@ -14,9 +14,10 @@ class SQL::Translator::Parser {
 
     my $apply_role_ddl = sub {
         my $self = shift;
-        my $role =  __PACKAGE__ . '::DDL::' . $self->type;
+        my $role =  __PACKAGE__ . '::DDL';
         Class::MOP::load_class($role);
         $role->meta->apply($self);
+        $self->_subclass();
     };
 
     has 'dbh' => (
