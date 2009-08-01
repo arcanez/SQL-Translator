@@ -41,6 +41,7 @@ role SQL::Translator::Producer::SQL::PostgreSQL {
     method _create_column(Column $column) {
         my $size = $column->size;
         my $default_value = $column->default_value;
+        $default_value =~ s/^CURRENT_TIMESTAMP/now()/i if $default_value;
     
         my $column_def;
         $column_def  = $column->name . ' ';
