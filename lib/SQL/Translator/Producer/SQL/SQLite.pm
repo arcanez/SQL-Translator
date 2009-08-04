@@ -1,4 +1,4 @@
-use MooseX:Declare;
+use MooseX::Declare;
 role SQL::Translator::Producer::SQL::SQLite {
     use SQL::Translator::Constants qw(:sqlt_types);
     use SQL::Translator::Types qw(Column Table);
