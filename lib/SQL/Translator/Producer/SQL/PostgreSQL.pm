@@ -12,6 +12,7 @@ role SQL::Translator::Producer::SQL::PostgreSQL {
         SQL_CHAR()        => 'character',
         SQL_VARCHAR()     => 'varchar',
         SQL_BIGINT()      => 'bigint',
+        SQL_FLOAT()       => 'numeric',
     );
     
     method _create_table(Table $table) {
