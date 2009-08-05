@@ -18,7 +18,6 @@ role SQL::Translator::Grammar::SQLite {
 # 02111-1307  USA
 # -------------------------------------------------------------------
 
-#my $GRAMMAR = q!
 method _build_grammar {
 return q!
 { 
