@@ -20,10 +20,8 @@ role SQL::Translator::Parser::DBI::PostgreSQL {
     
     method _column_default_value(HashRef $column_info) {
         my $default_value = $column_info->{COLUMN_DEF};
-    
-        if (defined $default_value) {
-            $default_value =~ s/::.*$//
-        }
+        $default_value =~ s/::.*$// if defined $default_value
+
         return $default_value;
     }
 }
