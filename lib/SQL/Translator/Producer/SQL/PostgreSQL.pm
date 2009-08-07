@@ -3,18 +3,6 @@ role SQL::Translator::Producer::SQL::PostgreSQL {
     use SQL::Translator::Constants qw(:sqlt_types);
     use SQL::Translator::Types qw(Column Index Table);
     
-    my %data_type_mapping = (
-        SQL_LONGVARCHAR() => 'text',
-        SQL_TIMESTAMP()   => 'timestamp',
-        SQL_TYPE_TIMESTAMP() => 'timestamp without time zone',
-        SQL_TYPE_TIMESTAMP_WITH_TIMEZONE() => 'timestamp',
-        SQL_INTEGER()     => 'integer',
-        SQL_CHAR()        => 'character',
-        SQL_VARCHAR()     => 'varchar',
-        SQL_BIGINT()      => 'bigint',
-        SQL_FLOAT()       => 'numeric',
-    );
-    
     method _create_table(Table $table) {
         my $pg_version = 0;
     
@@ -46,8 +34,8 @@ role SQL::Translator::Producer::SQL::PostgreSQL {
     
         my $column_def;
         $column_def  = $column->name . ' ';
-        $column_def .= defined $data_type_mapping{$column->data_type}
-                       ? $data_type_mapping{$column->data_type}
+        $column_def .= defined $self->data_type_mapping->{$column->data_type}
+                       ? $self->data_type_mapping->{$column->data_type}
                        : $column->data_type;
         $column_def .= '(' . $column->size . ')' if $size;
         $column_def .= ' NOT NULL' unless $column->is_nullable;

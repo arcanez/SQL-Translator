@@ -2,15 +2,14 @@ use MooseX::Declare;
 role SQL::Translator::Producer::SQL::SQLite {
     use SQL::Translator::Constants qw(:sqlt_types);
     use SQL::Translator::Types qw(Column Table);
-    
-    my %data_type_mapping = (
-        SQL_LONGVARCHAR() => 'text',
-        SQL_TIMESTAMP()   => 'timestamp',
-        SQL_INTEGER()     => 'integer',
-        SQL_CHAR()        => 'character',
-        SQL_VARCHAR()     => 'varchar',
-        SQL_BIGINT()      => 'integer',
-    );
+
+    around _build_data_type_mapping {
+        my $data_type_mapping = $self->$orig;
+        $data_type_mapping->{SQL_FLOAT()} = 'real';
+        $data_type_mapping->{SQL_BIGINT()} = 'integer';
+
+        return $data_type_mapping;
+    };
     
     method _create_table(Table $table) {
         my $sqlite_version = 0;
@@ -35,8 +34,8 @@ role SQL::Translator::Producer::SQL::SQLite {
     
         my $column_def;
         $column_def  = $column->name . ' ';
-        $column_def .= defined $data_type_mapping{$column->data_type}
-                       ? $data_type_mapping{$column->data_type}
+        $column_def .= defined $self->data_type_mapping->{$column->data_type}
+                       ? $self->data_type_mapping->{$column->data_type}
                        : $column->data_type;
         #$column_def .= '(' . $column->size . ')' if $size;
         $column_def .= ' NOT NULL' unless $column->is_nullable;

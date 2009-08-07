@@ -1,6 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator::Producer {
-    use MooseX::Types::Moose qw(Bool Str);
+    use SQL::Translator::Constants qw(:sqlt_types);
+    use MooseX::Types::Moose qw(Bool HashRef Str);
     use SQL::Translator::Types qw(Column Schema Table);
     
     has 'schema' => (
@@ -22,7 +23,27 @@ class SQL::Translator::Producer {
         lazy => 1,
         default => 1
     );
-    
+
+    has 'data_type_mapping' => (
+        isa => HashRef,
+        is => 'ro',
+        lazy_build => 1
+    );
+
+    method _build_data_type_mapping {
+        return { 
+            SQL_LONGVARCHAR() => 'text',
+            SQL_TIMESTAMP()   => 'timestamp',
+            SQL_TYPE_TIMESTAMP() => 'timestamp without time zone',
+            SQL_TYPE_TIMESTAMP_WITH_TIMEZONE() => 'timestamp',
+            SQL_INTEGER()     => 'integer',
+            SQL_CHAR()        => 'character',
+            SQL_VARCHAR()     => 'varchar',
+            SQL_BIGINT()      => 'bigint',
+            SQL_FLOAT()       => 'numeric',
+        };
+    }
+
     method produce {
         my $schema = $self->schema;
     
