@@ -37,7 +37,7 @@ class SQL::Translator::Producer {
             SQL_TYPE_TIMESTAMP() => 'timestamp without time zone',
             SQL_TYPE_TIMESTAMP_WITH_TIMEZONE() => 'timestamp',
             SQL_INTEGER()     => 'integer',
-            SQL_CHAR()        => 'character',
+            SQL_CHAR()        => 'char',
             SQL_VARCHAR()     => 'varchar',
             SQL_BIGINT()      => 'bigint',
             SQL_FLOAT()       => 'numeric',
