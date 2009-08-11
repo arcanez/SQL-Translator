@@ -1,8 +1,8 @@
 use MooseX::Declare;
 class SQL::Translator::Object::PrimaryKey {
-    extends 'SQL::Translator::Object::Index';
+    extends qw(SQL::Translator::Object::Index SQL::Translator::Object::Constraint);
 
     has '+type' => (
-        default => 'PRIMARY_KEY',
+        default => 'PRIMARY KEY',
     );
 }
