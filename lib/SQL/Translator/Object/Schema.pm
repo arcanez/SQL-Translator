@@ -51,7 +51,7 @@ class SQL::Translator::Object::Schema {
                 }
             }
         },
-        default => sub { {} },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'procedures' => (
