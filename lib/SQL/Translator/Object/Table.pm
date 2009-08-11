@@ -108,4 +108,7 @@ class SQL::Translator::Object::Table {
     );
 
     method get_fields { return $self->get_columns }
+    method primary_key(Str $column) {
+        $self->get_column($column)->is_primary_key(1);
+    }
 }

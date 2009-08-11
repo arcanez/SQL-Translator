@@ -1,7 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Column {
-    use MooseX::Types::Moose qw(Bool HashRef Int Maybe Str);
-    use SQL::Translator::Types qw(Trigger);
+    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Int Maybe Str);
+    use SQL::Translator::Types qw(ColumnSize Constraint Trigger);
     extends 'SQL::Translator::Object';
     
     has 'name' => (
@@ -24,8 +24,9 @@ class SQL::Translator::Object::Column {
     
     has 'size' => (
         is => 'rw',
-        isa => Maybe[Int],
-        required => 1
+        isa => ColumnSize,
+        coerce => 1,
+        auto_deref => 1,
     );
     
     has 'is_nullable' => (
@@ -57,6 +58,17 @@ class SQL::Translator::Object::Column {
         isa => Bool,
         default => 0
     );
+
+    has 'is_foreign_key' => (
+        is => 'rw',
+        isa => Bool,
+        default => 0
+    );
+
+    has 'foreign_key_reference' => (
+         is => 'rw',
+         isa => Constraint,
+    );
     
     has 'trigger' => (
         is => 'rw',
@@ -68,4 +80,11 @@ class SQL::Translator::Object::Column {
         isa => HashRef,
         auto_deref => 1,
     );
+
+    around size(@args) {
+        $self->$orig(@args) if @args;
+        my @sizes = $self->$orig;
+        return wantarray ? @sizes
+                         : join ',', @sizes;
+    }
 }
