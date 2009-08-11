@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Column {
-    use MooseX::Types::Moose qw(Bool Int Maybe Str);
+    use MooseX::Types::Moose qw(Bool HashRef Int Maybe Str);
     use SQL::Translator::Types qw(Trigger);
     extends 'SQL::Translator::Object';
     
@@ -45,9 +45,21 @@ class SQL::Translator::Object::Column {
         is => 'rw',
         isa => Maybe[Str],
     );
+
+    has 'is_primary_key' => (
+        is => 'rw',
+        isa => Bool,
+        default => 0
+    );
     
     has 'trigger' => (
         is => 'rw',
         isa => Trigger,
+    );
+
+    has 'extra' => (
+        is => 'rw',
+        isa => HashRef,
+        auto_deref => 1,
     );
 }
