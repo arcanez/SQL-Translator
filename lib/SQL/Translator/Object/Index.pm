@@ -18,6 +18,7 @@ class SQL::Translator::Object::Index {
         provides => {
             exists => 'exists_column',
             keys   => 'column_ids',
+            values => 'get_columns',
             get    => 'get_column',
         },
         curries => {
@@ -36,4 +37,7 @@ class SQL::Translator::Object::Index {
         isa => Str,
         required => 1
     );
+
+    method get_fields { return $self->get_columns }
+    method fields { return $self->column_ids }
 }
