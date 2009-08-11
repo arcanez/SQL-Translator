@@ -38,15 +38,15 @@ BEGIN {
     my $f1 = shift @fields;
     my $f2 = shift @fields;
     is( $f1->name, 'id', 'First field name is "id"' );
-    is( $f1->data_type, SQL_CHAR(), 'Type is "char"' );
+    is( $f1->data_type, 'char', 'Type is "char"' );
     is( $f1->size, 32, 'Size is "32"' );
     is( $f1->is_nullable, 0, 'Field cannot be null' );
     is( $f1->default_value, '0', 'Default value is "0"' );
     is( $f1->is_primary_key, 1, 'Field is PK' );
 
     is( $f2->name, 'a_session', 'Second field name is "a_session"' );
-    is( $f2->data_type, SQL_LONGVARCHAR(), 'Type is "text"' );
-    is( $f2->size, undef, 'Size is "65,535"' );
+    is( $f2->data_type, 'text', 'Type is "text"' );
+    is( $f2->size, 65_535, 'Size is "65,535"' );
     is( $f2->is_nullable, 1, 'Field can be null' );
     is( $f2->default_value, undef, 'Default value is undefined' );
     is( $f2->is_primary_key, 0, 'Field is not PK' );
@@ -59,9 +59,9 @@ BEGIN {
 
     my @constraints = $table->get_constraints;
     is( scalar @constraints, 2, 'Right number of constraints (2)' );
-    my $c = shift @constraints;
-    is( $c->type, PRIMARY_KEY, 'Constraint is a PK' );
-    is( join(',', $c->fields), 'id', 'Constraint is on "id"' );
+    my $c1 = shift @constraints;
+    is( $c1->type, PRIMARY_KEY, 'Constraint is a PK' );
+    is( join(',', $c1->fields), 'id', 'Constraint is on "id"' );
     my $c2 = shift @constraints;
     is( $c2->type, UNIQUE, 'Constraint is UNIQUE' );
     is( join(',', $c2->fields), 'ssn', 'Constraint is on "ssn"' );
@@ -86,7 +86,7 @@ BEGIN {
               KEY (i1),
               UNIQUE (date, i1),
               KEY date_idx (date),
-              KEY name_idx (name)
+              KEY name_idx (name(10))
             ) TYPE=MyISAM PACK_KEYS=1;
         ]
     );
@@ -102,7 +102,7 @@ BEGIN {
     is( scalar @fields, 10, 'Right number of fields (10)' );
     my $f1 = shift @fields;
     is( $f1->name, 'check_id', 'First field name is "check_id"' );
-    is( $f1->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f1->data_type, 'int', 'Type is "int"' );
     is( $f1->size, 7, 'Size is "7"' );
     is( $f1->is_nullable, 0, 'Field cannot be null' );
     is( $f1->default_value, '0000000', 'Default value is "0000000"' );
@@ -130,7 +130,7 @@ BEGIN {
 
     my $f4 = shift @fields;
     is( $f4->name, 'i1', 'Fourth field name is "i1"' );
-    is( $f4->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f4->data_type, 'int', 'Type is "int"' );
     is( $f4->size, 11, 'Size is "11"' );
     is( $f4->is_nullable, 0, 'Field cannot be null' );
     is( $f4->default_value, '0', 'Default value is "0"' );
@@ -273,7 +273,7 @@ BEGIN {
 
     my $f1 = shift @fields;
     is( $f1->name, 'order_id', 'First field name is "order_id"' );
-    is( $f1->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f1->data_type, 'int', 'Type is "int"' );
     is( $f1->size, 11, 'Size is "11"' );
     is( $f1->is_nullable, 0, 'Field cannot be null' );
     is( $f1->default_value, undef, 'Default value is undefined' );
@@ -291,18 +291,18 @@ BEGIN {
     my $f3 = shift @fields;
     is( $f3->name, 'billing_address_id', 
         'Third field name is "billing_address_id"' );
-    is( $f3->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f3->data_type, 'int', 'Type is "int"' );
     is( $f3->size, 11, 'Size is "11"' );
 
     my $f4 = shift @fields;
     is( $f4->name, 'shipping_address_id', 
         'Fourth field name is "shipping_address_id"' );
-    is( $f4->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f4->data_type, 'int', 'Type is "int"' );
     is( $f4->size, 11, 'Size is "11"' );
 
     my $f5 = shift @fields;
     is( $f5->name, 'credit_card_id', 'Fifth field name is "credit_card_id"' );
-    is( $f5->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f5->data_type, 'int', 'Type is "int"' );
     is( $f5->size, 11, 'Size is "11"' );
 
     my $f6 = shift @fields;
@@ -736,7 +736,7 @@ ok ($@, 'Exception thrown on invalid version string');
     my $f1 = shift @fields;
     my $f2 = shift @fields;
     is( $f1->name, 'id', 'First field name is "id"' );
-    is( $f1->data_type, SQL_INTEGER(), 'Type is "int"' );
+    is( $f1->data_type, 'int', 'Type is "int"' );
     is( $f1->size, 11, 'Size is "11"' );
     is( $f1->is_nullable, 0, 'Field cannot be null' );
     is( $f1->is_primary_key, 1, 'Field is PK' );
@@ -799,7 +799,7 @@ ok ($@, 'Exception thrown on invalid version string');
         my @fields = $table->get_fields;
         my $f1 = shift @fields;
         is( $f1->name, 'id', 'First field name is "id"' );
-        is( $f1->data_type, SQL_INTEGER(), 'Type is "int"' );
+        is( $f1->data_type, 'int', 'Type is "int"' );
         is( $f1->size, 11, 'Size is "11"' );
         is( $f1->is_nullable, 0, 'Field cannot be null' );
         is( $f1->is_primary_key, 1, 'Field is PK' );
