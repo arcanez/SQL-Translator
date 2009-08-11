@@ -19,6 +19,7 @@ class SQL::Translator::Object::Schema {
         provides => {
             exists => 'exists_table',
             keys   => 'table_ids',
+            values => 'get_tables',
             get    => 'get_table',
         },
         curries => {
@@ -29,7 +30,7 @@ class SQL::Translator::Object::Schema {
                 }
             }
         },
-        default => sub { {} },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'views' => (
@@ -39,6 +40,7 @@ class SQL::Translator::Object::Schema {
         provides => {
             exists => 'exists_view',
             keys   => 'view_ids',
+            values => 'get_views',
             get    => 'get_view',
         },
         curries => {
@@ -59,6 +61,7 @@ class SQL::Translator::Object::Schema {
         provides => {
             exists => 'exists_procedure',
             keys   => 'procedure_ids',
+            values => 'get_procedures',
             get    => 'get_procedure',
         },
         curries => {
@@ -71,4 +74,6 @@ class SQL::Translator::Object::Schema {
         },
         default => sub { {} },
     );
+
+    method is_valid { 1 }
 }
