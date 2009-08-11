@@ -19,6 +19,7 @@ class SQL::Translator::Object::Table {
         provides => {
             exists => 'exists_column',
             keys   => 'column_ids',
+            values => 'get_columns',
             get    => 'get_column',
         },
         curries => {
@@ -39,6 +40,7 @@ class SQL::Translator::Object::Table {
         provides => {
             exists => 'exists_index',
             keys   => 'index_ids',
+            values => 'get_indices',
             get    => 'get_index',
         },
         curries => {
@@ -59,6 +61,7 @@ class SQL::Translator::Object::Table {
         provides => {
             exists => 'exists_constraint',
             keys   => 'constraint_ids',
+            values => 'get_constraints',
             get    => 'get_constraint',
         },
         curries => {
@@ -69,7 +72,7 @@ class SQL::Translator::Object::Table {
                 }
             }
         },
-        default => sub { {} },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'sequences' => (
@@ -79,6 +82,7 @@ class SQL::Translator::Object::Table {
         provides => {
             exists => 'exists_sequence',
             keys   => 'sequence_ids',
+            values => 'get_sequences',
             get    => 'get_sequence',
         },
         curries => {
@@ -102,4 +106,6 @@ class SQL::Translator::Object::Table {
         isa => Bool,
         default => 0
     );
+
+    method get_fields { return $self->get_columns }
 }
