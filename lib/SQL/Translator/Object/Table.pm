@@ -51,7 +51,7 @@ class SQL::Translator::Object::Table {
                 }
             }
         },
-        default => sub { {} },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'constraints' => (
@@ -93,7 +93,7 @@ class SQL::Translator::Object::Table {
                 }
             }
         },
-        default => sub { {} },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
     has 'comments' => (
