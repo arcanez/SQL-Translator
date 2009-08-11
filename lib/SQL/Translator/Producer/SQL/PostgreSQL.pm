@@ -34,8 +34,8 @@ role SQL::Translator::Producer::SQL::PostgreSQL {
     
         my $column_def;
         $column_def  = $column->name . ' ';
-        $column_def .= defined $self->data_type_mapping->{$column->data_type}
-                       ? $self->data_type_mapping->{$column->data_type}
+        $column_def .= defined $self->data_type_mapping->{$column->sql_data_type}
+                       ? $self->data_type_mapping->{$column->sql_data_type}
                        : $column->data_type;
         $column_def .= '(' . $column->size . ')' if $size;
         $column_def .= ' NOT NULL' unless $column->is_nullable;

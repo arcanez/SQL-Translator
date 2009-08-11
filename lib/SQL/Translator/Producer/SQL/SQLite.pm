@@ -28,14 +28,14 @@ role SQL::Translator::Producer::SQL::SQLite {
     }
     
     method _create_column(Column $column) {
-        my $size = $column->data_type == SQL_TIMESTAMP() ? undef : $column->size;
+        my $size = $column->sql_data_type == SQL_TIMESTAMP() ? undef : $column->size;
         my $default_value = $column->default_value;
         $default_value =~ s/^now[()]*/CURRENT_TIMESTAMP/i if $default_value;
     
         my $column_def;
         $column_def  = $column->name . ' ';
-        $column_def .= defined $self->data_type_mapping->{$column->data_type}
-                       ? $self->data_type_mapping->{$column->data_type}
+        $column_def .= defined $self->data_type_mapping->{$column->sql_data_type}
+                       ? $self->data_type_mapping->{$column->sql_data_type}
                        : $column->data_type;
         #$column_def .= '(' . $column->size . ')' if $size;
         $column_def .= ' NOT NULL' unless $column->is_nullable;
