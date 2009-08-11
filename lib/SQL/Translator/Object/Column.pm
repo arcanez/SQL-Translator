@@ -12,6 +12,12 @@ class SQL::Translator::Object::Column {
     
     has 'data_type' => (
         is => 'rw',
+        isa => Str,
+        required => 1
+    );
+
+    has 'sql_data_type' => (
+        is => 'rw',
         isa => Int,
         required => 1
     );
@@ -29,13 +35,6 @@ class SQL::Translator::Object::Column {
         default => 1
     );
     
-    has 'is_auto_increment' => (
-        is => 'rw',
-        isa => Bool,
-        required => 1,
-        default => 0
-    );
-    
     has 'default_value' => (
         is => 'rw',
         isa => Maybe[Str],
@@ -44,6 +43,13 @@ class SQL::Translator::Object::Column {
     has 'comments' => (
         is => 'rw',
         isa => Maybe[Str],
+    );
+
+    has 'is_auto_increment' => (
+        is => 'rw',
+        isa => Bool,
+        required => 1,
+        default => 0
     );
 
     has 'is_primary_key' => (
