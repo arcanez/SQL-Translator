@@ -2,13 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Producer {
     use SQL::Translator::Constants qw(:sqlt_types);
     use MooseX::Types::Moose qw(Bool HashRef Str);
-    use SQL::Translator::Types qw(Column Schema Table);
-    
-    has 'schema' => (
-        isa => Schema,
-        is => 'rw',
-        required => 1
-    );
+    use SQL::Translator::Types qw(Column Table Translator);
     
     has 'no_comments' => (
         isa => Bool,
@@ -30,6 +24,14 @@ class SQL::Translator::Producer {
         lazy_build => 1
     );
 
+    has 'translator' => (
+        isa => Translator,
+        is => 'ro',
+        weak_ref => 1,
+        required => 1,
+        handles => [ qw(schema) ],
+    );
+
     method _build_data_type_mapping {
         return { 
             SQL_LONGVARCHAR() => 'text',
@@ -46,7 +48,7 @@ class SQL::Translator::Producer {
 
     method produce {
         my $schema = $self->schema;
-    
+
         $self->_create_table($_) for values %{$schema->tables};
     }
     
