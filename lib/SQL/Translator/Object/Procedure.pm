@@ -12,7 +12,7 @@ class SQL::Translator::Object::Procedure {
         required => 1
     );
     
-    has 'contents ' => (
+    has 'sql ' => (
         is => 'rw',
         isa => Str,
     );
