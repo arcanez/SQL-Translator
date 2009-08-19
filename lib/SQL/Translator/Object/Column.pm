@@ -87,4 +87,7 @@ class SQL::Translator::Object::Column {
         return wantarray ? @sizes
                          : join ',', @sizes;
     }
+
+    method order { }
+    method is_unique { }
 }

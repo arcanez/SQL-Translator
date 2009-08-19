@@ -97,4 +97,12 @@ class SQL::Translator::Object::Schema {
     );
 
     method is_valid { 1 }
+
+    method order { }
+    method perform_action_when { }
+    method database_events { }
+    method fields { }
+    method on_table { }
+    method action { }
+    method extra { }
 }

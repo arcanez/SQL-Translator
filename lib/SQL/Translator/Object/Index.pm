@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Index {
-    use MooseX::Types::Moose qw(HashRef Str);
+    use MooseX::Types::Moose qw(ArrayRef HashRef Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column);
     extends 'SQL::Translator::Object';
@@ -36,6 +36,18 @@ class SQL::Translator::Object::Index {
         is => 'rw',
         isa => Str,
         required => 1
+    );
+
+    has 'options' => (
+        is => 'rw',
+        isa => ArrayRef,
+        auto_deref => 1
+    );
+
+    has 'extra' => (
+        is => 'rw',
+        isa => HashRef,
+        auto_deref => 1,
     );
 
     method get_fields { return $self->get_columns }

@@ -36,4 +36,7 @@ class SQL::Translator::Object::View {
         isa => Str,
         required => 1
     );
+
+    method get_fields { return $self->get_columns }
+    method fields { return $self->column_ids }
 }

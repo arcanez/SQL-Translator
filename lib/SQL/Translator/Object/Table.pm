@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Table {
-    use MooseX::Types::Moose qw(Bool HashRef Maybe Str);
+    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
     use SQL::Translator::Object::Schema;
@@ -107,8 +107,17 @@ class SQL::Translator::Object::Table {
         default => 0
     );
 
+    has 'options' => (
+        is => 'rw',
+        isa => ArrayRef,
+        auto_deref => 1
+    );
+
     method get_fields { return $self->get_columns }
+    method fields { return $self->column_ids }
     method primary_key(Str $column) {
         $self->get_column($column)->is_primary_key(1);
     }
+
+    method order { }
 }

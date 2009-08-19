@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Constraint {
-    use MooseX::Types::Moose qw(HashRef Maybe Str);
+    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column);
     extends 'SQL::Translator::Object';
@@ -38,6 +38,32 @@ class SQL::Translator::Object::Constraint {
         required => 1
     );
 
+    has 'deferrable' => (
+        is => 'rw',
+        isa => Bool,
+        default => 0
+    );
+
+    has 'expression' => (
+        is => 'rw',
+        isa => Str,
+    );
+
+    has 'options' => (
+        is => 'rw',
+        isa => ArrayRef,
+        auto_deref => 1
+    );
+
+    has 'extra' => (
+        is => 'rw',
+        isa => HashRef,
+        auto_deref => 1,
+    );
+
     method get_fields { return $self->get_columns }
     method fields { return $self->column_ids }
+    method field_names { return $self->column_ids }
+
+    method match_type { }
 }
