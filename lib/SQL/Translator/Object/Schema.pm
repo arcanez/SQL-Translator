@@ -2,9 +2,9 @@ use MooseX::Declare;
 class SQL::Translator::Object::Schema {
     use MooseX::Types::Moose qw(HashRef Maybe Str);
     use MooseX::AttributeHelpers;
-    use SQL::Translator::Types qw(Procedure Table View);
+    use SQL::Translator::Types qw(Procedure Table Trigger View);
     extends 'SQL::Translator::Object';
-    
+ 
     has 'name' => (
         is => 'rw',
         isa => Maybe[Str],
@@ -72,7 +72,28 @@ class SQL::Translator::Object::Schema {
                 }
             }
         },
-        default => sub { {} },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+    );
+
+    has 'triggers' => (
+        metaclass => 'Collection::Hash',
+        is => 'rw',
+        isa => HashRef[Trigger],
+        provides => {
+            exists => 'exists_trigger',
+            keys   => 'trigger_ids',
+            values => 'get_triggers',
+            get    => 'get_trigger',
+        },
+        curries => {
+            set => {
+                add_trigger => sub {
+                    my ($self, $body, $trigger) = @_;
+                    $self->$body($trigger->name, $trigger);
+                }
+            }
+        },
+        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
     method is_valid { 1 }
