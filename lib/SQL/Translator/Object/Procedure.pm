@@ -2,9 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Object::Procedure {
     use namespace::autoclean;
     use Moose;
-    use MooseX::Types::Moose qw(HashRef Int Maybe Str);
-    use MooseX::AttributeHelpers;
-    use SQL::Translator::Types qw();
+    use MooseX::Types::Moose qw(ArrayRef Int Maybe Str);
     use aliased 'SQL::Translator::Object::Schema';
     extends 'SQL::Translator::Object';
     
@@ -14,22 +12,14 @@ class SQL::Translator::Object::Procedure {
         required => 1
     );
     
-    has 'contents' => (
+    has 'contents ' => (
         is => 'rw',
         isa => Str,
-        required => 1
     );
     
     has 'parameters' => (
-        metaclass => 'Collection::Hash',
         is => 'rw',
-        isa => Maybe[HashRef[Int|Str]],
-        provides => {
-            exists => 'exists_parameter',
-            keys   => 'parameter_ids',
-            get    => 'get_parameter',
-            set    => 'set_parameter',
-        },
+        isa => ArrayRef,
     );
     
     has 'owner' => (
