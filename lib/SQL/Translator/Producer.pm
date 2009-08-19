@@ -4,20 +4,6 @@ class SQL::Translator::Producer {
     use MooseX::Types::Moose qw(Bool HashRef Str);
     use SQL::Translator::Types qw(Column Table Translator);
     
-    has 'no_comments' => (
-        isa => Bool,
-        is => 'rw',
-        lazy => 1, 
-        default => 0
-    );
-    
-    has 'drop_table' => (
-        isa => Bool,
-        is => 'rw',
-        lazy => 1,
-        default => 1
-    );
-
     has 'data_type_mapping' => (
         isa => HashRef,
         is => 'ro',
