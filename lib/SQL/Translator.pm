@@ -1,21 +1,20 @@
 use MooseX::Declare;
 class SQL::Translator {
-    use MooseX::Types::Moose qw(Str);
     use TryCatch;
-    use SQL::Translator::Types qw(DBIHandle Parser Producer);
-    
+    use MooseX::Types::Moose qw(Bool HashRef Str);
+    use SQL::Translator::Types qw(DBIHandle Parser Producer Schema);
+    use SQL::Translator::Object::Schema;
+
     has 'parser' => (
         isa => Str,
-        is => 'ro',
+        is => 'rw',
         init_arg => 'from',
-        required => 1,
     );
     
     has 'producer' => (
         isa => Str,
-        is => 'ro',
+        is => 'rw',
         init_arg => 'to',
-        required => 1,
     );
     
     has '_parser' => (
@@ -37,13 +36,30 @@ class SQL::Translator {
         is => 'ro',
         predicate => 'has_dbh',
     );
-    
-    has 'filename' => (
-        isa => Str,
-        is => 'ro',
-        predicate => 'has_ddl',
+
+    has 'schema' => (
+        isa => Schema,
+        is => 'rw',
+        default => sub { SQL::Translator::Object::Schema->new }
+    );
+
+    has 'parser_args' => (
+        isa => HashRef,
+        is => 'rw',
+    );
+
+    has 'producer_args' => (
+        isa => HashRef,
+        is => 'rw',
     );
     
+    has 'add_drop_table' => (isa => Bool, is => 'rw', default => 0);
+    has 'no_comments' => (isa => Bool, is => 'rw', default => 0);
+    has 'show_warnings' => (isa => Bool, is => 'rw', default => 1);
+    has 'trace' => (isa => Bool, is => 'rw', default => 0);
+    has 'version' => (isa => Str, is => 'rw');
+    has 'filename' => (isa => Str, is => 'rw');
+
     method _build__parser {
         my $class = 'SQL::Translator::Parser';
     
@@ -51,11 +67,9 @@ class SQL::Translator {
     
         my $parser;
         if ($self->has_dbh) {
-            $parser = $class->new({ dbh => $self->dbh });
-        } elsif ($self->has_ddl) {
-            $parser = $class->new({ filename => $self->filename, type => $self->parser });
+            $parser = $class->new({ translator => $self, dbh => $self->dbh });
         } else {
-            die "dbh or filename is required!";
+            $parser = $class->new({ translator => $self, type => $self->parser || '' });
         }
     
         return $parser;
@@ -66,11 +80,27 @@ class SQL::Translator {
         my $role = $class . '::' . $self->producer;
     
         Class::MOP::load_class($class);
-        try { Class::MOP::load_class($role) } catch ($e) { $role = $class . '::SQL::' . $self->producer; Class::MOP::load_class($role) }
+        try { Class::MOP::load_class($role) } catch ($e) { warn "ERROR: $e"; $role = $class . '::SQL::' . $self->producer; Class::MOP::load_class($role) }
     
-        my $producer = $class->new({ schema => $self->parse });
+        my $producer = $class->new({ translator => $self });
         $role->meta->apply($producer);
     
         return $producer;
     }
+
+    method translate(:$data, :$producer?, :$producer_args?, :$parser?, :$parser_args?) {
+        if ($parser) {
+            $self->_clear_parser;
+            $self->parser($parser);
+            $self->schema($self->parse($data));
+        } elsif ($producer) {
+            $self->_clear_producer;
+            $self->schema($self->parse($data)) if $data;
+            $self->producer($producer);
+            return $self->produce;
+        }
+    }
+
+    method parser_type { return $self->parser }
+    method producer_type { return $self->producer }
 } 
