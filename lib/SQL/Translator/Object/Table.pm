@@ -21,14 +21,7 @@ class SQL::Translator::Object::Table {
             keys   => 'column_ids',
             values => 'get_columns',
             get    => 'get_column',
-        },
-        curries => {
-            set => {
-                add_column => sub {
-                    my ($self, $body, $column) = @_;
-                    $self->$body($column->name, $column);
-                }
-            }
+            set    => 'add_column',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -42,14 +35,7 @@ class SQL::Translator::Object::Table {
             keys   => 'index_ids',
             values => 'get_indices',
             get    => 'get_index',
-        },
-        curries => {
-            set => {
-                add_index => sub {
-                    my ($self, $body, $index) = @_;
-                    $self->$body($index->name, $index);
-                }
-            }
+            set    => 'add_index',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -63,14 +49,7 @@ class SQL::Translator::Object::Table {
             keys   => 'constraint_ids',
             values => 'get_constraints',
             get    => 'get_constraint',
-        },
-        curries => {
-            set => {
-                add_constraint => sub {
-                    my ($self, $body, $constraint) = @_;
-                    $self->$body($constraint->name, $constraint);
-                }
-            }
+            set    => 'add_constraint',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -84,14 +63,7 @@ class SQL::Translator::Object::Table {
             keys   => 'sequence_ids',
             values => 'get_sequences',
             get    => 'get_sequence',
-        },
-        curries => {
-            set => {
-                add_sequence => sub {
-                    my ($self, $body, $sequence) = @_;
-                    $self->$body($sequence->name, $sequence);
-                }
-            }
+            set    => 'add_sequence',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -112,6 +84,11 @@ class SQL::Translator::Object::Table {
         isa => ArrayRef,
         auto_deref => 1
     );
+
+    around add_column(Column $column) { $self->$orig($column->name, $column) }
+    around add_index(Index $index) { $self->$orig($index->name, $index) }
+    around add_constraint(Constraint $constraint) { $self->$orig($constraint->name, $constraint) }
+    around add_sequence(Sequence $sequence) { $self->$orig($sequence->name, $sequence) }
 
     method get_fields { return $self->get_columns }
     method fields { return $self->column_ids }

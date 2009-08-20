@@ -21,14 +21,7 @@ class SQL::Translator::Object::Schema {
             keys   => 'table_ids',
             values => 'get_tables',
             get    => 'get_table',
-        },
-        curries => {
-            set => {
-                add_table => sub {
-                    my ($self, $body, $table) = @_;
-                    $self->$body($table->name, $table);
-                }
-            }
+            set    => 'add_table',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -42,14 +35,7 @@ class SQL::Translator::Object::Schema {
             keys   => 'view_ids',
             values => 'get_views',
             get    => 'get_view',
-        },
-        curries => {
-            set => { 
-                add_view => sub {
-                    my ($self, $body, $view) = @_;
-                    $self->$body($view->name, $view);
-                }
-            }
+            set    => 'add_view',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -63,14 +49,7 @@ class SQL::Translator::Object::Schema {
             keys   => 'procedure_ids',
             values => 'get_procedures',
             get    => 'get_procedure',
-        },
-        curries => {
-            set => {
-                add_procedure => sub {
-                    my ($self, $body, $procedure) = @_;
-                    $self->$body($procedure->name, $procedure);
-                }
-            }
+            set    => 'add_procedure',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -84,17 +63,15 @@ class SQL::Translator::Object::Schema {
             keys   => 'trigger_ids',
             values => 'get_triggers',
             get    => 'get_trigger',
-        },
-        curries => {
-            set => {
-                add_trigger => sub {
-                    my ($self, $body, $trigger) = @_;
-                    $self->$body($trigger->name, $trigger);
-                }
-            }
+            set    => 'add_trigger',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
+
+    around add_table(Table $table) { $self->$orig($table->name, $table) }
+    around add_view(View $view) { $self->$orig($view->name, $view) }
+    around add_procedure(Procedure $procedure) { $self->$orig($procedure->name, $procedure) }
+    around add_trigger(Trigger $trigger) { $self->$orig($trigger->name, $trigger) }
 
     method is_valid { 1 }
 

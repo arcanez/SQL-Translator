@@ -20,14 +20,7 @@ class SQL::Translator::Object::Constraint {
             keys   => 'column_ids',
             values => 'get_columns',
             get    => 'get_column',
-        },
-        curries => {
-            set => {
-                add_column => sub {
-                    my ($self, $body, $column) = @_;
-                    $self->$body($column->name, $column);
-                }
-            }
+            set    => 'add_column',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -60,6 +53,8 @@ class SQL::Translator::Object::Constraint {
         isa => HashRef,
         auto_deref => 1,
     );
+
+    around add_column(Column $column) { $self->$orig($column->name, $column) }
 
     method get_fields { return $self->get_columns }
     method fields { return $self->column_ids }
