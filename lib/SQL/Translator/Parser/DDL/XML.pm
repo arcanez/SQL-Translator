@@ -3,8 +3,8 @@ role SQL::Translator::Parser::DDL::XML {
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 
-sub parse {
-    my ( $translator, $data ) = @_;
+method parse {
+    my $translator = $self->translator;
     my $schema                = $translator->schema;
     local $DEBUG              = $translator->debug;
     my $doc                   = XML::LibXML->new->parse_string($data);
