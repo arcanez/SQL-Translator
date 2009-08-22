@@ -49,6 +49,17 @@ class SQL::Translator::Object::Constraint {
         isa => Str,
     );
 
+    has 'reference_table' => (
+        isa => Maybe[Str],
+        is => 'rw',
+    );
+
+    has 'reference_columns' => (
+         isa => ArrayRef | Undef,
+         is => 'rw',
+         auto_deref => 1
+    );
+
     has 'options' => (
         is => 'rw',
         isa => ArrayRef,

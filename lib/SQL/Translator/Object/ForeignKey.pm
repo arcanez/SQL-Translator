@@ -7,12 +7,6 @@ class SQL::Translator::Object::ForeignKey {
         default => 'FOREIGN KEY',
     );
     
-    has 'reference_columns' => (
-         isa => ArrayRef | Undef,
-         is => 'rw',
-         auto_deref => 1
-    );
-
     has 'on_delete' => (
         isa => Maybe[Str],
         is => 'rw',
@@ -27,6 +21,4 @@ class SQL::Translator::Object::ForeignKey {
         isa => Str,
         is => 'rw',
     );
-
-    method reference_fields { return $self->reference_columns }
 }
