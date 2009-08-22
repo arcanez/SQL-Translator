@@ -53,9 +53,9 @@ role SQL::Translator::Parser::DBI {
 
     method _is_auto_increment(HashRef $column_info) { 0 }
 
-    method _column_default_value(HashRef $column_info) { return $column_info->{COLUMN_DEF}; }
+    method _column_default_value(HashRef $column_info) { $column_info->{COLUMN_DEF} }
 
-    method _column_data_type(HashRef $column_info) { return $column_info->{DATA_TYPE}; }
+    method _column_data_type(HashRef $column_info) { $column_info->{DATA_TYPE} }
 
     method _add_tables(Schema $schema) {
         my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', "TABLE,VIEW,'LOCAL TEMPORARY','GLOBAL TEMPORARY'");
