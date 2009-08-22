@@ -8,7 +8,7 @@ use Test::Differences;
 use FindBin qw/$Bin/;
 
 use SQL::Translator;
-$Carp::Internal{'MooseX::Method::Signatures::Meta::Method'} = 1;
+
 ### Set $ENV{SQLTTEST_RT_DEBUG} = 1 for more output
 
 # What tests to run - parser/producer name, and optional args
@@ -42,11 +42,11 @@ my $plan = [
 #    producer_args => { mysql_version => '5.1' },
 #    parser_args => { mysql_parser_version => '5.1' },
 #  },
-#  {
-#    engine => 'PostgreSQL',
-#    producer_args => {},
-#    parser_args => {},
-#  },
+  {
+    engine => 'PostgreSQL',
+    producer_args => {},
+    parser_args => {},
+  },
 #  {
 #    engine => 'SQLServer',
 #    producer_args => {},
@@ -87,9 +87,9 @@ my $base_file = "$Bin/data/roundtrip_autogen.yaml";
 open (my $base_fh, '<', $base_file) or die "$base_file: $!";
 
 my $base_t = SQL::Translator->new;
-#$base_t->$_ (1) for qw/add_drop_table no_comments/;
+$base_t->$_ (1) for qw/add_drop_table no_comments/;
 
-my $base_schema = $base_t->translate (
+my $base_schema = $base_t->translate(
   parser => 'YAML',
   data => do { local $/; <$base_fh>; },
 ) or die $base_t->error;
@@ -106,7 +106,7 @@ for my $args (@$plan) {
     $args->{name} ||= $args->{engine};
 
     my @req = ref $args->{req} ? @{$args->{req}} : $args->{req}||();
-    my @missing;
+    my @missing; 
     for (@req) {
       eval "require $_";
       push @missing, $_ if ($@);
@@ -138,7 +138,7 @@ sub check_roundtrip {
   my ($args, $base_t, $base_schema) = @_;
 
 # create some output from the submitted schema
-  my $base_out = $base_t->translate (
+  my $base_out = $base_t->translate(
     data => $base_schema,
     producer => $args->{engine},
 #    producer_args => $args->{producer_args},
@@ -154,14 +154,14 @@ sub check_roundtrip {
   };
 
 # parse the sql back
-  my $parser_t = SQL::Translator->new({ parser => 'YAML' });
-  #$parser_t->$_ (1) for qw/add_drop_table no_comments/;
+  my $parser_t = SQL::Translator->new; #({ parser => $args->{engine} });
+  $parser_t->$_ (1) for qw/add_drop_table no_comments/;
   my $mid_schema = $parser_t->translate (
     data => $base_out,
     parser => $args->{engine},
 #    parser_args => $args->{parser_args},
   );
-warn "MID SCHEMA FIRST (PRODUCED) BASE SCHEMA SECOND (PARSED)";
+
   isa_ok ($mid_schema, 'SQL::Translator::Object::Schema', "First $args->{name} parser pass produced a schema:")
     or do {
       diag (_gen_diag ( $parser_t->error, $base_out ) );
@@ -216,7 +216,7 @@ sub _get_table_info {
 
   my @info;
 
-  for my $t (@tables) {  warn $t->name . "\t" . (join ', ', map { $_->name } $t->get_fields) . "\n";
+  for my $t (@tables) {
     push @info, {
       name => $t->name,
       fields => [
