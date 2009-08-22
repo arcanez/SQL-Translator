@@ -31,8 +31,14 @@ class SQL::Translator::Object::View {
         required => 1
     );
 
+    has 'extra' => (
+        is => 'rw',
+        isa => HashRef,
+        auto_deref => 1,
+    );
+
     around add_column(Column $column) { $self->$orig($column->name, $column) }
 
-    method get_fields { return $self->get_columns }
-    method fields { return $self->column_ids }
+    method get_fields { $self->get_columns }
+    method fields { $self->column_ids }
 }

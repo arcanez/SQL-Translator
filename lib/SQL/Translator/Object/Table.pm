@@ -1,7 +1,8 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Table {
-    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str);
+    use MooseX::Types::Moose qw(Any ArrayRef Bool HashRef Maybe Str);
     use MooseX::AttributeHelpers;
+    use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
     use SQL::Translator::Object::Schema;
     extends 'SQL::Translator::Object';
@@ -80,16 +81,22 @@ class SQL::Translator::Object::Table {
         auto_deref => 1
     );
 
+    has 'extra' => (
+        is => 'rw',
+        isa => HashRef,
+        auto_deref => 1,
+    );
+
     around add_column(Column $column) { $self->$orig($column->name, $column) }
     around add_index(Index $index) { $self->$orig($index->name, $index) }
     around add_constraint(Constraint $constraint) { $self->$orig($constraint->name, $constraint) }
     around add_sequence(Sequence $sequence) { $self->$orig($sequence->name, $sequence) }
 
-    method get_fields { return $self->get_columns }
-    method fields { return $self->column_ids }
-    method primary_key(Str $column) {
-        $self->get_column($column)->is_primary_key(1);
-    }
+    method get_fields { $self->get_columns }
+    method fields { $self->column_ids }
+
+    multi method primary_key(Any $) { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
+    multi method primary_key(Str $column) { $self->get_column($column)->is_primary_key(1) }
 
     method order { }
 }
