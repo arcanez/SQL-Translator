@@ -12,7 +12,7 @@ role SQL::Translator::Parser::DDL::YAML {
     use YAML qw(Load);
     use MooseX::MultiMethods;
 
-    multi method parse(Schema $data) { return $data }
+    multi method parse(Schema $data) { $data }
 
     multi method parse(Str $data) {
         $data = Load($data);
@@ -40,6 +40,7 @@ role SQL::Translator::Parser::DDL::YAML {
     
             for my $fdata ( @fields ) {
                 $fdata->{sql_data_type} = $self->data_type_mapping->{$fdata->{data_type}} || -99999;
+                $fdata->{table} = $table;
 
                 my $column = Column->new($fdata);
                 $table->add_column($column);
@@ -47,11 +48,13 @@ role SQL::Translator::Parser::DDL::YAML {
             }
     
             for my $idata ( @{ $tdata->{'indices'} || [] } ) {
+                 $idata->{table} = $table;
                  my $index = Index->new($idata);
                  $table->add_index($index);
             }
     
             for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
+                 $cdata->{table} = $table;
                  my $constraint = Constraint->new($cdata);
                  $table->add_constraint($constraint);
             }
