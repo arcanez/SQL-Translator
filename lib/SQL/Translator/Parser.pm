@@ -1,8 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator::Parser {
-    use MooseX::Types::Moose qw(Str);
-    use SQL::Translator::Types qw(DBIHandle);
-    use aliased 'SQL::Translator::Object::Schema';
+    use MooseX::Types::Moose qw(Maybe Str);
+    use SQL::Translator::Types qw(DBIHandle Translator);
 
     has 'dbh' => (
         isa => DBIHandle,
@@ -17,9 +16,17 @@ class SQL::Translator::Parser {
     );
 
     has 'type' => (
-        isa => Str,
+        isa => Maybe[Str],
         is => 'ro',
         predicate => 'has_type',
+    );
+
+    has 'translator' => (
+        isa => Translator,
+        is => 'ro',
+        weak_ref => 1,
+        required => 1,
+        handles => [ qw(schema) ],
     );
 
     method BUILD(@) {
