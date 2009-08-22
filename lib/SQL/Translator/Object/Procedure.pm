@@ -1,9 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Procedure {
-    use namespace::autoclean;
-    use Moose;
     use MooseX::Types::Moose qw(ArrayRef Int Str);
-    use aliased 'SQL::Translator::Object::Schema';
     extends 'SQL::Translator::Object';
     
     has 'name' => (
