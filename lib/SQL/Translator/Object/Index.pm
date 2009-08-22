@@ -52,6 +52,6 @@ class SQL::Translator::Object::Index {
 
     around add_column(Column $column) { $self->$orig($column->name, $column) }
 
-    method get_fields { return $self->get_columns }
-    method fields { return $self->column_ids }
+    method get_fields { $self->get_columns }
+    method fields { $self->column_ids }
 }
