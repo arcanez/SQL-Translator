@@ -80,9 +80,14 @@ class SQL::Translator {
     method _build__producer {
         my $class = 'SQL::Translator::Producer';
         my $role = $class . '::' . $self->producer;
-    
+
         Class::MOP::load_class($class);
-        try { Class::MOP::load_class($role) } catch ($e) { warn "ERROR: $e"; $role = $class . '::SQL::' . $self->producer; Class::MOP::load_class($role) }
+        try {
+            Class::MOP::load_class($role)
+        } catch ($e) {
+            $role = $class . '::SQL::' . $self->producer;
+            Class::MOP::load_class($role)
+        }
     
         my $producer = $class->new({ translator => $self });
         $role->meta->apply($producer);
@@ -94,12 +99,13 @@ class SQL::Translator {
         if ($parser) {
             $self->_clear_parser;
             $self->parser($parser);
-            $self->schema($self->parse($data));
+            $self->parse($data);
+            $self->schema;
         } elsif ($producer) {
             $self->_clear_producer;
             $self->schema($self->parse($data)) if $data;
             $self->producer($producer);
-            return $self->produce;
+            $self->produce;
         }
     }
 
