@@ -57,6 +57,8 @@ class SQL::Translator {
     has 'no_comments' => (isa => Bool, is => 'rw', default => 0);
     has 'show_warnings' => (isa => Bool, is => 'rw', default => 1);
     has 'trace' => (isa => Bool, is => 'rw', default => 0);
+    has 'quote_table_names' => (isa => Bool, is => 'rw', default => 0);
+    has 'quote_field_names' => (isa => Bool, is => 'rw', default => 0);
     has 'version' => (isa => Str, is => 'rw');
     has 'filename' => (isa => Str, is => 'rw');
 
