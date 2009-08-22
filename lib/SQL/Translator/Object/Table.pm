@@ -68,11 +68,6 @@ class SQL::Translator::Object::Table {
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
-    has 'comments' => (
-        is => 'rw',
-        isa => Maybe[Str],
-    );
-    
     has 'temporary' => (
         is => 'rw',
         isa => Bool,

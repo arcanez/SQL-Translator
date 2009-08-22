@@ -28,16 +28,4 @@ class SQL::Translator::Object::Procedure {
         isa => Str,
         required => 1
     );
-    
-    has 'comments' => (
-        is => 'rw',
-        isa => Str,
-    );
-    
-    has 'schema' => (
-        is => 'rw',
-        isa => Schema,
-        required => 1,
-        default => sub { Schema->new }
-    );
 }

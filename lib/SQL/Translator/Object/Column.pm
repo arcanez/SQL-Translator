@@ -40,11 +40,6 @@ class SQL::Translator::Object::Column {
         is => 'rw',
         isa => Maybe[Str],
     );
-    
-    has 'comments' => (
-        is => 'rw',
-        isa => Maybe[Str],
-    );
 
     has 'is_auto_increment' => (
         is => 'rw',
