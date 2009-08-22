@@ -40,10 +40,4 @@ class SQL::Translator::Parser {
         $role->meta->apply($self);
         $self->_subclass();
     }
-
-    method parse {
-        my $schema = Schema->new({ name => $self->schema_name });
-        $self->_add_tables($schema);
-        $schema;
-    }
 }
