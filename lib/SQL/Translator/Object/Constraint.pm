@@ -1,9 +1,16 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Constraint {
-    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str);
+    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str Undef);
     use MooseX::AttributeHelpers;
-    use SQL::Translator::Types qw(Column);
+    use SQL::Translator::Types qw(Column Table);
     extends 'SQL::Translator::Object';
+
+    has 'table' => (
+        is => 'rw',
+        isa => Table,
+        required => 1,
+        weak_ref => 1,
+    );
     
     has 'name' => (
         is => 'rw',
