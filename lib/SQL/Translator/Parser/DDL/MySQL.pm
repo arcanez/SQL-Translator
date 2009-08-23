@@ -18,18 +18,10 @@ role SQL::Translator::Parser::DDL::MySQL {
         return $data_type_mapping;
     }; 
 
+    multi method parse(Schema $data) { $data }
+
     multi method parse(Str $data) {
-        my $DEBUG = 0;
-  
-#        unless ($data) { 
-#        open DUMP_FILE, $self->filename;
-#        my $data = do { local $/; <DUMP_FILE>; };
-#        close DUMP_FILE;
-#        }
-
         my $parser = Parse::RecDescent->new($self->grammar);
-
-#        local $::RD_TRACE  = undef; #$self->trace ? 1 : undef;
 
         unless (defined $parser) {
             return $self->error("Error instantiating Parse::RecDescent ".
@@ -42,20 +34,19 @@ role SQL::Translator::Parser::DDL::MySQL {
         my $parser_version = 30000;
     
         while ($data =~ s#/\*!(\d{5})?(.*?)\*/#($1 && $1 > $parser_version ? '' : $2)#es) { }
-    
+
         my $result = $parser->startrule($data);
-#        return $self->error( "Parse failed." ) unless defined $result;
         die "Parse failed" unless defined $result;
-        warn "Parse result:".Dumper( $result ) if $DEBUG;
     
-        my $schema = Schema->new;
+        my $translator = $self->translator;
+        my $schema = $translator->schema;
         $schema->name($result->{'database_name'}) if $result->{'database_name'};
     
         my @tables = sort { $result->{'tables'}{ $a }{'order'} <=> $result->{'tables'}{ $b }{'order'} } keys %{ $result->{'tables'} };
     
         for my $table_name ( @tables ) {
             my $tdata = $result->{tables}{ $table_name };
-            my $table = Table->new({ name => $tdata->{table_name} });
+            my $table = Table->new({ name => $tdata->{table_name}, schema => $schema });
             $schema->add_table($table);
             $table->comments( join "\n", @{$tdata->{comments}} ) if $tdata->{comments};
     
@@ -274,5 +265,6 @@ role SQL::Translator::Parser::DDL::MySQL {
 #            $column->sql_data_type( $self->data_type_mapping->{$type} || -99999 );
             $self->extra->{list} = $list if @$list;
 #        }
+        return 1;
     }
 }
