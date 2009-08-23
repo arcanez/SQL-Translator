@@ -17,7 +17,7 @@ class SQL::Translator::Object::Index {
         isa => Str,
         required => 1
     );
-    
+
     has 'columns' => (
         metaclass => 'Collection::Hash',
         is => 'rw',
@@ -31,17 +31,11 @@ class SQL::Translator::Object::Index {
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
-    
+
     has 'type' => (
         is => 'rw',
         isa => Str,
         required => 1
-    );
-
-    has 'options' => (
-        is => 'rw',
-        isa => ArrayRef,
-        auto_deref => 1
     );
 
     has 'extra' => (

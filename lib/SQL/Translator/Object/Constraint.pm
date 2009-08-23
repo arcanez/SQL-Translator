@@ -60,12 +60,6 @@ class SQL::Translator::Object::Constraint {
          auto_deref => 1
     );
 
-    has 'options' => (
-        is => 'rw',
-        isa => ArrayRef,
-        auto_deref => 1
-    );
-
     has 'extra' => (
         is => 'rw',
         isa => HashRef,

@@ -69,16 +69,17 @@ class SQL::Translator::Object::Table {
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
+    has 'schema' => (
+        is => 'rw',
+        isa => Schema,
+        weak_ref => 1,
+        required => 1,
+    );
+
     has 'temporary' => (
         is => 'rw',
         isa => Bool,
         default => 0
-    );
-
-    has 'options' => (
-        is => 'rw',
-        isa => ArrayRef,
-        auto_deref => 1
     );
 
     has 'extra' => (
