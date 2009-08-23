@@ -2,7 +2,7 @@ use MooseX::Declare;
 role SQL::Translator::Producer::SQL::SQLite {
     use MooseX::Types::Moose qw(HashRef);
     use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
-    use SQL::Translator::Types qw(Column Table);
+    use SQL::Translator::Types qw(Column Constraint Index Trigger Table View);
 
     around _build_data_type_mapping {
         my $data_type_mapping = $self->$orig;
@@ -12,9 +12,8 @@ role SQL::Translator::Producer::SQL::SQLite {
         return $data_type_mapping;
     };
 
-sub header_comment {
-    my $producer = shift || caller;
-    my $comment_char = shift;
+method header_comment($producer, $comment_char) {
+    $producer ||= caller;
     my $now = scalar localtime;
 my $DEFAULT_COMMENT = '-- ';
 
@@ -52,7 +51,7 @@ method produce {
 #    %global_names = ();   #reset
 
     my @create = ();
-    push @create, header_comment unless ($no_comments);
+    push @create, $self->header_comment unless ($no_comments);
     $create[0] .= "\n\nBEGIN TRANSACTION" unless $no_txn;
 
     for my $table ( $schema->get_tables ) {
@@ -62,14 +61,14 @@ method produce {
     }
 
     for my $view ( $schema->get_views ) {
-      push @create, create_view($view, {
+      push @create, $self->create_view($view, {
         add_drop_view => $add_drop_table,
         no_comments   => $no_comments,
       });
     }
 
     for my $trigger ( $schema->get_triggers ) {
-      push @create, create_trigger($trigger, {
+      push @create, $self->create_trigger($trigger, {
         add_drop_trigger => $add_drop_table,
         no_comments   => $no_comments,
       });
@@ -105,8 +104,7 @@ my $max_id_length = 30;
     return $name;
 }
 
-sub create_view {
-    my ($view, $options) = @_;
+method create_view(View $view, $options?) {
     my $add_drop_view = $options->{add_drop_view};
 
     my $view_name = $view->name;
@@ -129,10 +127,6 @@ sub create_view {
     return $create;
 }
 
-
-#sub create_table
-#{
-#    my ($table, $options) = @_;
 method create_table(Table $table, HashRef $options) {
     my $table_name = $table->name;
     my $no_comments = $options->{no_comments};
@@ -180,7 +174,7 @@ method create_table(Table $table, HashRef $options) {
     #
     my ( @field_defs, $pk_set );
     for my $field ( @fields ) {
-        push @field_defs, create_field($field);
+        push @field_defs, $self->create_field($field);
     }
 
     if ( 
@@ -196,7 +190,7 @@ method create_table(Table $table, HashRef $options) {
     #
     my $idx_name_default = 'A';
     for my $index ( $table->get_indices ) {
-        push @index_defs, create_index($index);
+        push @index_defs,  $self->create_index($index);
     }
 
     #
@@ -205,7 +199,7 @@ method create_table(Table $table, HashRef $options) {
     my $c_name_default = 'A';
     for my $c ( $table->get_constraints ) {
         next unless $c->type eq UNIQUE; 
-        push @constraint_defs, create_constraint($c);
+        push @constraint_defs, $self->create_constraint($c);
     }
 
     $create_table .= join(",\n", map { "  $_" } @field_defs ) . "\n)";
@@ -213,10 +207,7 @@ method create_table(Table $table, HashRef $options) {
     return (@create, $create_table, @index_defs, @constraint_defs );
 }
 
-sub create_field
-{
-    my ($field, $options) = @_;
-
+method create_field(Column $field, $options?) {
     my $field_name = $field->name;
 #    debug("PKG: Looking at field '$field_name'\n");
     my $field_comments = $field->comments 
@@ -295,10 +286,7 @@ sub create_field
 
 }
 
-sub create_index
-{
-    my ($index, $options) = @_;
-
+method create_index(Index $index, $options?) {
     my $name   = $index->name;
     $name      = mk_name($name);
 
@@ -315,10 +303,7 @@ sub create_index
     return $index_def;
 }
 
-sub create_constraint
-{
-    my ($c, $options) = @_;
-
+method create_constraint(Constraint $c, $options?) {
     my $name   = $c->name;
     $name      = mk_name($name);
     my @fields = $c->fields;
@@ -328,12 +313,10 @@ sub create_constraint
     my $c_def =  
     "CREATE UNIQUE INDEX $name ON " . $index_table_name .
         ' (' . join( ', ', @fields ) . ')';
-
     return $c_def;
 }
 
-sub create_trigger {
-  my ($trigger, $options) = @_;
+method create_trigger(Trigger $trigger, $options?) {
   my $add_drop = $options->{add_drop_trigger};
 
   my @statements;
@@ -385,40 +368,30 @@ sub create_trigger {
   return @statements;
 }
 
-sub alter_table { } # Noop
+method alter_table(@) { } # Noop
 
-sub add_field {
-  my ($field) = @_;
-
+method add_field(Column $field) {
   return sprintf("ALTER TABLE %s ADD COLUMN %s",
-      $field->table->name, create_field($field))
+      $field->table->name, $self->create_field($field))
 }
 
-sub alter_create_index {
-  my ($index) = @_;
-
+method alter_create_index(Index $index) {
   # This might cause name collisions
-  return create_index($index);
+  return $self->create_index($index);
 }
 
-sub alter_create_constraint {
-  my ($constraint) = @_;
-
-  return create_constraint($constraint) if $constraint->type eq 'UNIQUE';
+method alter_create_constraint(Constraint $constraint) {
+  return $self->create_constraint($constraint) if $constraint->type eq 'UNIQUE';
 }
 
-sub alter_drop_constraint { alter_drop_index(@_) }
+method alter_drop_constraint(@args) { $self->alter_drop_index(@args) }
 
-sub alter_drop_index {
-  my ($constraint) = @_;
-
+method alter_drop_index(Constraint $constraint) {
   return sprintf("DROP INDEX %s",
       $constraint->name);
 }
 
-sub batch_alter_table {
-  my ($table, $diffs) = @_;
-
+method batch_alter_table(Table $table, $diffs) {
   # If we have any of the following
   #
   #  rename_field
@@ -465,20 +438,19 @@ sub batch_alter_table {
        alter_table/;
   }
 
-
   my @sql;
   my $old_table = $renaming ? $diffs->{rename_table}[0][0] : $table;
   
   do {
     local $table->{name} = $table_name . '_temp_alter';
     # We only want the table - dont care about indexes on tmp table
-    my ($table_sql) = create_table($table, {no_comments => 1, temporary_table => 1});
+    my ($table_sql) = $self->create_table($table, {no_comments => 1, temporary_table => 1});
     push @sql,$table_sql;
   };
 
   push @sql, "INSERT INTO @{[$table_name]}_temp_alter SELECT @{[ join(', ', $old_table->get_fields)]} FROM @{[$old_table]}",
              "DROP TABLE @{[$old_table]}",
-             create_table($table, { no_comments => 1 }),
+             $self->create_table($table, { no_comments => 1 }),
              "INSERT INTO @{[$table_name]} SELECT @{[ join(', ', $old_table->get_fields)]} FROM @{[$table_name]}_temp_alter",
              "DROP TABLE @{[$table_name]}_temp_alter";
 
@@ -486,14 +458,11 @@ sub batch_alter_table {
 #  return join("", @sql, "");
 }
 
-sub drop_table {
-  my ($table) = @_;
+method drop_table(Str $table) {
   return "DROP TABLE $table";
 }
 
-sub rename_table {
-  my ($old_table, $new_table, $options) = @_;
-
+method rename_table(Str $old_table, Str $new_table, $options?) {
   my $qt = $options->{quote_table_names} || '';
 
   return "ALTER TABLE $qt$old_table$qt RENAME TO $qt$new_table$qt";
@@ -501,5 +470,5 @@ sub rename_table {
 }
 
 # No-op. Just here to signify that we are a new style parser.
-sub preproces_schema { }
+method preproces_schema(@) { }
 }
