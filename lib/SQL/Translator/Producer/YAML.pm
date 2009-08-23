@@ -48,14 +48,14 @@ role SQL::Translator::Producer::YAML {
         return {
             'deferrable'       => scalar $constraint->deferrable,
             'expression'       => scalar $constraint->expression,
-            'fields'           => [ map { ref $_ ? $_->name : $_ } $constraint->field_names ],
+            'fields'           => [ $constraint->fields ],
             'match_type'       => scalar $constraint->match_type,
             'name'             => scalar $constraint->name,
             'options'          => scalar $constraint->options,
     #        'on_delete'        => scalar $constraint->on_delete,
     #        'on_update'        => scalar $constraint->on_update,
-    #        'reference_fields' => [ map { ref $_ ? $_->name : $_ } $constraint->reference_fields ],
-    #        'reference_table'  => scalar $constraint->reference_table,
+            'reference_fields' => [ map { ref $_ ? $_->name : $_ } $constraint->reference_fields ],
+            'reference_table'  => scalar $constraint->reference_table,
             'type'             => scalar $constraint->type,
             #keys %{$constraint->extra} ? ('extra' => { $constraint->extra } ) : (),
         };
@@ -95,7 +95,7 @@ role SQL::Translator::Producer::YAML {
             'name'                => scalar $trigger->name,
             'perform_action_when' => scalar $trigger->perform_action_when,
             'database_events'     => scalar $trigger->database_events,
-            'fields'              => scalar $trigger->fields,
+            'fields'              => [ $trigger->fields ],
             'on_table'            => scalar $trigger->on_table,
             'action'              => scalar $trigger->action,
             #keys %{$trigger->extra} ? ('extra' => { $trigger->extra } ) : (),
@@ -107,7 +107,7 @@ role SQL::Translator::Producer::YAML {
     #        'order'  => scalar $view->order,
             'name'   => scalar $view->name,
             'sql'    => scalar $view->sql,
-            'fields' => scalar $view->fields,
+            'fields' => [ $view->fields ],
             #keys %{$view->extra} ? ('extra' => { $view->extra } ) : (),
         };
     }
@@ -116,7 +116,7 @@ role SQL::Translator::Producer::YAML {
         return {
             'name'      => scalar $index->name,
             'type'      => scalar $index->type,
-            'fields'    => scalar $index->fields,
+            'fields'    => [ $index->fields ],
             'options'   => scalar $index->options,
             #keys %{$index->extra} ? ('extra' => { $index->extra } ) : (),
         };
