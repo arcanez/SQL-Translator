@@ -63,7 +63,8 @@ role SQL::Translator::Parser::DDL::MySQL {
                     is_auto_increment => $fdata->{is_auto_inc},
                     is_nullable       => $fdata->{null},
                     is_primary_key    => $fdata->{is_primary_key} ? 1 : 0,
-                    comments          => (join "\n", @{$fdata->{comments}}) || '',
+                    comments          => $fdata->{comments},
+                    table             => $table,
                 });
                 $table->add_column($field);
     
@@ -101,7 +102,7 @@ role SQL::Translator::Parser::DDL::MySQL {
             }
     
             for my $idata ( @{ $tdata->{indices} || [] } ) {
-                my $index = Index->new({ name => $idata->{name} || '', type => uc($idata->{type}) });
+                my $index = Index->new({ name => $idata->{name} || '', type => uc($idata->{type}), table => $table });
                 map { $index->add_column($table->get_column($_)) } @{$idata->{fields}};
                 $table->add_index($index);
             }
@@ -130,11 +131,12 @@ role SQL::Translator::Parser::DDL::MySQL {
             for my $cdata ( @{ $tdata->{constraints} || [] } ) {
                 my $constraint;
                 if (uc $cdata->{type} eq 'PRIMARY_KEY') {
-                    $constraint = PrimaryKey->new({ name => $cdata->{name} || 'primary_key' });
-                map { $constraint->add_column($table->get_column($_)) } @{$cdata->{fields}};
+                    $constraint = PrimaryKey->new({ name => $cdata->{name} || 'primary_key', table => $table });
+                    $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 $table->get_column($_)->is_primary_key(1) for @{$cdata->{fields}};
                 } elsif (uc $cdata->{type} eq 'FOREIGN_KEY') {
                     $constraint = ForeignKey->new({ name => $cdata->{name} || 'foreign_key',
+                                                    table => $table,
                                                     reference_table => $cdata->{reference_table},
                                                     reference_columns => $cdata->{reference_fields},
                                                     on_delete => $cdata->{on_delete} || $cdata->{on_delete_do},
@@ -142,8 +144,8 @@ role SQL::Translator::Parser::DDL::MySQL {
                     $table->get_column($_)->is_foreign_key(1) for @{$cdata->{fields}};
                     $table->get_column($_)->foreign_key_reference($constraint) for @{$cdata->{fields}};
                 } else {
-                    $constraint = Constraint->new({ name => $cdata->{name} || 'constraint', type => uc $cdata->{type} });
-                map { $constraint->add_column($table->get_column($_)) } @{$cdata->{fields}};
+                    $constraint = Constraint->new({ name => $cdata->{name} || 'constraint', type => uc $cdata->{type}, table => $table });
+                    $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 }
                 $table->add_constraint($constraint);
 
