@@ -82,7 +82,7 @@ role SQL::Translator::Parser::DDL::MySQL {
                 $field->extra(\%extra);
 
                 if ( $fdata->{has_index} ) {
-                    my $index = Index->new({ name => '', type => 'NORMAL' });
+                    my $index = Index->new({ name => '', type => 'NORMAL', table => $table });
                     $index->add_column($table->get_column($fdata->{name}));
                     $table->add_index($index);
                 }
