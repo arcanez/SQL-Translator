@@ -70,8 +70,10 @@ sort { ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'
                 my $index = Index->new({
                     name    => $idata->{name},
                     type    => uc $idata->{type},
-                    columns => $idata->{fields},
+                    table   => $table,
                 });
+                $index->add_column($table->get_column($_)) for @{$idata->{fields}};
+                $table->add_index($index);
             }
     
             for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
@@ -97,7 +99,6 @@ sort { ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'
           my $view = View->new({
             name    => $vinfo->{view_name},
             sql     => $sql,
-#            columns => $vinfo->{fields},
           });
 
           $schema->add_view($view);
