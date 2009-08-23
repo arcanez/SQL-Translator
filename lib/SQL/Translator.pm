@@ -40,7 +40,8 @@ class SQL::Translator {
     has 'schema' => (
         isa => Schema,
         is => 'rw',
-        default => sub { SQL::Translator::Object::Schema->new }
+        lazy => 1,
+        default => sub { SQL::Translator::Object::Schema->new },
     );
 
     has 'parser_args' => (
