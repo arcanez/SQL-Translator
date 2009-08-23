@@ -1,11 +1,11 @@
-use inc::Module::Install;
+use inc::Module::Install 0.91;
 
 name            'SQL-Translator';
 author          'Justin Hunter <justin.d.hunter@gmail.com>';
 license         'perl';
 
 all_from        'lib/SQL/Translator.pm';
-readme_from     'lib/SQL/Translator.pm';
+readme_from     ('lib/SQL/Translator.pm');
 
 tests           't/*.t';
 #author_tests    'xt', 'examples/MyApp-Web/t';
@@ -24,6 +24,7 @@ requires        'MooseX::Declare',              '0.23';
 requires        'MooseX::MethodAttributes',     '0.15';
 requires        'MooseX::Types',                '0.16';
 requires        'MooseX::Method::Signatures',   '0.16';
+requires        'MooseX::MultiMethods';
 requires        'TryCatch',                     '1.001001';
 requires        'FindBin';
 
@@ -43,5 +44,6 @@ bugtracker      'http://github.com/arcanez/sql-translator/issues';
 
 auto_manifest;
 auto_provides_class;
+auto_install;
 
 WriteAll;
