@@ -30,12 +30,14 @@ role SQL::Translator::Parser::DDL::YAML {
             keys %{ $data->{'tables'} };
     
         for my $tdata ( @tables ) {
-            my $table = Table->new({ map { $tdata->{$_} ? ($_ => $tdata->{$_}) : () } qw/name extra options/ });    
+            my $table = Table->new({ name => $tdata->{name}, schema => $schema });
+            $table->extra($tdata->{extra}) if $tdata->{extra};
+            $table->options($tdata->{options}) if $tdata->{options};
             $schema->add_table($table);
-    
+
             my @fields = 
                 map   { $tdata->{'fields'}{ $_->[1] } }
-                map   { [ $tdata->{'fields'}{ $_ }{'order'}, $_ ] }
+                map   { [ $tdata->{'fields'}{ $_ }{'order'} || 0, $_ ] }
                 keys %{ $tdata->{'fields'} };
     
             for my $fdata ( @fields ) {
