@@ -104,7 +104,7 @@ class SQL::Translator {
             $self->schema;
         } elsif ($producer) {
             $self->_clear_producer;
-            $self->schema($self->parse($data)) if $data;
+            $self->parse($data) if $data;
             $self->producer($producer);
             $self->produce;
         }
