@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Trigger {
-    use MooseX::Types::Moose qw(ArrayRef HashRef Str);
+    use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column);
     extends 'SQL::Translator::Object';
@@ -33,7 +33,7 @@ class SQL::Translator::Object::Trigger {
 
     has 'action' => (
         is => 'rw',
-        isa => Str
+        isa => Any
     );
 
     has 'perform_action_when' => (
