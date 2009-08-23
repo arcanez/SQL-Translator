@@ -18,9 +18,6 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
         my $translator = $self->translator;
         my $parser = Parse::RecDescent->new($self->grammar);
     
-#        $::RD_TRACE  = $translator->trace ? 1 : undef;
-#        $DEBUG       = $translator->debug;
-    
         unless (defined $parser) {
             return $translator->error("Error instantiating Parse::RecDescent ".
                 "instance: Bad grammer");
@@ -28,7 +25,6 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
     
         my $result = $parser->startrule($data);
         die "Parse failed.\n" unless defined $result;
-#        warn Dumper($result) if $DEBUG;
     
         my $schema = $translator->schema;
         my @tables = 
@@ -111,6 +107,6 @@ sort { $tdata->{'fields'}{ $a }{'order'} <=> $tdata->{'fields'}{ $b }{'order'} }
           $view->extra ( temporary => 1 ) if $vinfo->{is_temporary};
         }
     
-        return 1; #$schema;
+        return 1;
     }
 }
