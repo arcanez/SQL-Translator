@@ -47,15 +47,21 @@ role SQL::Translator::Parser::DDL::YAML {
                 $table->primary_key($column->name) if $fdata->{is_primary_key};
             }
     
-            for my $idata ( @{ $tdata->{'indices'} || [] } ) {
+            for my $idata ( @{ $tdata->{'indices'} || [] } ) { 
                  $idata->{table} = $table;
+                 my $columns = delete $idata->{fields};
+
                  my $index = Index->new($idata);
+                 $index->add_column($table->get_column($_)) for @$columns;
                  $table->add_index($index);
             }
     
             for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
                  $cdata->{table} = $table;
+                 $cdata->{reference_columns} = delete $cdata->{reference_fields};
+                 my $columns = delete $cdata->{fields} || [];
                  my $constraint = Constraint->new($cdata);
+                 $constraint->add_column($table->get_column($_)) for @$columns;
                  $table->add_constraint($constraint);
             }
         }
@@ -82,9 +88,9 @@ role SQL::Translator::Parser::DDL::YAML {
             keys %{ $data->{'triggers'} };
     
         for my $tdata ( @triggers ) {
-            my @columns = delete $tdata->{fields} || ();
+            my $columns = delete $tdata->{fields} || ();
             my $trigger = Trigger->new($tdata);
-            $trigger->add_column($schema->get_table($tdata->{on_table})->get_column($_)) for @columns; 
+            $trigger->add_column($schema->get_table($tdata->{on_table})->get_column($_)) for @$columns; 
             $schema->add_trigger($trigger);
         }
     
