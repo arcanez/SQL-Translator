@@ -18,6 +18,7 @@ requires        'MooseX::MethodAttributes',     '0.15';
 requires        'MooseX::Types',                '0.16';
 requires        'MooseX::Method::Signatures',   '0.16';
 requires        'MooseX::MultiMethods',         '0.04';
+requires        'Parse::RecDescent',            '1.94';
 requires        'Tie::IxHash',                  '1.21';
 requires        'TryCatch',                     '1.001001';
 
