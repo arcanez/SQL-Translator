@@ -26,21 +26,20 @@ role SQL::Translator::Producer::YAML {
                 trace          => $translator->trace,
                 version        => $translator->version,
             },
-    #        keys %{$schema->extra} ? ('extra' => { $schema->extra } ) : (),
+            keys %{$schema->extra} ? ('extra' => { $schema->extra } ) : (),
         });
     }
     
     method _create_table(Table $table) {
         return {
-            'name'        => $table->name,
-    #        'order'       => $table->order,
-            'options'     => $table->options  || [],
+            'name'        => scalar $table->name,
+            'options'     => scalar $table->options,
             $table->comments ? ('comments'    => $table->comments ) : (),
             'constraints' => [ map { $self->_create_constraint($_) } $table->get_constraints ],
             'indices'     => [ map { $self->_create_index($_) } $table->get_indices ],
             'fields'      => { map { ($_->name => $self->_create_field($_)) } $table->get_fields 
             },
-            #keys %{$table->extra} ? ('extra' => { $table->extra } ) : (),
+            keys %{$table->extra} ? ('extra' => { $table->extra } ) : (),
         };
     }
     
@@ -57,13 +56,12 @@ role SQL::Translator::Producer::YAML {
             'reference_fields' => [ map { ref $_ ? $_->name : $_ } $constraint->reference_fields ],
             'reference_table'  => scalar $constraint->reference_table,
             'type'             => scalar $constraint->type,
-            #keys %{$constraint->extra} ? ('extra' => { $constraint->extra } ) : (),
+            keys %{$constraint->extra} ? ('extra' => { $constraint->extra } ) : (),
         };
     }
     
     method _create_field(Column $field) {
         return {
-    #        'order'             => scalar $field->order,
             'name'              => scalar $field->name,
             'data_type'         => scalar $field->data_type,
             'size'              => [ $field->size ],
@@ -73,42 +71,39 @@ role SQL::Translator::Producer::YAML {
             'is_unique'         => scalar $field->is_unique,
             $field->is_auto_increment ? ('is_auto_increment' => 1) : (),
             $field->comments ? ('comments' => $field->comments) : (),
-            #keys %{$field->extra} ? ('extra' => { $field->extra } ) : (),
+            keys %{$field->extra} ? ('extra' => { $field->extra } ) : (),
         };
     }
     
     method _create_procedure(Procedure $procedure) {
         return {
-    #        'order'      => scalar $procedure->order,
             'name'       => scalar $procedure->name,
             'sql'        => scalar $procedure->sql,
             'parameters' => scalar $procedure->parameters,
             'owner'      => scalar $procedure->owner,
             'comments'   => scalar $procedure->comments,
-            #keys %{$procedure->extra} ? ('extra' => { $procedure->extra } ) : (),
+            keys %{$procedure->extra} ? ('extra' => { $procedure->extra } ) : (),
         };
     }
     
     method _create_trigger(Trigger $trigger) {
         return {
-    #        'order'               => scalar $trigger->order,
             'name'                => scalar $trigger->name,
             'perform_action_when' => scalar $trigger->perform_action_when,
             'database_events'     => scalar $trigger->database_events,
             'fields'              => [ $trigger->fields ],
             'on_table'            => scalar $trigger->on_table,
             'action'              => scalar $trigger->action,
-            #keys %{$trigger->extra} ? ('extra' => { $trigger->extra } ) : (),
+            keys %{$trigger->extra} ? ('extra' => { $trigger->extra } ) : (),
         };
     }
     
     method _create_view(View $view) {
         return {
-    #        'order'  => scalar $view->order,
             'name'   => scalar $view->name,
             'sql'    => scalar $view->sql,
             'fields' => [ $view->fields ],
-            #keys %{$view->extra} ? ('extra' => { $view->extra } ) : (),
+            keys %{$view->extra} ? ('extra' => { $view->extra } ) : (),
         };
     }
     
@@ -118,7 +113,7 @@ role SQL::Translator::Producer::YAML {
             'type'      => scalar $index->type,
             'fields'    => [ $index->fields ],
             'options'   => scalar $index->options,
-            #keys %{$index->extra} ? ('extra' => { $index->extra } ) : (),
+            keys %{$index->extra} ? ('extra' => { $index->extra } ) : (),
         };
     }
 }
