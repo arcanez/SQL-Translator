@@ -82,12 +82,6 @@ class SQL::Translator::Object::Table {
         default => 0
     );
 
-    has 'extra' => (
-        is => 'rw',
-        isa => HashRef,
-        auto_deref => 1,
-    );
-
     around add_column(Column $column) { $self->$orig($column->name, $column) }
     around add_index(Index $index) { $self->$orig($index->name, $index) }
     around add_constraint(Constraint $constraint) { $self->$orig($constraint->name, $constraint) }

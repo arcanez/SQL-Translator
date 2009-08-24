@@ -60,12 +60,6 @@ class SQL::Translator::Object::Constraint {
          auto_deref => 1
     );
 
-    has 'extra' => (
-        is => 'rw',
-        isa => HashRef,
-        auto_deref => 1,
-    );
-
     around add_column(Column $column) { $self->$orig($column->name, $column) }
 
     method get_fields { $self->get_columns }

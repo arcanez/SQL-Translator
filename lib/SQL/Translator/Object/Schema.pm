@@ -68,12 +68,6 @@ class SQL::Translator::Object::Schema {
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
-    has 'extra' => (
-        is => 'rw',
-        isa => HashRef,
-        auto_deref => 1,
-    );
-
     around add_table(Table $table) { $self->$orig($table->name, $table) }
     around add_view(View $view) { $self->$orig($view->name, $view) }
     around add_procedure(Procedure $procedure) { $self->$orig($procedure->name, $procedure) }

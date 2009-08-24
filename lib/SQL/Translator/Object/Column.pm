@@ -78,12 +78,6 @@ class SQL::Translator::Object::Column {
         isa => Trigger,
     );
 
-    has 'extra' => (
-        is => 'rw',
-        isa => HashRef,
-        auto_deref => 1,
-    );
-
     around size(@args) {
         $self->$orig(@args) if @args;
         my @sizes = $self->$orig;
