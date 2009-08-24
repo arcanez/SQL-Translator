@@ -62,7 +62,7 @@ role SQL::Translator::Parser::DBI {
         while (my $table_info = $sth->fetchrow_hashref) {
             if ($table_info->{TABLE_TYPE} =~ /^(TABLE|LOCAL TEMPORARY|GLOBAL TEMPORARY)$/) {
                 my $temp = $table_info->{TABLE_TYPE} =~ /TEMPORARY$/ ? 1 : 0;
-                my $table = SQL::Translator::Object::Table->new({ name => $table_info->{TABLE_NAME}, temporary => $temp });
+                my $table = SQL::Translator::Object::Table->new({ name => $table_info->{TABLE_NAME}, temporary => $temp, schema => $schema });
                 $schema->add_table($table);
 
                 $self->_add_columns($table);
