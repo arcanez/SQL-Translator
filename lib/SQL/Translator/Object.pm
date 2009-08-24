@@ -33,6 +33,6 @@ class SQL::Translator::Object {
     multi method comments(Any $) { return wantarray ? @{$self->_comments} : join "\n", $self->_comments }
 
     multi method options(Str $option) { $self->add_option($option) }
-    multi method options(ArrayRef $option) { $self->add_option($option) }
-    multi method options(Any $) { $self->_options }
+    multi method options(ArrayRef $option) { $self->add_option($option) if scalar @$option }
+    multi method options(Any $) { wantarray ? @{$self->_options} : $self->_options }
 }
