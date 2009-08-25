@@ -151,25 +151,22 @@ role SQL::Translator::Parser::DDL::MySQL {
             normalize_field($_) for $table->get_fields;
         }
         
-#        my @procedures = sort { $result->{procedures}->{ $a }->{'order'} <=> $result->{procedures}->{ $b }->{'order'} } keys %{ $result->{procedures} };
+        for my $proc_name ( keys %{ $result->{procedures} } ) {
+            my $procedure = Procedure->new({ name  => $proc_name,
+                                             owner => $result->{procedures}->{$proc_name}->{owner},
+                                             sql   => $result->{procedures}->{$proc_name}->{sql}
+            });
+            $schema->add_procedure($procedure);
+        }
     
-#        for my $proc_name ( @procedures ) {
-#            $schema->add_procedure(
-#                name  => $proc_name,
-#                owner => $result->{procedures}->{$proc_name}->{owner},
-#                sql   => $result->{procedures}->{$proc_name}->{sql},
-#            );
-#        }
-    
-#        my @views = sort { $result->{views}->{ $a }->{'order'} <=> $result->{views}->{ $b }->{'order'} } keys %{ $result->{views} };
-    
-#        for my $view_name ( keys %{ $result->{'views'} } ) {
-#            $schema->add_view(
-#                name => $view_name,
-#                sql  => $result->{'views'}->{$view_name}->{sql},
-#            );
-#        }
-        return $schema;
+        for my $view_name ( keys %{ $result->{'views'} } ) {
+            my $view = View->new({ 
+                name => $view_name,
+                sql  => $result->{'views'}->{$view_name}->{sql},
+            });
+            $schema->add_view($view);
+        }
+        return 1;
     }
     
     # Takes a field, and returns 
