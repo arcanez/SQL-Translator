@@ -1,9 +1,8 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Schema {
+class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(HashRef Maybe Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Procedure Table Trigger View);
-    extends 'SQL::Translator::Object';
  
     has 'name' => (
         is => 'rw',

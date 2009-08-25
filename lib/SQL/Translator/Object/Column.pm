@@ -1,9 +1,8 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Column {
+class SQL::Translator::Object::Column extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Bool HashRef Int Maybe Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(ColumnSize Constraint Table Trigger);
-    extends 'SQL::Translator::Object';
 
     has 'table' => (
         is => 'rw',

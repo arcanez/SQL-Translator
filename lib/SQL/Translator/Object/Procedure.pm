@@ -1,7 +1,6 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Procedure {
+class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Int Str);
-    extends 'SQL::Translator::Object';
     
     has 'name' => (
         is => 'rw',

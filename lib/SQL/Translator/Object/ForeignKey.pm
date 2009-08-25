@@ -1,7 +1,6 @@
 use MooseX::Declare;
-class SQL::Translator::Object::ForeignKey {
+class SQL::Translator::Object::ForeignKey extends SQL::Translator::Object::Constraint {
     use MooseX::Types::Moose qw(ArrayRef Maybe Undef Str);
-    extends 'SQL::Translator::Object::Constraint';
     
     has '+type' => (
         default => 'FOREIGN KEY',

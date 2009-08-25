@@ -1,8 +1,6 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Sequence {
+class SQL::Translator::Object::Sequence extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(Str);
-    use SQL::Translator::Types qw();
-    extends 'SQL::Translator::Object';
     
     has 'name' => (
         is => 'ro',

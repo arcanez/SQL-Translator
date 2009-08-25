@@ -1,11 +1,9 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Table {
+class SQL::Translator::Object::Table extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(Any ArrayRef Bool HashRef Maybe Str);
     use MooseX::AttributeHelpers;
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
-    use SQL::Translator::Object::Schema;
-    extends 'SQL::Translator::Object';
     
     has 'name' => (
         is => 'rw',

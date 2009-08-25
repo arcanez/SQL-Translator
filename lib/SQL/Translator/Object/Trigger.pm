@@ -1,9 +1,8 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Trigger {
+class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column);
-    extends 'SQL::Translator::Object';
     
     has 'name' => (
         is => 'ro',
