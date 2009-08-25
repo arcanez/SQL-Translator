@@ -121,6 +121,6 @@ role SQL::Translator::Parser::DDL::YAML {
             $translator->trace( $tr_data->{'trace'} );
         }
     
-        return $schema;
+        return 1;
     }
 }
