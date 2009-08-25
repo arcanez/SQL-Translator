@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Index extends SQL::Translator::Object {
-    use MooseX::Types::Moose qw(ArrayRef HashRef Str);
+    use MooseX::Types::Moose qw(HashRef Str);
     use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Column Table);
 

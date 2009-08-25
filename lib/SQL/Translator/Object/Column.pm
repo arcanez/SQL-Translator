@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Column extends SQL::Translator::Object {
-    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Int Maybe Str);
+    use MooseX::Types::Moose qw(Bool Int Maybe Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(ColumnSize Constraint Table Trigger);
 
