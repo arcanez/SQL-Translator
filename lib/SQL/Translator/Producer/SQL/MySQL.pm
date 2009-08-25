@@ -132,7 +132,7 @@ role SQL::Translator::Producer::SQL::MySQL {
                     my $table = $schema->get_table($c->$meth) || next;
                     # This normalizes the types to ENGINE and returns the value if its there
                     next if $extra_to_options->($table, 'mysql_table_type', ['ENGINE', 'TYPE']);
-                    $table->options( { 'ENGINE' => 'InnoDB' } );
+                    $table->options({ 'ENGINE' => 'InnoDB' });
                 }
             } # foreach constraints
     
@@ -152,7 +152,7 @@ role SQL::Translator::Producer::SQL::MySQL {
         }
     }
     
-    method produce { 
+    method produce {
         my $translator = $self->translator;
         my $DEBUG = 0;#     = $translator->debug;
         #local %used_names;
@@ -210,14 +210,12 @@ role SQL::Translator::Producer::SQL::MySQL {
         }
     
     
-    #    print "@table_defs\n";
+        #warn "@table_defs\n";
         push @table_defs, "SET foreign_key_checks=1";
-    
         return wantarray ? ($create ? $create : (), @create, @table_defs) : ($create . join('', map { $_ ? "$_;\n\n" : () } (@create, @table_defs)));
     }
     
     method create_view($view, $options) {
-#        my ($view, $options) = @_;
         my $qt = $options->{quote_table_names} || '';
         my $qf = $options->{quote_field_names} || '';
     
@@ -301,19 +299,20 @@ role SQL::Translator::Producer::SQL::MySQL {
         my @constraint_defs;
         my @constraints = $table->get_constraints;
         for my $c ( @constraints ) {
-            my $constr = $self->create_constraint($c, $options);
-            push @constraint_defs, $constr if($constr);
+            my $constr = $self->create_constraint($c, $options); 
+            push @constraint_defs, $constr if($constr); #use Data::Dumper; warn Dumper($c->columns) if $constr =~ /^CONSTRAINT/; # unless $c->fields;
             next unless $c->fields;
+ 
             unless ( $indexed_fields{ ($c->fields())[0] } || $c->type ne FOREIGN_KEY ) {
                  push @index_defs, "INDEX ($qf" . ($c->fields())[0] . "$qf)";
                  $indexed_fields{ ($c->fields())[0] } = 1;
             }
         }
-    
+
         $create .= join(",\n", map { "  $_" } 
                         @field_defs, @index_defs, @constraint_defs
                         );
-    
+
         #
         # Footer
         #
@@ -338,7 +337,8 @@ role SQL::Translator::Producer::SQL::MySQL {
       my $charset          = $table->extra->{'mysql_charset'};
       my $collate          = $table->extra->{'mysql_collate'};
       my $union            = undef;
-      for my $t1_option_ref ( $table->options ) {
+
+      for my $t1_option_ref ($table->_options) {
         my($key, $value) = %{$t1_option_ref};
         $table_type_defined = 1
           if uc $key eq 'ENGINE' or uc $key eq 'TYPE';
@@ -573,7 +573,6 @@ role SQL::Translator::Producer::SQL::MySQL {
             #
             # Make sure FK field is indexed or MySQL complains.
             #
-    
             my $table = $c->table;
             my $c_name = $self->truncate_id_uniquely( $c->name, $options->{max_id_length} || $DEFAULT_MAX_ID_LENGTH );
     
@@ -586,10 +585,10 @@ role SQL::Translator::Producer::SQL::MySQL {
     
     
             $def .= ' ('.$qf . join( "$qf, $qf", @fields ) . $qf . ')';
-    
+
             $def .= ' REFERENCES ' . $qt . $c->reference_table . $qt;
-    
             my @rfields = map { $_ || () } $c->reference_fields;
+
             unless ( @rfields ) {
                 my $rtable_name = $c->reference_table;
                 if ( my $ref_table = $table->schema->get_table( $rtable_name ) ) {
@@ -611,17 +610,16 @@ role SQL::Translator::Producer::SQL::MySQL {
             }
     
             if ( $c->match_type ) {
-                $def .= ' MATCH ' . 
-                    ( $c->match_type =~ /full/i ) ? 'FULL' : 'PARTIAL';
+                $def .= ' MATCH ';
+                $def .= ( $c->match_type =~ /full/i ) ? 'FULL' : 'PARTIAL';
             }
+#            if ( $c->on_delete ) {
+#                $def .= ' ON DELETE '.join( ' ', $c->on_delete );
+#            }
     
-            if ( $c->on_delete ) {
-                $def .= ' ON DELETE '.join( ' ', $c->on_delete );
-            }
-    
-            if ( $c->on_update ) {
-                $def .= ' ON UPDATE '.join( ' ', $c->on_update );
-            }
+#            if ( $c->on_update ) {
+#                $def .= ' ON UPDATE '.join( ' ', $c->on_update );
+#            }
             return $def;
         }
     
