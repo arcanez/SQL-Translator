@@ -20,7 +20,7 @@ my $PArgs     = {};
 my $no_comments;
 
 method produce {
-    my $translator  = $self;
+    my $translator  = $self->translator;
     my $schema      = $translator->schema;
     $no_comments    = $translator->no_comments;
 #    $PArgs          = $translator->producer_args;
