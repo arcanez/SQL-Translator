@@ -193,9 +193,8 @@ method xml_obj_children($xml: $parent, HashRef $args?) {
 #
 my $elements_re = join("|", @MAP_AS_ELEMENTS);
 $elements_re = qr/^($elements_re)$/;
-#sub xml_obj {
+
 method xml_obj($xml: $obj, HashRef $args?) {
-#    my ($xml, $obj, %args) = @_;
     my $tag                = $args->{'tag'}              || '';
     my $end_tag            = $args->{'end_tag'}          || '';
     my @meths              = @{ $args->{'methods'} };
@@ -217,7 +216,7 @@ method xml_obj($xml: $obj, HashRef $args?) {
     $end_tag && !$child_tags
         ? $xml->emptyTag( [ $Namespace => $tag ], @attr )
         : $xml->startTag( [ $Namespace => $tag ], @attr );
-    while ( my ($name,$val) = splice @tags,0,2 ) { warn "NAME: $name, $val";
+    while ( my ($name,$val) = splice @tags,0,2 ) {
         if ( ref $val eq 'HASH' ) {
              $xml->emptyTag( [ $Namespace => $name ],
                  map { ($_, $val->{$_}) } sort keys %$val );
