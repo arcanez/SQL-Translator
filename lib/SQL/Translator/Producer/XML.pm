@@ -47,8 +47,7 @@ method produce {
 #      unless $no_comments;
 
     xml_obj($xml, $schema,
-        { tag => "schema", methods => [qw/name database /], end_tag => 0 });
-#        tag => "schema", methods => [qw/name database extra/], end_tag => 0 );
+        { tag => "schema", methods => [qw/name extra/], end_tag => 0 });
 
     #
     # Table
@@ -58,8 +57,7 @@ method produce {
 #        debug "Table:",$table->name;
         xml_obj($xml, $table,
             { tag => "table",
-             methods => [qw/name order/],
-#             methods => [qw/name order extra/],
+             methods => [qw/name extra/],
              end_tag => 0 }
          );
 
@@ -70,9 +68,8 @@ method produce {
             { tag   => 'field',
             methods =>[qw/
                 name data_type size is_nullable default_value is_auto_increment
-                is_primary_key is_foreign_key comments order
+                is_primary_key is_foreign_key extra comments
             /], }
-#                is_primary_key is_foreign_key extra comments order
         );
 
         #
@@ -81,8 +78,7 @@ method produce {
         xml_obj_children( $xml, $table,
             { tag   => 'index',
             collection_tag => "indices",
-            methods => [qw/name type fields options/], }
-#            methods => [qw/name type fields options extra/],
+            methods => [qw/name type fields extra/], }
         );
 
         #
@@ -95,7 +91,7 @@ method produce {
 #                on_delete on_update match_type expression options deferrable
 #                extra
 #            /],
-             methods => [qw/name type expression options deferrable/], }
+             methods => [qw/name type expression options deferrable extra/], }
         );
 
         #
@@ -103,10 +99,7 @@ method produce {
         #
         xml_obj_children( $xml, $table,
             { tag   => 'comment',
-#            collection_tag => "comments",
-            methods => [qw/
-                comments
-            /], }
+            methods => [qw/ comments /], }
         );
 
         $xml->endTag( [ $Namespace => 'table' ] );
@@ -118,8 +111,7 @@ method produce {
     #
     xml_obj_children( $xml, $schema,
         { tag   => 'view',
-        methods => [qw/name sql fields/], }
-#        methods => [qw/name sql fields order extra/],
+        methods => [qw/name sql fields extra/], }
     );
 
     #
@@ -127,8 +119,7 @@ method produce {
     #
     xml_obj_children( $xml, $schema,
         { tag    => 'trigger',
-        methods => [qw/name database_events action on_table perform_action_when fields order/], }
-#        methods => [qw/name database_events action on_table perform_action_when fields order extra/], 
+        methods => [qw/name database_events action on_table perform_action_when fields extra/], }
     );
 
     #
@@ -136,8 +127,7 @@ method produce {
     #
     xml_obj_children( $xml, $schema,
         { tag   => 'procedure',
-        methods => [qw/name sql parameters owner comments order/], }
-#        methods => [qw/name sql parameters owner comments order extra/],
+        methods => [qw/name sql parameters owner comments extra/], }
     );
 
     $xml->endTag([ $Namespace => 'schema' ]);
