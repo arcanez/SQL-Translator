@@ -1,12 +1,23 @@
 use MooseX::Declare;
 role SQL::Translator::Parser::DDL::XML {
-use XML::LibXML;
-use XML::LibXML::XPathContext;
+    use MooseX::MultiMethods;
+    use MooseX::Types::Moose qw(Any);
+    use XML::LibXML;
+    use XML::LibXML::XPathContext;
+    use aliased 'SQL::Translator::Object::Column';
+    use aliased 'SQL::Translator::Object::Constraint';
+    use aliased 'SQL::Translator::Object::Index';
+    use aliased 'SQL::Translator::Object::Procedure';
+    use aliased 'SQL::Translator::Object::Table';
+    use aliased 'SQL::Translator::Object::Trigger';
+    use aliased 'SQL::Translator::Object::View';
+    use SQL::Translator::Types qw(Schema);
 
-method parse {
+multi method parse(Schema $data) { $data }
+multi method parse(Any $data) {
     my $translator = $self->translator;
     my $schema                = $translator->schema;
-    local $DEBUG              = $translator->debug;
+#    local $DEBUG              = $translator->debug;
     my $doc                   = XML::LibXML->new->parse_string($data);
     my $xp                    = XML::LibXML::XPathContext->new($doc);
 
@@ -25,11 +36,12 @@ method parse {
             ("".$xp->findvalue('sqlf:order|@order',$b) || 0)
         } @nodes
     ) {
-        debug "Adding table:".$xp->findvalue('sqlf:name',$tblnode);
+#        debug "Adding table:".$xp->findvalue('sqlf:name',$tblnode);
 
-        my $table = $schema->add_table(
-            get_tagfields($xp, $tblnode, "sqlf:" => qw/name order extra/)
-        ) or die $schema->error;
+        my $table = Table->new({
+            get_tagfields($xp, $tblnode, "sqlf:" => qw/name order extra/), schema => $schema
+        });
+        $schema->add_table($table);
 
         #
         # Fields
@@ -59,7 +71,10 @@ method parse {
                 }
             }
 
-            my $field = $table->add_field( %fdata ) or die $table->error;
+            $fdata{table} = $table;
+            $fdata{sql_data_type} = $self->data_type_mapping->{$fdata{data_type}} || -99999;
+            my $field = Column->new(%fdata);
+            $table->add_column($field);
 
             $table->primary_key( $field->name ) if $fdata{'is_primary_key'};
 
@@ -79,7 +94,10 @@ method parse {
                 qw/name type table fields reference_fields reference_table
                 match_type on_delete on_update extra/
             );
-            $table->add_constraint( %data ) or die $table->error;
+
+            $data{table} = $table;
+            my $constraint = Constraint->new(%data);
+            $table->add_constraint($constraint);
         }
 
         #
@@ -89,7 +107,10 @@ method parse {
         foreach (@nodes) {
             my %data = get_tagfields($xp, $_, "sqlf:",
                 qw/name type fields options extra/);
-            $table->add_index( %data ) or die $table->error;
+
+            $data{table} = $table;
+            my $index = Index->new(%data);
+            $table->add_index($index);
         }
 
         
@@ -112,9 +133,10 @@ method parse {
     );
     foreach (@nodes) {
         my %data = get_tagfields($xp, $_, "sqlf:",
-            qw/name sql fields order extra/
+            qw/name sql fields extra/
         );
-        $schema->add_view( %data ) or die $schema->error;
+        my $view = View->new(%data);
+        $schema->add_view($view);
     }
 
     #
@@ -126,14 +148,14 @@ method parse {
     foreach (@nodes) {
         my %data = get_tagfields($xp, $_, "sqlf:", qw/
             name perform_action_when database_event database_events fields
-            on_table action order extra
+            on_table action extra
         /);
 
         # back compat
         if (my $evt = $data{database_event} and $translator->{show_warnings}) {
-          carp 'The database_event tag is deprecated - please use ' .
-            'database_events (which can take one or more comma separated ' .
-            'event names)';
+#          carp 'The database_event tag is deprecated - please use ' .
+#            'database_events (which can take one or more comma separated ' .
+#            'event names)';
           $data{database_events} = join (', ',
             $data{database_events} || (),
             $evt,
@@ -144,8 +166,8 @@ method parse {
         if (my $evts = $data{database_events}) {
           $data{database_events} = [split (/\s*,\s*/, $evts) ];
         }
-
-        $schema->add_trigger( %data ) or die $schema->error;
+        my $trigger = Trigger->new(%data);
+        $schema->add_trigger($trigger);
     }
 
     #
@@ -156,9 +178,10 @@ method parse {
     );
     foreach (@nodes) {
         my %data = get_tagfields($xp, $_, "sqlf:",
-        qw/name sql parameters owner comments order extra/
+        qw/name sql parameters owner comments extra/
         );
-        $schema->add_procedure( %data ) or die $schema->error;
+        my $procedure = Procedure->new(%data);
+        $schema->add_procedure($procedure);
     }
 
     return 1;
@@ -190,7 +213,7 @@ sub get_tagfields {
                 ." Use a child tag instead."
                 ." To convert your file to the new version see the Docs.\n"
                 unless $is_attrib;
-            debug "Got $_=".( defined $data{ $_ } ? $data{ $_ } : 'UNDEF' );
+#            debug "Got $_=".( defined $data{ $_ } ? $data{ $_ } : 'UNDEF' );
         }
         elsif ( $found = $xp->find($tag_path,$node) ) {
             if ($_ eq "extra") {
@@ -207,7 +230,7 @@ sub get_tagfields {
                 ." Use an attribute instead."
                 ." To convert your file to the new version see the Docs.\n"
                 if $is_attrib;
-            debug "Got $_=".( defined $data{ $_ } ? $data{ $_ } : 'UNDEF' );
+#            debug "Got $_=".( defined $data{ $_ } ? $data{ $_ } : 'UNDEF' );
         }
     }
 
