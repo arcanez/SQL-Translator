@@ -50,11 +50,11 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
                     sql_data_type     => $self->data_type_mapping->{$fdata->{data_type}} || -999999,
                     size              => $fdata->{'size'},
                     default_value     => $fdata->{'default'},
-                    is_auto_increment => $fdata->{'is_auto_increment'},
+                    is_auto_increment => $fdata->{'is_auto_increment'}, 
                     is_nullable       => $fdata->{'is_nullable'},
-                    comments          => $fdata->{'comments'},
                     table             => $table,
                 });
+                $field->comments($fdata->{comments});
 
                 $table->add_column($field);
                 $table->primary_key($field->name) if $fdata->{is_primary_key};
