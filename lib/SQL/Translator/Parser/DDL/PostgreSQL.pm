@@ -25,10 +25,10 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
     
         my $result = $parser->startrule($data);
         die "Parse failed.\n" unless defined $result;
-    
+
         my $schema = $translator->schema;
         my @tables = 
-sort { ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'order'} || 0 ) }
+         sort { ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'order'} || 0 ) }
          keys %{ $result->{tables} };
     
         for my $table_name ( @tables ) {
@@ -55,9 +55,9 @@ sort { ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'
                     comments          => $fdata->{'comments'},
                     table             => $table,
                 });
+
                 $table->add_column($field);
-    
-                $table->primary_key( $field->name ) if $fdata->{is_primary_key};
+                $table->primary_key($field->name) if $fdata->{is_primary_key};
     
                 for my $cdata ( @{ $fdata->{constraints} } ) {
                     next unless $cdata->{type} eq 'foreign_key';
@@ -77,18 +77,23 @@ sort { ( $result->{tables}{ $a }{'order'} || 0 ) <=> ( $result->{tables}{ $b }{'
             }
     
             for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
-                my $constraint = Constraint->new({
-                    name             => $cdata->{name},
-                    type             => $cdata->{type},
-                    fields           => $cdata->{fields},
-                    reference_table  => $cdata->{reference_table},
-                    reference_fields => $cdata->{reference_fields},
-                    match_type       => $cdata->{match_type} || '',
-                    on_delete        => $cdata->{on_delete} || $cdata->{on_delete_do},
-                    on_update        => $cdata->{on_update} || $cdata->{on_update_do},
-                    expression       => $cdata->{expression},
-                    table            => $table,
-                });
+                my $constraint;
+                if (uc $cdata->{type} eq 'PRIMARY_KEY') {
+                    $constraint = PrimaryKey->new({ name => $cdata->{name} || '', table => $table });
+                    $table->get_column($_)->is_primary_key(1) for @{$cdata->{fields}};
+                } elsif (uc $cdata->{type} eq 'FOREIGN_KEY') {
+                    $constraint = ForeignKey->new({ name => $cdata->{name} || '',
+                                                    table => $table,
+                                                    reference_table => $cdata->{reference_table},
+                                                    reference_columns => $cdata->{reference_fields},
+                                                    on_delete => $cdata->{on_delete} || $cdata->{on_delete_do},
+                                                    on_update => $cdata->{on_update} || $cdata->{on_update_do} });
+                    $table->get_column($_)->is_foreign_key(1) for @{$cdata->{fields}};
+                    $table->get_column($_)->foreign_key_reference($constraint) for @{$cdata->{fields}};
+                } else {
+                    $constraint = Constraint->new({ name => $cdata->{name} || '', type => uc $cdata->{type}, table => $table });
+                }
+                $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 $table->add_constraint($constraint);
             }
         }

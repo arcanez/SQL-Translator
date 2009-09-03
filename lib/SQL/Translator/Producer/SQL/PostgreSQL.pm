@@ -296,7 +296,6 @@ method create_table(Table $table, $options?) {
         push @fks, @$fks;
     }
 
-
     my $temporary = "";
 
     if(exists $table->{extra}{temporary}) {
@@ -317,9 +316,9 @@ method create_table(Table $table, $options?) {
     $create_statement .= join(";\n", @type_defs) . ";\n"
         if $postgres_version >= 8.3 && scalar @type_defs;
     $create_statement .= qq[CREATE ${temporary}TABLE $qt$table_name_ur$qt (\n].
-                            join( ",\n", map { "  $_" } @field_defs, @constraint_defs ).
-                            "\n)"
-                            ;
+                            join( ",\n", map { "  $_" } @field_defs, @constraint_defs ) .
+                            "\n)" ;
+
     $create_statement .= @index_defs ? ';' : q{};
     $create_statement .= ( $create_statement =~ /;$/ ? "\n" : q{} )
         . join(";\n", @index_defs);
@@ -489,13 +488,12 @@ method create_constraint(Constraint $c, $options?) {
         map { $_ =~ s/\(.+\)//; $_ }
     map { $qt ? $_ : $self->unreserve( $_, $table_name )}
     $c->fields;
-
     my @rfields     = 
         map { $_ =~ s/\(.+\)//; $_ }
     map { $qt ? $_ : $self->unreserve( $_, $table_name )}
     $c->reference_fields;
-
     return ([], []) if !@fields && $c->type ne CHECK_C;
+
     my $def_start = $name ? qq[CONSTRAINT "$name" ] : '';
     if ( $c->type eq PRIMARY_KEY ) {
         push @constraint_defs, "${def_start}PRIMARY KEY ".
@@ -520,10 +518,10 @@ method create_constraint(Constraint $c, $options?) {
         }
 
         if ( $c->match_type ) {
-            $def .= ' MATCH ' . 
-                ( $c->match_type =~ /full/i ) ? 'FULL' : 'PARTIAL';
+            $def .= ' MATCH ' . ( $c->match_type =~ /full/i ) ? 'FULL' : 'PARTIAL';
         }
 
+=cut
         if ( $c->on_delete ) {
             $def .= ' ON DELETE '.join( ' ', $c->on_delete );
         }
@@ -531,7 +529,7 @@ method create_constraint(Constraint $c, $options?) {
         if ( $c->on_update ) {
             $def .= ' ON UPDATE '.join( ' ', $c->on_update );
         }
-
+=cut
         if ( $c->deferrable ) {
             $def .= ' DEFERRABLE';
         }
