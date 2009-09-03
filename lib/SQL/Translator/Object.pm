@@ -44,11 +44,11 @@ class SQL::Translator::Object {
     );
 
     multi method comments(Str $comment) { $self->add_comment($comment) }
-    multi method comments(ArrayRef $comment) { $self->add_comment($comment) }
+    multi method comments(ArrayRef $comments) { $self->add_comment($_) for @$comments }
     multi method comments(Any $) { wantarray ? @{$self->_comments} : join "\n", $self->_comments }
 
     multi method options(Str $option) { $self->add_option($option) }
-    multi method options(ArrayRef $option) { $self->add_option($option) if scalar @$option }
+    multi method options(ArrayRef $options) { $self->add_option($_) for @$options }
     multi method options(Any $) { wantarray ? @{$self->_options} : $self->_options }
 
     multi method extra(Str $extra) { $self->get_extra($extra) }
