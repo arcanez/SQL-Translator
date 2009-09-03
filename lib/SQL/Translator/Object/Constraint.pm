@@ -54,9 +54,14 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     );
 
     has 'reference_columns' => (
-         isa => ArrayRef | Undef,
-         is => 'rw',
-         auto_deref => 1
+        isa => ArrayRef | Undef,
+        is => 'rw',
+        auto_deref => 1
+    );
+
+    has 'match_type' => (
+        isa => Str,
+        is => 'rw'
     );
 
     around add_column(Column $column) { $self->$orig($column->name, $column) }
@@ -66,6 +71,4 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     method field_names { $self->column_ids }
 
     method reference_fields { $self->reference_columns }
-
-    method match_type { }
 }
