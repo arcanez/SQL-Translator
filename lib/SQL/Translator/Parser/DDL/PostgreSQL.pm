@@ -36,7 +36,7 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
             my $table = Table->new({ name => $tdata->{table_name}, schema => $schema });
             $schema->add_table($table);
     
-            $table->extra(temporary => 1) if $tdata->{'temporary'};
+            $table->extra({ temporary => 1 }) if $tdata->{'temporary'};
             $table->comments( $tdata->{'comments'} );
     
             my @fields = sort { $tdata->{'fields'}{ $a }{'order'} <=> $tdata->{'fields'}{ $b }{'order'} } keys %{ $tdata->{'fields'} };
