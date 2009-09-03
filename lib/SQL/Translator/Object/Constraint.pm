@@ -40,7 +40,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     has 'deferrable' => (
         is => 'rw',
         isa => Bool,
-        default => 0
+        default => 1
     );
 
     has 'expression' => (
