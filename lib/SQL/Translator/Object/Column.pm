@@ -2,7 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Object::Column extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(Bool Int Maybe Str);
     use MooseX::MultiMethods;
-    use SQL::Translator::Types qw(ColumnSize Constraint Table Trigger);
+    use SQL::Translator::Types qw(Bit ColumnSize Constraint Table Trigger);
 
     has 'table' => (
         is => 'rw',
@@ -50,8 +50,9 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object {
 
     has 'is_auto_increment' => (
         is => 'rw',
-        isa => Bool,
+        isa => Bit,
         required => 1,
+        coerce => 1,
         default => 0
     );
 
