@@ -9,15 +9,13 @@ readme_from     ('lib/SQL/Translator.pm');
 
 tests           't/*.t';
 
-requires        'aliased',                      '0.22';
+requires        'aliased',                      '0.30';
 requires        'FindBin';
-requires        'Moose',                        '0.88';
-requires        'MooseX::AttributeHelpers',     '0.16';
-requires        'MooseX::Declare',              '0.23';
-requires        'MooseX::MethodAttributes',     '0.15';
-requires        'MooseX::Types',                '0.16';
-requires        'MooseX::Method::Signatures',   '0.16';
-requires        'MooseX::MultiMethods',         '0.04';
+requires        'Moose',                        '0.89_01';
+requires        'MooseX::Declare',              '0.29';
+requires        'MooseX::Types',                '0.19';
+requires        'MooseX::Method::Signatures',   '0.24';
+requires        'MooseX::MultiMethods',         '0.07';
 requires        'Parse::RecDescent',            '1.94';
 requires        'Tie::IxHash',                  '1.21';
 requires        'TryCatch',                     '1.001001';
