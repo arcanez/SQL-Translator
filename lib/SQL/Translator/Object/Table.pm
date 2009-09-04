@@ -20,6 +20,10 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object {
             get_columns   => 'values',
             get_column    => 'get',
             add_column    => 'set',
+
+            ## compat
+            get_fields    => 'values',
+            fields        => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -83,9 +87,6 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object {
     around add_index(Index $index) { $self->$orig($index->name, $index) }
     around add_constraint(Constraint $constraint) { $self->$orig($constraint->name, $constraint) }
     around add_sequence(Sequence $sequence) { $self->$orig($sequence->name, $sequence) }
-
-    method get_fields { $self->get_columns }
-    method fields { $self->column_ids }
 
     multi method primary_key(Any $) { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
     multi method primary_key(Str $column) { $self->get_column($column)->is_primary_key(1) }

@@ -26,6 +26,10 @@ class SQL::Translator::Object::Index extends SQL::Translator::Object {
             get_columns   => 'values',
             get_column    => 'get',
             add_column    => 'set',
+
+            ## compat
+            get_fields    => 'values',
+            fields        => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -37,7 +41,4 @@ class SQL::Translator::Object::Index extends SQL::Translator::Object {
     );
 
     around add_column(Column $column) { $self->$orig($column->name, $column) }
-
-    method get_fields { $self->get_columns }
-    method fields { $self->column_ids }
 }
