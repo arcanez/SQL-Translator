@@ -1,7 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Table extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(Any Bool HashRef Str);
-    use MooseX::AttributeHelpers;
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
     
@@ -12,57 +11,57 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object {
     );
     
     has 'columns' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Column],
-        provides => {
-            exists => 'exists_column',
-            keys   => 'column_ids',
-            values => 'get_columns',
-            get    => 'get_column',
-            set    => 'add_column',
+        handles => {
+            exists_column => 'exists',
+            column_ids    => 'keys',
+            get_columns   => 'values',
+            get_column    => 'get',
+            add_column    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'indexes' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Index],
-        provides => {
-            exists => 'exists_index',
-            keys   => 'index_ids',
-            values => 'get_indices',
-            get    => 'get_index',
-            set    => 'add_index',
+        handles => {
+            exists_index => 'exists',
+            index_ids    => 'keys',
+            get_indices  => 'values',
+            get_index    => 'get',
+            add_index    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'constraints' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Constraint],
-        provides => {
-            exists => 'exists_constraint',
-            keys   => 'constraint_ids',
-            values => 'get_constraints',
-            get    => 'get_constraint',
-            set    => 'add_constraint',
+        handles => {
+            exists_constraint => 'exists',
+            constraint_ids    => 'keys',
+            get_constraints   => 'values',
+            get_constraint    => 'get',
+            add_constraint    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'sequences' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Sequence],
-        provides => {
-            exists => 'exists_sequence',
-            keys   => 'sequence_ids',
-            values => 'get_sequences',
-            get    => 'get_sequence',
-            set    => 'add_sequence',
+        handles => {
+            exists_sequence => 'exists',
+            sequence_ids    => 'keys',
+            get_sequences   => 'values',
+            get_sequence    => 'get',
+            add_sequence    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );

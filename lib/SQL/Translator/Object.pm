@@ -5,39 +5,39 @@ class SQL::Translator::Object {
     use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
 
     has '_comments' => (
-        metaclass => 'Collection::Array',
+        traits => ['Array'],
         is => 'rw',
         isa => ArrayRef,
-        provides => {
-            push => 'add_comment',
-            pop  => 'remove_last_comment',
+        handles => {
+            add_comment         => 'push',
+            remove_last_comment => 'pop',
         },
         default => sub { [] },
         auto_deref => 1,
     );
 
     has '_options' => (
-        metaclass => 'Collection::Array',
+        traits => ['Array'],
         is => 'rw',
         isa => ArrayRef,
-        provides => {
-            push => 'add_option',
-            pop  => 'remove_last_option',
+        handles => {
+            add_option         => 'push',
+            remove_last_option => 'pop',
         },
         default => sub { [] },
         auto_deref => 1,
     );
 
     has '_extra' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef,
-        provides => {
-            exists => 'exists_extra',
-            keys   => 'extra_ids',
-            values => 'get_extras',
-            get    => 'get_extra',
-            set    => 'add_extra',
+        handles => {
+            exists_extra => 'exists',
+            extra_ids    => 'keys',
+            get_extras   => 'values',
+            get_extra    => 'get',
+            add_extra    => 'set',
         },
         default => sub { {} },
         auto_deref => 1,
