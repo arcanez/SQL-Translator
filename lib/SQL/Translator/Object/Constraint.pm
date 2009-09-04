@@ -30,7 +30,6 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
             ## compat
             get_fields    => 'values',
             fields        => 'keys',
-            field_names   => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
