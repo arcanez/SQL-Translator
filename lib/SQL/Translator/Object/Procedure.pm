@@ -1,7 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Str);
-    use MooseX::AttributeHelpers;
     use MooseX::MultiMethods;
     
     has 'name' => (
@@ -17,12 +16,12 @@ class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
     );
     
     has '_parameters' => (
-        metaclass => 'Collection::Array',
+        traits => ['Array'],
         is => 'rw',
         isa => ArrayRef,
-        provides => {
-            push => 'add_parameter',
-            pop  => 'remove_last_parameter',
+        handles => {
+            add_parameter         => 'push',
+            remove_last_parameter => 'pop',
         },
         default => sub { [] },
         auto_deref => 1,

@@ -1,7 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(HashRef Maybe Str);
-    use MooseX::AttributeHelpers;
     use SQL::Translator::Types qw(Procedure Table Trigger View);
  
     has 'name' => (
@@ -12,57 +11,57 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     );
     
     has 'tables' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Table],
-        provides => {
-            exists => 'exists_table',
-            keys   => 'table_ids',
-            values => 'get_tables',
-            get    => 'get_table',
-            set    => 'add_table',
+        handles => {
+            exists_table => 'exists',
+            table_ids    => 'keys',
+            get_tables   => 'values',
+            get_table    => 'get',
+            add_table    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'views' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[View],
-        provides => {
-            exists => 'exists_view',
-            keys   => 'view_ids',
-            values => 'get_views',
-            get    => 'get_view',
-            set    => 'add_view',
+        handles => {
+            exists_view => 'exists',
+            view_ids    => 'keys',
+            get_views   => 'values',
+            get_view    => 'get',
+            add_view    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
     
     has 'procedures' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Procedure],
-        provides => {
-            exists => 'exists_procedure',
-            keys   => 'procedure_ids',
-            values => 'get_procedures',
-            get    => 'get_procedure',
-            set    => 'add_procedure',
+        handles => {
+            exists_procedure => 'exists',
+            procedure_ids    => 'keys',
+            get_procedures   => 'values',
+            get_procedure    => 'get',
+            add_procedure    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
     has 'triggers' => (
-        metaclass => 'Collection::Hash',
+        traits => ['Hash'],
         is => 'rw',
         isa => HashRef[Trigger],
-        provides => {
-            exists => 'exists_trigger',
-            keys   => 'trigger_ids',
-            values => 'get_triggers',
-            get    => 'get_trigger',
-            set    => 'add_trigger',
+        handles => {
+            exists_trigger => 'exists',
+            trigger_ids    => 'keys',
+            get_triggers   => 'values',
+            get_trigger    => 'get',
+            add_trigger    => 'set',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
