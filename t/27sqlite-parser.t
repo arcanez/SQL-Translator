@@ -1,16 +1,9 @@
-#!/usr/bin/perl
-# vim: set ft=perl:
-
 use strict;
+use warnings;
 use Test::More;
-use Test::SQL::Translator qw(maybe_plan);
 use FindBin qw/$Bin/;
 use SQL::Translator;
 use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
-
-BEGIN {
-    maybe_plan(12, 'SQL::Translator::Parser::DDL::SQLite');
-}
 
 my $file = "$Bin/data/sqlite/create.sql";
 
@@ -52,4 +45,6 @@ my $file = "$Bin/data/sqlite/create.sql";
 
     my @triggers = $schema->get_triggers;
     is( scalar @triggers, 1, 'Parsed one triggers' );
+
+    done_testing;
 }

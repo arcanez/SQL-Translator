@@ -1,16 +1,8 @@
-#!/usr/bin/perl
-# vim: set ft=perl:
-
 use strict;
+use warnings;
 use Test::More;
 use SQL::Translator;
 use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
-use Test::SQL::Translator qw(maybe_plan);
-
-BEGIN {
-    maybe_plan(120, 'SQL::Translator::Parser::DDL::PostgreSQL');
-#    SQL::Translator::Parser::PostgreSQL->import('parse');
-}
 
 my $t   = SQL::Translator->new( trace => 0, from => 'PostgreSQL' );
 my $sql = q[
@@ -278,3 +270,5 @@ is( $t2_c3->type, CHECK_C, "Constraint is a 'CHECK'" );
 is( exists $schema->get_table('products_1')->extra()->{'temporary'}, "", "Table is NOT temporary");
 is( $schema->get_table('products_2')->extra('temporary'), 1,"Table is TEMP");
 is( $schema->get_table('products_3')->extra('temporary'), 1,"Table is TEMPORARY");
+
+done_testing;

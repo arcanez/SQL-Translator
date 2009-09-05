@@ -1,8 +1,6 @@
-#!/usr/bin/perl
-
 use warnings;
 use strict;
-use Test::More qw/no_plan/;
+use Test::More;
 use Test::Exception;
 use Test::Differences;
 use FindBin qw/$Bin/;
@@ -122,18 +120,15 @@ for my $args (@$plan) {
       local $TODO = $args->{todo} if $args->{todo};
 
       lives_ok (
-#        sub { check_roundtrip ($args, $base_schema) },
         sub { check_roundtrip ($args, $base_t, $base_schema) },
-#        sub { check_roundtrip ($args, $base_schema) },
         "Round trip for $args->{name} did not throw an exception",
       );
     }
   }
 }
+done_testing;
 
 sub check_roundtrip {
-#  my ($args, $base_schema) = @_;
-#  my $base_t = $base_schema->translator;
   my ($args, $base_t, $base_schema) = @_;
 
 # create some output from the submitted schema
