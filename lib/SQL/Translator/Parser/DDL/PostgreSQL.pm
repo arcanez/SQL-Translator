@@ -60,7 +60,7 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
                 $table->primary_key($field->name) if $fdata->{is_primary_key};
     
                 for my $cdata ( @{ $fdata->{constraints} } ) {
-                    next unless $cdata->{type} eq 'foreign_key';
+                    next unless lc $cdata->{type} eq 'foreign_key';
                     $cdata->{fields} ||= [ $field->name ];
                     push @{ $tdata->{constraints} }, $cdata;
                 }
