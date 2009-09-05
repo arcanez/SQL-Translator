@@ -78,10 +78,11 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
     
             for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
                 my $constraint;
-                if (uc $cdata->{type} eq 'PRIMARY_KEY') {
+                $cdata->{type} =~ s/_/ /g;
+                if (uc $cdata->{type} eq PRIMARY_KEY) {
                     $constraint = PrimaryKey->new({ name => $cdata->{name} || '', table => $table });
                     $table->get_column($_)->is_primary_key(1) for @{$cdata->{fields}};
-                } elsif (uc $cdata->{type} eq 'FOREIGN_KEY') {
+                } elsif (uc $cdata->{type} eq FOREIGN_KEY) {
                     $constraint = ForeignKey->new({ name => $cdata->{name} || '',
                                                     table => $table,
                                                     reference_table => $cdata->{reference_table},
