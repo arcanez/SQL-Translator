@@ -37,7 +37,7 @@ role SQL::Translator::Parser::DDL::SQLite {
         my $schema = $translator->schema;
         my @tables = 
             map   { $_->[1] }
-#            sort  { $a->[0] <=> $b->[0] } 
+            sort  { $a->[0] <=> $b->[0] }
             map   { [ $result->{'tables'}{ $_ }->{'order'}, $_ ] }
             keys %{ $result->{'tables'} };
     
