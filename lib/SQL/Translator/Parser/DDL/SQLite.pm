@@ -101,20 +101,6 @@ role SQL::Translator::Parser::DDL::SQLite {
                     $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 }
                 $table->add_constraint($constraint);
-=cut
-                my $constraint = Constraint->new({
-                    name             => $cdata->{'name'},
-                    type             => $cdata->{'type'},
-                    columns          => $cdata->{'fields'},
-                    reference_table  => $cdata->{'reference_table'},
-                    reference_fields => $cdata->{'reference_fields'},
-                    match_type       => $cdata->{'match_type'} || '',
-                    on_delete        => $cdata->{'on_delete'} || $cdata->{'on_delete_do'},
-                    on_update        => $cdata->{'on_update'} || $cdata->{'on_update_do'},
-                    table            => $table,
-                });
-                $table->add_constraint($constraint);
-=cut
             }
         }
     
