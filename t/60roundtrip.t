@@ -20,16 +20,16 @@ my $plan = [
   {
     engine => 'YAML',
   },
-#  {
-#    engine => 'SQLite',
-#    producer_args => {},
-#    parser_args => {},
-#  },
-#  {
-#    engine => 'MySQL',
-#    producer_args => {},
-#    parser_args => {},
-#  },
+  {
+    engine => 'SQLite',
+    producer_args => {},
+    parser_args => {},
+  },
+  {
+    engine => 'MySQL',
+    producer_args => {},
+    parser_args => {},
+  },
 #  {
 #    engine => 'MySQL',
 #    name => 'MySQL 5.0',
@@ -131,13 +131,13 @@ for my $args (@$plan) {
   }
 }
 
-
 sub check_roundtrip {
 #  my ($args, $base_schema) = @_;
 #  my $base_t = $base_schema->translator;
   my ($args, $base_t, $base_schema) = @_;
 
 # create some output from the submitted schema
+
   my $base_out = $base_t->translate(
     data => $base_schema,
     producer => $args->{engine},
@@ -154,8 +154,8 @@ sub check_roundtrip {
   };
 
 # parse the sql back
-  my $parser_t = SQL::Translator->new; #({ parser => $args->{engine} });
-  $parser_t->$_ (1) for qw/add_drop_table no_comments/;
+  my $parser_t = SQL::Translator->new;
+  $parser_t->$_(1) for qw/add_drop_table no_comments/;
   my $mid_schema = $parser_t->translate (
     data => $base_out,
     parser => $args->{engine},
