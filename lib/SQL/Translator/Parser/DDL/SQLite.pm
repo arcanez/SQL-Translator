@@ -91,7 +91,7 @@ role SQL::Translator::Parser::DDL::SQLite {
                     $constraint = ForeignKey->new({ name => $cdata->{name} || 'foreign_key',
                                                     table => $table,
                                                     reference_table => $cdata->{reference_table},
-                                                    reference_columns => $cdata->{reference_fields},
+                                                    reference_columns => ref $cdata->{reference_fields} ? $cdata->{reference_fields} : [ $cdata->{reference_fields} ],
                                                     on_delete => $cdata->{on_delete} || $cdata->{on_delete_do},
                                                     on_update => $cdata->{on_update} || $cdata->{on_update_do} });
                     $table->get_column($_)->is_foreign_key(1) for @{$cdata->{fields}};
