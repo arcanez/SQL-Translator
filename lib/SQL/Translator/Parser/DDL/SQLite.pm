@@ -28,7 +28,7 @@ role SQL::Translator::Parser::DDL::SQLite {
     
         unless (defined $parser) {
             return $translator->error("Error instantiating Parse::RecDescent ".
-                "instance: Bad grammer");
+                "instance: Bad grammar");
         }
     
         my $result = $parser->startrule($data);
