@@ -841,3 +841,5 @@ ok ($@, 'Exception thrown on invalid version string');
     is( $f3->default_value, "test single quotes escaped like you\\'re", "Single quote in default value is escaped properly" );
     is( $f3->is_primary_key, 0, 'Field is not PK' );
 }
+
+done_testing;
