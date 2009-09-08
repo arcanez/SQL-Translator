@@ -673,10 +673,11 @@ my $parse_as = {
     },
 };
 
+my $tr = SQL::Translator->new;
 for my $target (keys %$parse_as) {
     for my $str (keys %{$parse_as->{$target}}) {
         cmp_ok (
-            SQL::Translator::Utils::parse_mysql_version ($str, $target),
+            $tr->engine_version($str, $target),
             '==',
             $parse_as->{$target}{$str},
             "'$str' parsed as $target version '$parse_as->{$target}{$str}'",
@@ -684,11 +685,11 @@ for my $target (keys %$parse_as) {
     }
 }
 
-eval { SQL::Translator::Utils::parse_mysql_version ('bogus5.1') };
+eval { $tr->engine_version ('bogus5.1') };
 ok ($@, 'Exception thrown on invalid version string');
 
 {
-    my $tr = SQL::Translator->new;
+    my $tr = SQL::Translator->new({ from => 'MySQL' });
     my $data = q|create table merge_example (
        id int(11) NOT NULL auto_increment,
        shape_field geometry NOT NULL,
