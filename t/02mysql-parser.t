@@ -14,9 +14,8 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
         fulltext key `session_fulltext` (a_session)
     );|;
 
-    #my $val = $tr->parse();
-#    my $val = $tr->parse($data);
-    my $schema = $tr->parse($data);
+    my $val = $tr->parse($data);
+    my $schema = $tr->schema;
     is( $schema->is_valid, 1, 'Schema is valid' );
     my @tables = $schema->get_tables;
     is( scalar @tables, 1, 'Right number of tables (1)' );
@@ -60,7 +59,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 
 {
     my $tr = SQL::Translator->new({ from => 'MySQL' });
-    my $schema = $tr->parse(
+    my $val = $tr->parse(
         q[
             CREATE TABLE `check` (
               check_id int(7) unsigned zerofill NOT NULL default '0000000' 
@@ -77,12 +76,12 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
               KEY (i1),
               UNIQUE (date, i1),
               KEY date_idx (date),
-              KEY name_idx (name(10))
+              KEY name_idx (name)
             ) TYPE=MyISAM PACK_KEYS=1;
         ]
-    );
+    ); ## KEY name_idx (name(10))
     
-#    my $schema = $tr->schema;
+    my $schema = $tr->schema;
     is( $schema->is_valid, 1, 'Schema is valid' );
     my @tables = $schema->get_tables;
     is( scalar @tables, 1, 'Right number of tables (1)' );
@@ -212,8 +211,8 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 }
 
 {
-    my $tr = SQL::Translator->new;
-    my $data = parse($tr, 
+    my $tr = SQL::Translator->new({ from => 'MySQL' });
+    my $val = $tr->parse(
         q[
             CREATE TABLE orders (
               order_id                  integer NOT NULL auto_increment,
@@ -399,8 +398,8 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 #    Ignoring INSERT statements
 #
 {
-    my $tr = SQL::Translator->new;
-    my $data = parse($tr, 
+    my $tr = SQL::Translator->new({ from => 'MySQL' });
+    my $data = $tr->parse(
         q[
             USE database_name;
 
@@ -472,9 +471,9 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 #    charset table option
 #
 {
-    my $tr = SQL::Translator->new(parser_args => {mysql_parser_version => 50003});
-    my $data = parse($tr, 
-        q[
+    my $tr = SQL::Translator->new({ from => 'MySQL', parser_args => { mysql_parser_version => 50003 } });
+    my $data = $tr->parse(
+            q[
         	DELIMITER ;;
             /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;;
 			/*!50003 CREATE */ /*!50017 DEFINER=`cmdomain`@`localhost` */
@@ -631,8 +630,8 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 
 # Tests for collate table option
 {
-    my $tr = SQL::Translator->new(parser_args => {mysql_parser_version => 50003});
-    my $data = parse($tr, 
+    my $tr = SQL::Translator->new({ from => 'MySQL', parser_args => { mysql_parser_version => 50003 } });
+    my $data = $tr->parse(
         q[
           CREATE TABLE test ( id int ) DEFAULT CHARACTER SET latin1 COLLATE latin1_bin;
          ] ); 
@@ -697,7 +696,7 @@ ok ($@, 'Exception thrown on invalid version string');
        SPATIAL KEY shape_field (shape_field)
     ) ENGINE=MRG_MyISAM UNION=(`sometable_0`,`sometable_1`,`sometable_2`);|;
 
-    my $val = parse($tr, $data);
+    my $val = $tr->parse($data);
     my $schema = $tr->schema;
     is( $schema->is_valid, 1, 'Schema is valid' );
     my @tables = $schema->get_tables;
@@ -766,9 +765,9 @@ ok ($@, 'Exception thrown on invalid version string');
         ) ENGINE=innodb;|,
     );
     for my $data (@data) {
-        my $tr = SQL::Translator->new;
+        my $tr = SQL::Translator->new({ from => 'MySQL' });
 
-        my $val = parse($tr, $data);
+        my $val = $tr->parse($data);
         my $schema = $tr->schema;
         is( $schema->is_valid, 1, 'Schema is valid' );
         my @tables = $schema->get_tables;
@@ -798,14 +797,14 @@ ok ($@, 'Exception thrown on invalid version string');
 }
 
 {
-    my $tr = SQL::Translator->new;
+    my $tr = SQL::Translator->new({ from => 'MySQL' });
     my $data = q|create table "sessions" (
         id char(32) not null default '0' primary key,
         ssn varchar(12) NOT NULL default 'test single quotes like in you''re',
         user varchar(20) NOT NULL default 'test single quotes escaped like you\'re',
     );|;
 
-    my $val = parse($tr, $data);
+    my $val = $tr->parse($data);
     my $schema = $tr->schema;
     is( $schema->is_valid, 1, 'Schema is valid' );
     my @tables = $schema->get_tables;
