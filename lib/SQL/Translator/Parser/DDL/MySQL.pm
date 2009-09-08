@@ -63,9 +63,9 @@ role SQL::Translator::Parser::DDL::MySQL {
                     is_auto_increment => $fdata->{is_auto_inc},
                     is_nullable       => $fdata->{null},
                     is_primary_key    => $fdata->{is_primary_key} ? 1 : 0,
-                    comments          => $fdata->{comments},
                     table             => $table,
                 });
+                $field->comments($fdata->{comments});
                 $table->add_column($field);
     
                 $table->primary_key( $field->name ) if $fdata->{'is_primary_key'};
