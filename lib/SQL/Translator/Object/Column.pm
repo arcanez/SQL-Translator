@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Column extends SQL::Translator::Object {
-    use MooseX::Types::Moose qw(Bool Int Maybe Str);
+    use MooseX::Types::Moose qw(Bool Int Maybe ScalarRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Bit ColumnSize Constraint Table Trigger);
 
@@ -45,7 +45,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object {
     
     has 'default_value' => (
         is => 'rw',
-        isa => Maybe[Str],
+        isa => Maybe[ScalarRef|Str],
     );
 
     has 'is_auto_increment' => (
