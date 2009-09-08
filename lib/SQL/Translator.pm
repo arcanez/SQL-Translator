@@ -114,4 +114,38 @@ class SQL::Translator {
 
     method parser_type { return $self->parser }
     method producer_type { return $self->producer }
+
+    method engine_version(Int|Str $v, Str $target = 'perl') {
+        my @vers;
+
+        # X.Y.Z style 
+        if ( $v =~ / ^ (\d+) \. (\d{1,3}) (?: \. (\d{1,3}) )? $ /x ) {
+            push @vers, $1, $2, $3;
+        }
+
+        # XYYZZ (mysql) style 
+        elsif ( $v =~ / ^ (\d) (\d{2}) (\d{2}) $ /x ) {
+            push @vers, $1, $2, $3;
+        }
+
+        # XX.YYYZZZ (perl) style or simply X 
+        elsif ( $v =~ / ^ (\d+) (?: \. (\d{3}) (\d{3}) )? $ /x ) {
+            push @vers, $1, $2, $3;
+        }
+        else {
+            #how do I croak sanely here?
+            die "Unparseable MySQL version '$v'";
+        }
+
+        if ($target eq 'perl') {
+            return sprintf ('%d.%03d%03d', map { $_ || 0 } (@vers) );
+        }
+        elsif ($target eq 'mysql') {
+            return sprintf ('%d%02d%02d', map { $_ || 0 } (@vers) );
+        }
+        else {
+            #how do I croak sanely here?
+            die "Unknown version target '$target'";
+        }
+    }
 } 
