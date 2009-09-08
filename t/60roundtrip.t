@@ -28,18 +28,18 @@ my $plan = [
     producer_args => {},
     parser_args => {},
   },
-#  {
-#    engine => 'MySQL',
-#    name => 'MySQL 5.0',
-#    producer_args => { mysql_version => 5 },
-#    parser_args => { mysql_parser_version => 5 },
-#  },
-#  {
-#    engine => 'MySQL',
-#    name => 'MySQL 5.1',
-#    producer_args => { mysql_version => '5.1' },
-#    parser_args => { mysql_parser_version => '5.1' },
-#  },
+  {
+    engine => 'MySQL',
+    name => 'MySQL 5.0',
+    producer_args => { mysql_version => 5 },
+    parser_args => { mysql_parser_version => 5 },
+  },
+  {
+    engine => 'MySQL',
+    name => 'MySQL 5.1',
+    producer_args => { mysql_version => '5.1' },
+    parser_args => { mysql_parser_version => '5.1' },
+  },
   {
     engine => 'PostgreSQL',
     producer_args => {},
