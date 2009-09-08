@@ -1,11 +1,11 @@
 package SQL::Translator::Constants;
 use DBI qw(:sql_types);
 use Sub::Exporter -setup => {
-    exports => [ @{$DBI::EXPORT_TAGS{sql_types}}, CHECK_C, FOREIGN_KEY, FULL_TEXT, SPATIAL, NOT_NULL, NORMAL, NULL, PRIMARY_KEY, UNIQUE ],
+    exports => [ @{$DBI::EXPORT_TAGS{sql_types}}, CHECK_C, FOREIGN_KEY, FULL_TEXT, SPATIAL, NOT_NULL, NORMAL, NULL, PRIMARY_KEY, UNIQUE, DEFAULT_PARSER_VERSION ],
     groups => {
         sqlt_types => [ @{$DBI::EXPORT_TAGS{sql_types}} ],
         sqlt_fk_actions => [ qw(SQLT_FK_CASCADE SQLT_FK_RESTRICT SQLT_FK_SET_NULL SQLT_FK_NO_ACTION SQLT_FK_SET_DEFAULT) ],
-        sqlt_constants => [ qw(CHECK_C FOREIGN_KEY FULL_TEXT SPATIAL NOT_NULL NORMAL NULL PRIMARY_KEY UNIQUE) ],
+        sqlt_constants => [ qw(CHECK_C FOREIGN_KEY FULL_TEXT SPATIAL NOT_NULL NORMAL NULL PRIMARY_KEY UNIQUE DEFAULT_PARSER_VERSION) ],
     }
 };
 
@@ -24,5 +24,7 @@ use constant NORMAL => 'NORMAL';
 use constant NULL => 'NULL';
 use constant PRIMARY_KEY => 'PRIMARY KEY';
 use constant UNIQUE => 'UNIQUE';
+
+use constant DEFAULT_PARSER_VERSION => 30000;
 
 1;
