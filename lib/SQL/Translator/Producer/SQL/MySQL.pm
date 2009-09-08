@@ -161,7 +161,7 @@ role SQL::Translator::Producer::SQL::MySQL {
         my $schema         = $translator->schema;
         my $show_warnings  = $translator->show_warnings || 0;
         my $producer_args  = $translator->producer_args;
-        my $mysql_version  = $self->parse_mysql_version ($producer_args->{mysql_version}, 'perl') || 0;
+        my $mysql_version  = $translator->engine_version ($producer_args->{mysql_version}, 'perl') || 0;
         my $max_id_length  = $producer_args->{mysql_max_id_length} || $DEFAULT_MAX_ID_LENGTH;
     
         my ($qt, $qf, $qc) = ('','', '');
@@ -803,62 +803,22 @@ HEADER_COMMENT
 	return $header_comment;
     }
 
-    method parse_mysql_version($v?, $target?) {
-        return undef unless $v;
+    use constant COLLISION_TAG_LENGTH => 8;
 
-        $target ||= 'perl';
+    method truncate_id_uniquely(Str $desired_name, Int $max_symbol_length) {
+        return $desired_name
+          unless defined $desired_name && length $desired_name > $max_symbol_length;
 
-        my @vers;
+        my $truncated_name = substr $desired_name, 0,
+          $max_symbol_length - COLLISION_TAG_LENGTH - 1;
 
-        # X.Y.Z style 
-        if ( $v =~ / ^ (\d+) \. (\d{1,3}) (?: \. (\d{1,3}) )? $ /x ) {
-            push @vers, $1, $2, $3;
-        }
+        # Hex isn't the most space-efficient, but it skirts around allowed
+        # charset issues
+        my $digest = sha1_hex($desired_name);
+        my $collision_tag = substr $digest, 0, COLLISION_TAG_LENGTH;
 
-        # XYYZZ (mysql) style 
-        elsif ( $v =~ / ^ (\d) (\d{2}) (\d{2}) $ /x ) {
-            push @vers, $1, $2, $3;
-        }
-
-        # XX.YYYZZZ (perl) style or simply X 
-        elsif ( $v =~ / ^ (\d+) (?: \. (\d{3}) (\d{3}) )? $ /x ) {
-            push @vers, $1, $2, $3;
-        }
-        else {
-            #how do I croak sanely here?
-            die "Unparseable MySQL version '$v'";
-        }
-
-        if ($target eq 'perl') {
-            return sprintf ('%d.%03d%03d', map { $_ || 0 } (@vers) );
-        }
-        elsif ($target eq 'mysql') {
-            return sprintf ('%d%02d%02d', map { $_ || 0 } (@vers) );
-        }
-        else {
-            #how do I croak sanely here?
-            die "Unknown version target '$target'";
-        }
+        return $truncated_name
+             . '_'
+             . $collision_tag;
     }
-
-use constant COLLISION_TAG_LENGTH => 8;
-
-method truncate_id_uniquely(Str $desired_name, Int $max_symbol_length) {
-    return $desired_name
-      unless defined $desired_name && length $desired_name > $max_symbol_length;
-
-    my $truncated_name = substr $desired_name, 0,
-      $max_symbol_length - COLLISION_TAG_LENGTH - 1;
-
-    # Hex isn't the most space-efficient, but it skirts around allowed
-    # charset issues
-    my $digest = sha1_hex($desired_name);
-    my $collision_tag = substr $digest, 0, COLLISION_TAG_LENGTH;
-
-    return $truncated_name
-         . '_'
-         . $collision_tag;
-}
-
-
 }
