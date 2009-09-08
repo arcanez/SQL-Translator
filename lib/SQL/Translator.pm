@@ -1,7 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator {
     use TryCatch;
-    use MooseX::Types::Moose qw(Bool HashRef Str);
+    use MooseX::Types::Moose qw(Bool HashRef Int Str Undef);
     use SQL::Translator::Types qw(DBIHandle Parser Producer Schema);
     use SQL::Translator::Object::Schema;
 
@@ -99,23 +99,32 @@ class SQL::Translator {
     }
 
     method translate(:$data, :$producer?, :$producer_args?, :$parser?, :$parser_args?) {
-        if ($parser) {
+        my $return;
+
+        $parser ||= $self->parser;
+        if (defined $parser) {
             $self->_clear_parser;
             $self->parser($parser);
             $self->parse($data);
-            $self->schema;
-        } elsif ($producer) {
-            $self->_clear_producer;
-            $self->parse($data) if $data;
-            $self->producer($producer);
-            $self->produce;
+            $return = $self->schema;
         }
+
+        $producer ||= $self->producer;
+        if (defined $producer) {
+            $self->_clear_producer;
+            $self->producer($producer);
+            $return = $self->produce;
+        }
+
+        return $return;
     }
 
     method parser_type { return $self->parser }
     method producer_type { return $self->producer }
 
-    method engine_version(Int|Str $v, Str $target = 'perl') {
+    method engine_version(Int|Str|Undef $v, Str $target = 'perl') {
+        return undef unless $v;
+
         my @vers;
 
         # X.Y.Z style 
