@@ -1,17 +1,8 @@
-#!/usr/bin/perl
 use strict;
-
+use warnings;
 use Test::More;
 use SQL::Translator;
-#use SQL::Translator::Schema::Constants;
 use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
-#use SQL::Translator::Utils qw//;
-use Test::SQL::Translator qw(maybe_plan);
-
-BEGIN {
-    maybe_plan(317, "SQL::Translator::Parser::DDL::MySQL");
-#    SQL::Translator::Parser::DDL::MySQL->import('parse');
-}
 
 {
     my $tr = SQL::Translator->new({ from => 'MySQL' });
