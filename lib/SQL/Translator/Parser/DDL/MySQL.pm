@@ -145,10 +145,6 @@ role SQL::Translator::Parser::DDL::MySQL {
                 $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 $table->add_constraint($constraint);
             }
-    
-            # After the constrains and PK/idxs have been created, 
-            # we normalize fields
-            normalize_field($_) for $table->get_fields;
         }
         
         for my $proc_name ( keys %{ $result->{procedures} } ) {
@@ -166,87 +162,6 @@ role SQL::Translator::Parser::DDL::MySQL {
             });
             $schema->add_view($view);
         }
-        return 1;
-    }
-    
-    # Takes a field, and returns 
-    method normalize_field {
-        my ($size, $type, $list, $changed); # = @_;
-      
-        $size = $self->size || 0;
-        $type = $self->data_type;
-        $list = $self->extra->{list} || [];
-
-        if ( !ref $size && $size == 0 ) {
-            if ( lc $type eq 'tinyint' ) {
-                $changed = $size != 4;
-                $size = 4;
-            }
-            elsif ( lc $type eq 'smallint' ) {
-                $changed = $size != 6;
-                $size = 6;
-            }
-            elsif ( lc $type eq 'mediumint' ) {
-                $changed = $size != 9;
-                $size = 9;
-            }
-            elsif ( $type =~ /^int(eger)?$/i ) {
-                $changed = $size != 11 || $type ne 'int';
-                $type = 'int';
-                $size = 11;
-            }
-            elsif ( lc $type eq 'bigint' ) {
-                $changed = $size != 20;
-                $size = 20;
-            }
-            elsif ( lc $type =~ /(float|double|decimal|numeric|real|fixed|dec)/ ) {
-                my $old_size = (ref $size || '') eq 'ARRAY' ? $size : [];
-                $changed     = @$old_size != 2 
-                            || $old_size->[0] != 8 
-                            || $old_size->[1] != 2;
-                $size        = [8,2];
-            }
-        }
-    
-        if ( $type =~ /^tiny(text|blob)$/i ) {
-            $changed = $size != 255;
-            $size = 255;
-        }
-        elsif ( $type =~ /^(blob|text)$/i ) {
-            $changed = $size != 65_535;
-            $size = 65_535;
-        }
-        elsif ( $type =~ /^medium(blob|text)$/i ) {
-            $changed = $size != 16_777_215;
-            $size = 16_777_215;
-        }
-        elsif ( $type =~ /^long(blob|text)$/i ) {
-            $changed = $size != 4_294_967_295;
-            $size = 4_294_967_295;
-        }
-    
-        if ( $type =~ /(set|enum)/i && !$size ) {
-            my %extra = $self->extra;
-            my $longest = 0;
-            for my $len ( map { length } @{ $extra{'list'} || [] } ) {
-                $longest = $len if $len > $longest;
-            }
-            $changed = 1;
-            $size = $longest if $longest;
-        }
-    
-#        if ( $changed ) {
-            # We only want to clone the field, not *everything*
-#            {
-#                local $field->{table} = undef;
-#                $field->parsed_field( dclone( $field ) );
-#                $field->parsed_field->{table} = $field->table;
-#            }
-            $self->size( $size );
-            $self->data_type( $type );
-#            $column->sql_data_type( $self->data_type_mapping->{$type} || -99999 );
-            $self->extra->{list} = $list if @$list;
-#        }
         return 1;
     }
 }
