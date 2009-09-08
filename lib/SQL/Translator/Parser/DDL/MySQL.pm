@@ -8,8 +8,10 @@ role SQL::Translator::Parser::DDL::MySQL {
     use aliased 'SQL::Translator::Object::ForeignKey';
     use aliased 'SQL::Translator::Object::Index';
     use aliased 'SQL::Translator::Object::PrimaryKey';
+    use aliased 'SQL::Translator::Object::Procedure';
     use aliased 'SQL::Translator::Object::Schema';
     use aliased 'SQL::Translator::Object::Table';
+    use aliased 'SQL::Translator::Object::View';
 
     around _build_data_type_mapping {
         my $data_type_mapping = $self->$orig;
