@@ -47,11 +47,13 @@ class SQL::Translator {
     has 'parser_args' => (
         isa => HashRef,
         is => 'rw',
+        predicate => 'has_parser_args',
     );
 
     has 'producer_args' => (
         isa => HashRef,
         is => 'rw',
+        predicate => 'has_producer_args',
     );
     
     has 'add_drop_table' => (isa => Bool, is => 'rw', default => 0);
