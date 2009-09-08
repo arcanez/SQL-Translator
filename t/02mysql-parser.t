@@ -308,7 +308,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     is( $f7->is_nullable, 0, 'Field cannot be null' );
     is( $f7->is_foreign_key, 1, 'Field is a FK' );
     my $fk_ref = $f7->foreign_key_reference;
-    isa_ok( $fk_ref, 'SQL::Translator::Schema::Constraint', 'FK' );
+    isa_ok( $fk_ref, 'SQL::Translator::Object::Constraint', 'FK' );
     is( $fk_ref->reference_table, 'store', 'FK is to "store" table' );
 
     my $f8 = shift @fields;
