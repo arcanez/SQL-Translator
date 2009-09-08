@@ -30,17 +30,17 @@ role SQL::Translator::Parser::DDL::MySQL {
                 "instance: Bad grammar");
         }
 
-#    my $parser_version = parse_mysql_version(
-#        $translator->parser_args->{mysql_parser_version}, 'mysql'
-#    ) || DEFAULT_PARSER_VERSION;
-        my $parser_version = 30000;
+        my $translator = $self->translator;
+
+        my $parser_version = $translator->has_parser_args
+                             ? $translator->engine_version($translator->parser_args->{mysql_parser_version}, 'mysql') || DEFAULT_PARSER_VERSION
+                             : DEFAULT_PARSER_VERSION;
     
         while ($data =~ s#/\*!(\d{5})?(.*?)\*/#($1 && $1 > $parser_version ? '' : $2)#es) { }
 
         my $result = $parser->startrule($data);
         die "Parse failed" unless defined $result;
     
-        my $translator = $self->translator;
         my $schema = $translator->schema;
         $schema->name($result->{'database_name'}) if $result->{'database_name'};
     
