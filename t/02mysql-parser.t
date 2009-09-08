@@ -36,7 +36,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 
     is( $f2->name, 'a_session', 'Second field name is "a_session"' );
     is( $f2->data_type, 'text', 'Type is "text"' );
-    is( $f2->size, 65_535, 'Size is "65,535"' );
+    is( $f2->size, 0, 'Size is "0"' );
     is( $f2->is_nullable, 1, 'Field can be null' );
     is( $f2->default_value, undef, 'Default value is undefined' );
     is( $f2->is_primary_key, 0, 'Field is not PK' );
@@ -129,7 +129,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     my $f5 = shift @fields;
     is( $f5->name, 's1', 'Fifth field name is "s1"' );
     is( $f5->data_type, 'set', 'Type is "set"' );
-    is( $f5->size, 1, 'Size is "1"' );
+    is( $f5->size, 0, 'Size is "0"' );
     is( $f5->is_nullable, 1, 'Field can be null' );
     is( $f5->default_value, 'b', 'Default value is "b"' );
     is( $f5->is_primary_key, 0, 'Field is not PK' );
@@ -139,7 +139,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     my $f6 = shift @fields;
     is( $f6->name, 'e1', 'Sixth field name is "e1"' );
     is( $f6->data_type, 'enum', 'Type is "enum"' );
-    is( $f6->size, 1, 'Size is "1"' );
+    is( $f6->size, 0, 'Size is "0"' );
     is( $f6->is_nullable, 1, 'Field can be null' );
     is( $f6->default_value, 'c', 'Default value is "c"' );
     is( $f6->is_primary_key, 0, 'Field is not PK' );
@@ -157,7 +157,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     my $f8 = shift @fields;
     is( $f8->name, 'foo_type', 'Eighth field name is "foo_type"' );
     is( $f8->data_type, 'enum', 'Type is "enum"' );
-    is( $f8->size, 2, 'Size is "2"' );
+    is( $f8->size, 0, 'Size is "0"' );
     is( $f8->is_nullable, 0, 'Field cannot be null' );
     is( $f8->default_value, 'vk', 'Default value is "vk"' );
     is( $f8->is_primary_key, 0, 'Field is not PK' );
@@ -263,8 +263,8 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
 
     my $f1 = shift @fields;
     is( $f1->name, 'order_id', 'First field name is "order_id"' );
-    is( $f1->data_type, 'int', 'Type is "int"' );
-    is( $f1->size, 11, 'Size is "11"' );
+    is( $f1->data_type, 'integer', 'Type is "integer"' );
+    is( $f1->size, 0, 'Size is "0"' );
     is( $f1->is_nullable, 0, 'Field cannot be null' );
     is( $f1->default_value, undef, 'Default value is undefined' );
     is( $f1->is_primary_key, 1, 'Field is PK' );
@@ -282,23 +282,23 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     is( $f3->name, 'billing_address_id', 
         'Third field name is "billing_address_id"' );
     is( $f3->data_type, 'int', 'Type is "int"' );
-    is( $f3->size, 11, 'Size is "11"' );
+    is( $f3->size, 0, 'Size is "0"' );
 
     my $f4 = shift @fields;
     is( $f4->name, 'shipping_address_id', 
         'Fourth field name is "shipping_address_id"' );
     is( $f4->data_type, 'int', 'Type is "int"' );
-    is( $f4->size, 11, 'Size is "11"' );
+    is( $f4->size, 0, 'Size is "0"' );
 
     my $f5 = shift @fields;
     is( $f5->name, 'credit_card_id', 'Fifth field name is "credit_card_id"' );
     is( $f5->data_type, 'int', 'Type is "int"' );
-    is( $f5->size, 11, 'Size is "11"' );
+    is( $f5->size, 0, 'Size is "0"' );
 
     my $f6 = shift @fields;
     is( $f6->name, 'status', 'Sixth field name is "status"' );
     is( $f6->data_type, 'smallint', 'Type is "smallint"' );
-    is( $f6->size, 6, 'Size is "6"' );
+    is( $f6->size, 0, 'Size is "0"' );
     is( $f6->is_nullable, 0, 'Field cannot be null' );
 
     my $f7 = shift @fields;
