@@ -107,25 +107,25 @@ role SQL::Translator::Parser::DDL::MySQL {
             }
             
     
-#            if ( my @options = @{ $tdata->{'table_options'} || [] } ) {
-#                my @cleaned_options;
-#                my @ignore_opts = $self->parser_args->{'ignore_opts'}
-#                    ? split( /,/, $self->parser_args->{'ignore_opts'} )
-#                    : ();
-#                if (@ignore_opts) {
-#                    my $ignores = { map { $_ => 1 } @ignore_opts };
-#                    foreach my $option (@options) {
-#                        # make sure the option isn't in ignore list
-#                        my ($option_key) = keys %$option;
-#                        if ( !exists $ignores->{$option_key} ) {
-#                            push @cleaned_options, $option;
-#                        }
-#                    }
-#                } else {
-#                    @cleaned_options = @options;
-#                }
-#                $table->options( \@cleaned_options ) or die $table->error;
-#            }
+            if ( my @options = @{ $tdata->{'table_options'} || [] } ) {
+                my @cleaned_options;
+                my @ignore_opts = $translator->has_parser_args && $translator->parser_args->{'ignore_opts'}
+                    ? split( /,/, $translator->parser_args->{'ignore_opts'} )
+                    : ();
+                if (@ignore_opts) {
+                    my $ignores = { map { $_ => 1 } @ignore_opts };
+                    foreach my $option (@options) {
+                        # make sure the option isn't in ignore list
+                        my ($option_key) = keys %$option;
+                        if ( !exists $ignores->{$option_key} ) {
+                            push @cleaned_options, $option;
+                        }
+                    }
+                } else {
+                    @cleaned_options = @options;
+                }
+                $table->options( \@cleaned_options ); # or die $table->error;
+            }
     
             for my $cdata ( @{ $tdata->{constraints} || [] } ) {
                 my $constraint;
