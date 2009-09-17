@@ -11,14 +11,14 @@ tests           't/*.t';
 
 requires        'aliased',                      '0.30';
 requires        'FindBin';
-requires        'Moose',                        '0.89_01';
-requires        'MooseX::Declare',              '0.29';
-requires        'MooseX::Types',                '0.19';
-requires        'MooseX::Method::Signatures',   '0.24';
+requires        'Moose',                        '0.90';
+requires        'MooseX::Declare',              '0.30';
+requires        'MooseX::Types',                '0.20';
+requires        'MooseX::Method::Signatures',   '0.26';
 requires        'MooseX::MultiMethods',         '0.07';
 requires        'Parse::RecDescent',            '1.94';
 requires        'Tie::IxHash',                  '1.21';
-requires        'TryCatch',                     '1.001001';
+requires        'TryCatch',                     '1.002000';
 
 test_requires   'Test::More',                   '0.92';
 test_requires   'Test::Output',                 '0.12';
