@@ -2,6 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(HashRef Maybe Str);
     use SQL::Translator::Types qw(Procedure Table Trigger View);
+    use MooseX::MultiMethods;
  
     has 'name' => (
         is => 'rw',
@@ -25,6 +26,7 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
             get_tables   => 'values',
             get_table    => 'get',
             add_table    => 'set',
+            remove_table => 'delete',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -71,12 +73,26 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
-    around add_table(Table $table) { $self->$orig($table->name, $table) }
+    around add_table(Table $table) {
+        die "Can't use table name " . $table->name if $self->exists_table($table->name) || $table->name eq '';
+        $self->$orig($table->name, $table);
+    }
     around add_view(View $view) { $self->$orig($view->name, $view) }
     around add_procedure(Procedure $procedure) { $self->$orig($procedure->name, $procedure) }
     around add_trigger(Trigger $trigger) { $self->$orig($trigger->name, $trigger) }
 
-    method is_valid { 1 }
+    method is_valid { return $self->get_tables ? 1 : undef }
+
+    multi method drop_table(Table $table, Int :$cascade = 0) {
+        die "Can't drop non-existant table " . $table->name unless $self->exists_table($table->name);
+        $self->remove_table($table->name);
+        
+    }
+
+    multi method drop_table(Str $table, Int :$cascade = 0) {
+        die "Can't drop non-existant table " . $table unless $self->exists_table($table);
+        $self->remove_table($table);
+    }
 
     method order { }
     method perform_action_when { }
