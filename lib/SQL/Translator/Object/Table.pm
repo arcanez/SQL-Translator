@@ -1,9 +1,16 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Table extends SQL::Translator::Object {
+class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Any Bool HashRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
-    
+    clean;
+
+    use overload
+        '""'     => sub { shift->name },
+        'bool'   => sub { $_[0]->name || $_[0] },
+        fallback => 1,
+    ;
+
     has 'name' => (
         is => 'rw',
         isa => Str,
