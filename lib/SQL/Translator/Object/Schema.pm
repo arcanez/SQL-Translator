@@ -9,6 +9,11 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
         required => 1,
         default => ''
     );
+
+    has 'database' => (
+        is => 'rw',
+        isa => Maybe[Str],
+    );
     
     has 'tables' => (
         traits => ['Hash'],
