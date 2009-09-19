@@ -90,7 +90,7 @@ $base_t->$_ (1) for qw/add_drop_table no_comments/;
 my $base_schema = $base_t->translate(
   parser => 'YAML',
   data => do { local $/; <$base_fh>; },
-) or die $base_t->error;
+) or die $!;
 
 #assume there is at least one table
 my $string_re = {
@@ -136,7 +136,7 @@ sub check_roundtrip {
   my $base_out = $base_t->translate(
     data => $base_schema,
     producer => $args->{engine},
-#    producer_args => $args->{producer_args},
+    producer_args => $args->{producer_args} || {},
   );
 
   like (
@@ -144,7 +144,7 @@ sub check_roundtrip {
     $string_re->{$args->{engine}} || $string_re->{SQL},
     "Received some meaningful output from the first $args->{name} production",
   ) or do {
-    diag ( _gen_diag ($base_t->error) );
+    diag ( _gen_diag ($@) );
     return;
   };
 
@@ -154,12 +154,12 @@ sub check_roundtrip {
   my $mid_schema = $parser_t->translate (
     data => $base_out,
     parser => $args->{engine},
-#    parser_args => $args->{parser_args},
+    parser_args => $args->{parser_args} || {},
   );
 
   isa_ok ($mid_schema, 'SQL::Translator::Object::Schema', "First $args->{name} parser pass produced a schema:")
     or do {
-      diag (_gen_diag ( $parser_t->error, $base_out ) );
+      diag (_gen_diag ( $@, $base_out ) );
       return;
     };
 
@@ -186,7 +186,7 @@ sub check_roundtrip {
   my $rt_out = $parser_t->translate (
     data => $mid_schema,
     producer => $args->{engine},
-#    producer_args => $args->{producer_args},
+    producer_args => $args->{producer_args} || {},
   );
 
   like (
@@ -194,7 +194,7 @@ sub check_roundtrip {
     $string_re->{$args->{engine}} || $string_re->{SQL},
     "Received some meaningful output from the second $args->{name} production",
   ) or do {
-    diag ( _gen_diag ( $parser_t->error ) );
+    diag ( _gen_diag ( $@ ) );
     return;
   };
 
