@@ -268,19 +268,18 @@ method create_field(Column $field, $options?) {
 
     # Default?  XXX Need better quoting!
     my $default = $field->default_value;
-=cut
-    if (defined $default) {
-        SQL::Translator::Producer->_apply_default_value(
-            \$field_def,
-            $default, 
-            [
-             'NULL'              => \'NULL',
-             'now()'             => 'now()',
-             'CURRENT_TIMESTAMP' => 'CURRENT_TIMESTAMP',
-            ],
-        );
-    }
-=cut
+
+#    if (defined $default) {
+#        SQL::Translator::Producer->_apply_default_value(
+#            \$field_def,
+#            $default, 
+#            [
+#             'NULL'              => \'NULL',
+#             'now()'             => 'now()',
+#             'CURRENT_TIMESTAMP' => 'CURRENT_TIMESTAMP',
+#            ],
+#        );
+#    }
 
     return $field_def;
 

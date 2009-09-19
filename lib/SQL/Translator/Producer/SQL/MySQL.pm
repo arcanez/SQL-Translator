@@ -463,17 +463,16 @@ role SQL::Translator::Producer::SQL::MySQL {
     
         # Default?  XXX Need better quoting!
         my $default = $field->default_value;
-=cut
-        if ( defined $default ) {
-            SQL::Translator::Producer->_apply_default_value(
-              \$field_def,
-              $default, 
-              [
-                'NULL'       => \'NULL',
-              ],
-            );
-        }
-=cut
+
+#        if ( defined $default ) {
+#            SQL::Translator::Producer->_apply_default_value(
+#              \$field_def,
+#              $default, 
+#              [
+#                'NULL'       => \'NULL',
+#              ],
+#            );
+#        }
     
         if ( my $comments = $field->comments ) {
             $field_def .= qq[ comment '$comments'];

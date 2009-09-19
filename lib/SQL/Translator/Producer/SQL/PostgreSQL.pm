@@ -406,19 +406,18 @@ method create_view(View $view, $options?) {
         # Default value 
         #
         my $default = $field->default_value;
-=cut
-        if ( defined $default ) {
-            SQL::Translator::Producer->_apply_default_value(
-              \$field_def,
-              $default,
-              [
-                'NULL'              => \'NULL',
-                'now()'             => 'now()',
-                'CURRENT_TIMESTAMP' => 'CURRENT_TIMESTAMP',
-              ],
-            );
-        }
-=cut
+
+#        if ( defined $default ) {
+#            SQL::Translator::Producer->_apply_default_value(
+#              \$field_def,
+#              $default,
+#              [
+#                'NULL'              => \'NULL',
+#                'now()'             => 'now()',
+#                'CURRENT_TIMESTAMP' => 'CURRENT_TIMESTAMP',
+#              ],
+#            );
+#        }
 
         #
         # Not null constraint
@@ -521,15 +520,14 @@ method create_constraint(Constraint $c, $options?) {
             $def .= ' MATCH ' . ( $c->match_type =~ /full/i ) ? 'FULL' : 'PARTIAL';
         }
 
-=cut
-        if ( $c->on_delete ) {
-            $def .= ' ON DELETE '.join( ' ', $c->on_delete );
-        }
+#        if ( $c->on_delete ) {
+#            $def .= ' ON DELETE '.join( ' ', $c->on_delete );
+#        }
 
-        if ( $c->on_update ) {
-            $def .= ' ON UPDATE '.join( ' ', $c->on_update );
-        }
-=cut
+#        if ( $c->on_update ) {
+#            $def .= ' ON UPDATE '.join( ' ', $c->on_update );
+#        }
+
         if ( $c->deferrable ) {
             $def .= ' DEFERRABLE';
         }
