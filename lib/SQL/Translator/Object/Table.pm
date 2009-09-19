@@ -114,5 +114,9 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     multi method primary_key(Any $) { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
     multi method primary_key(Str $column) { $self->get_column($column)->is_primary_key(1) }
 
+    method is_valid { return $self->get_columns ? 1 : undef }
     method order { }
+
+    before name($name?) { die "Can't use table name $name" if $name && $self->schema->exists_table($name); }
+
 }
