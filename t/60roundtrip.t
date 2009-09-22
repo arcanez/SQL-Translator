@@ -120,7 +120,7 @@ for my $args (@$plan) {
       local $TODO = $args->{todo} if $args->{todo};
 
       lives_ok (
-        sub { check_roundtrip ($args, $base_t, $base_schema) },
+        sub { check_roundtrip ($args, $base_t) },
         "Round trip for $args->{name} did not throw an exception",
       );
     }
@@ -129,12 +129,12 @@ for my $args (@$plan) {
 done_testing;
 
 sub check_roundtrip {
-  my ($args, $base_t, $base_schema) = @_;
+  my ($args, $base_t) = @_;
 
 # create some output from the submitted schema
 
   my $base_out = $base_t->translate(
-    data => $base_schema,
+    data => $base_t->schema,
     producer => $args->{engine},
     producer_args => $args->{producer_args} || {},
   );
