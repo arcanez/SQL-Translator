@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Types {
-    use MooseX::Types::Moose qw(ArrayRef CodeRef Int Maybe Str Undef);
+    use MooseX::Types::Moose qw(ArrayRef CodeRef HashRef Int Maybe Str Undef);
     use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View
                                     Bit DBIHandle ColumnSize Parser Producer Translator)];
     
@@ -19,6 +19,9 @@ class SQL::Translator::Types {
     class_type Parser, { class => 'SQL::Translator::Parser' };
     class_type Producer, { class => 'SQL::Translator::Producer' };
     class_type Translator, { class => 'SQL::Translator' };
+
+    coerce Column,
+        from HashRef, via { SQL::Translator::Object::Column->new($_) };
 
     subtype Bit, as Int, where { $_ == 1 || $_ == 0 };
     coerce Bit,
