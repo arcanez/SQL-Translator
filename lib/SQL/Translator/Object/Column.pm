@@ -34,11 +34,12 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object {
         isa => ColumnSize,
         coerce => 1,
         auto_deref => 1,
+        default => sub { [ 0 ] },
     );
     
     has 'is_nullable' => (
         is => 'rw',
-        isa => Bool,
+        isa => Bit,
         required => 1,
         default => 1
     );
