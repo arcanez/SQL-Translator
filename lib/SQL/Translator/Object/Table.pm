@@ -91,7 +91,12 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         default => 0
     );
 
-    around add_column(Column $column) { $self->$orig($column->name, $column) }
+    method add_field(Column $column does coerce) { $self->add_column($column) }
+
+    around add_column(Column $column does coerce) {
+        die "Can't use column name " . $column->name if $self->exists_column($column->name) || $column->name eq '';
+        return $self->$orig($column->name, $column);
+    }
     around add_constraint(Constraint $constraint) {
         my $name = $constraint->name;
         if ($name eq '') {
