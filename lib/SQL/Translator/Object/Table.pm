@@ -27,6 +27,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             get_columns   => 'values',
             get_column    => 'get',
             add_column    => 'set',
+            remove_column => 'delete',
 
             ## compat
             get_fields    => 'values',
@@ -117,6 +118,16 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     method is_valid { return $self->get_columns ? 1 : undef }
     method order { }
 
-    before name($name?) { die "Can't use table name $name" if $name && $self->schema->exists_table($name); }
+    before name($name?) { die "Can't use table name $name, table already exists" if $name && $self->schema->exists_table($name) && $name ne $self->name }
 
+    multi method drop_column(Column $column, Int :$cascade = 0) {
+        die "Can't drop non-existant table " . $column->name unless $self->exists_column($column->name);
+        $self->remove_column($column->name);
+
+    }
+
+    multi method drop_column(Str $column, Int :$cascade = 0) {
+        die "Can't drop non-existant table " . $column unless $self->exists_column($column);
+        $self->remove_column($column);
+    }
 }
