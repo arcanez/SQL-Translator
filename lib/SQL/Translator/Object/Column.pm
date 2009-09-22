@@ -1,32 +1,41 @@
 use MooseX::Declare;
-class SQL::Translator::Object::Column extends SQL::Translator::Object {
+class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Bool Int Maybe ScalarRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Bit ColumnSize Constraint Table Trigger);
+    clean;
+
+    use overload
+        '""'     => sub { shift->name },
+        'bool'   => sub { $_[0]->name || $_[0] },
+        fallback => 1,
+    ;
 
     has 'table' => (
         is => 'rw',
         isa => Table,
-        required => 1,
         weak_ref => 1,
     );
     
     has 'name' => (
         is => 'rw',
         isa => Str,
-        required => 1
+        required => 1,
+        trigger => sub { die "Cannot use '' as a column name" if $_[1] eq '' }
     );
     
     has 'data_type' => (
         is => 'rw',
         isa => Str,
-        required => 1
+        required => 1,
+        default => '',
     );
 
     has 'sql_data_type' => (
         is => 'rw',
         isa => Int,
-        required => 1
+        required => 1,
+        default => 0
     );
     
     has 'size' => (
