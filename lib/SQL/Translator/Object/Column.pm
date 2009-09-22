@@ -86,6 +86,11 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object {
                          : join ',', @sizes;
     }
 
+    method full_name { $self->table->name . '.' . $self->name }
+    method schema { $self->table->schema }
+
     method order { }
     method is_unique { }
+
+    before name($name?) { die "Can't use column name $name" if $name && $self->table->exists_column($name) && $name ne $self->name; }
 }
