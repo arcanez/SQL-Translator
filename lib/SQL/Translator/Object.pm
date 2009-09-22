@@ -43,15 +43,15 @@ class SQL::Translator::Object {
         auto_deref => 1,
     );
 
-    multi method comments(Str $comment) { $self->add_comment($comment) }
-    multi method comments(ArrayRef $comments) { $self->add_comment($_) for @$comments }
+    multi method comments(Str $comment) { $self->add_comment($comment); $self->comments }
+    multi method comments(ArrayRef $comments) { $self->add_comment($_) for @$comments; $self->comments }
     multi method comments(Any $) { wantarray ? @{$self->_comments} : join "\n", $self->_comments }
 
-    multi method options(Str $option) { $self->add_option($option) }
-    multi method options(ArrayRef $options) { $self->add_option($_) for @$options }
+    multi method options(Str $option) { $self->add_option($option); $self->options }
+    multi method options(ArrayRef $options) { $self->add_option($_) for @$options; $self->options }
     multi method options(Any $) { wantarray ? @{$self->_options} : $self->_options }
 
-    multi method extra(Str $extra) { $self->get_extra($extra) }
-    multi method extra(HashRef $extra) { $self->_extra($extra) }
+    multi method extra(Str $extra) { $self->get_extra($extra); $self->extra }
+    multi method extra(HashRef $extra) { $self->_extra($extra); $self->extra }
     multi method extra(Any $) { wantarray ? %{$self->_extra} : $self->_extra }
 }
