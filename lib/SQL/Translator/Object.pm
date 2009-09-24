@@ -51,7 +51,7 @@ class SQL::Translator::Object {
     multi method options(ArrayRef $options) { $self->add_option($_) for @$options; $self->options }
     multi method options(Any $) { wantarray ? @{$self->_options} : $self->_options }
 
-    multi method extra(Str $extra) { $self->get_extra($extra); $self->extra }
-    multi method extra(HashRef $extra) { $self->_extra($extra); $self->extra }
+    multi method extra(Str $extra) { $self->get_extra($extra) }
+    multi method extra(HashRef $extra) { $self->add_extra($_, $extra->{$_}) for keys %$extra; $self->extra }
     multi method extra(Any $) { wantarray ? %{$self->_extra} : $self->_extra }
 }
