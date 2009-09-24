@@ -507,9 +507,9 @@ role SQL::Translator::Grammar::PostgreSQL {
                 $return = { type => 'bytea' };
             }
             |
-            /(timestamptz|timestamp)(?:\(\d\))?( with(out)? time zone)?/i
+            /(timestamptz|timestamp)(?:\(\d\))?( with(?:out)? time zone)?/i
             { 
-                $return = { type => 'timestamp' };
+                $return = { type => 'timestamp' . ($2||'') };
             }
             |
             /text/i
@@ -557,7 +557,7 @@ role SQL::Translator::Grammar::PostgreSQL {
                 deferred         => $item{'deferred'},
                 reference_table  => $desc->{'reference_table'},
                 reference_fields => $desc->{'reference_fields'},
-                match_type       => $desc->{'match_type'}[0],
+                match_type       => $desc->{'match_type'},
                 on_delete        => $desc->{'on_delete'} || $desc->{'on_delete_do'},
                 on_update        => $desc->{'on_update'} || $desc->{'on_update_do'},
                 comments         => [ @comments ],
@@ -615,10 +615,8 @@ role SQL::Translator::Grammar::PostgreSQL {
     
         deferred : /initially/i /(deferred|immediate)/i { $item[2] }
     
-        match_type : /match full/i { 'match_full' }
-            |
-            /match partial/i { 'match_partial' }
-    
+        match_type : /match/i /partial|full|simple/i { $item[2] }
+
         key_action : key_delete 
             |
             key_update
