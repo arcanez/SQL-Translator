@@ -37,8 +37,11 @@ class SQL::Translator::Object::Index extends SQL::Translator::Object {
     has 'type' => (
         is => 'rw',
         isa => Str,
-        required => 1
+        required => 1,
+        default => 'NORMAL',
     );
 
     around add_column(Column $column) { $self->$orig($column->name, $column) }
+
+    method is_valid { $self->table && scalar $self->get_columns ? 1 : undef }
 }
