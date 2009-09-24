@@ -55,7 +55,9 @@ my $sql = q[
     alter table only t_test1 add constraint c_u1 unique (f_varchar);
 
     alter table t_test1 add constraint "c_fk2" foreign key (f_fk2)
-    references t_test2 (f_id) on update no action on delete cascade;
+    references t_test2 (f_id) match simple
+    on update no action on delete cascade deferrable;
+
 
     alter table t_test1 drop column f_dropped restrict;
 
@@ -189,7 +191,7 @@ is( $fk_ref1->reference_table, 't_test2', 'FK is to "t_test2" table' );
 
 my $f11 = shift @t1_fields;
 is( $f11->name, 'f_timestamp', 'Eleventh field is "f_timestamp"' );
-is( $f11->data_type, 'timestamp', 'Field is a timestamp' );
+is( $f11->data_type, 'timestamp with time zone', 'Field is a timestamp with time zone' );
 is( $f11->is_nullable, 1, 'Field can be null' );
 is( $f11->size, 0, 'Size is "0"' );
 is( $f11->default_value, undef, 'Default value is "undef"' );
