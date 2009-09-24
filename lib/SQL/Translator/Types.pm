@@ -20,8 +20,8 @@ class SQL::Translator::Types {
     class_type Producer, { class => 'SQL::Translator::Producer' };
     class_type Translator, { class => 'SQL::Translator' };
 
-    coerce Column,
-        from HashRef, via { SQL::Translator::Object::Column->new($_) };
+    coerce Column, from HashRef, via { SQL::Translator::Object::Column->new($_) };
+    coerce Index, from HashRef, via { SQL::Translator::Object::Index->new($_) };
 
     subtype Bit, as Int, where { $_ == 1 || $_ == 0 };
     coerce Bit,
