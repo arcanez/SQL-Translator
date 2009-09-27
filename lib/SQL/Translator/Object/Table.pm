@@ -31,6 +31,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
             ## compat
             get_fields    => 'values',
+            get_field     => 'get',
             fields        => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
