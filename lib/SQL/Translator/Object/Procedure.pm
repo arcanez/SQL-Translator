@@ -17,14 +17,13 @@ class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
     
     has '_parameters' => (
         traits => ['Array'],
-        is => 'rw',
         isa => ArrayRef,
         handles => {
+            _parameters           => 'elements',
             add_parameter         => 'push',
             remove_last_parameter => 'pop',
         },
         default => sub { [] },
-        auto_deref => 1,
 
     );
     
