@@ -107,7 +107,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         }
         $self->$orig($name, $constraint)
     }
-    around add_index(Index $index) {
+    around add_index(Index $index does coerce) {
         my $name = $index->name;
         if ($name eq '') {
             my $idx = 0;
