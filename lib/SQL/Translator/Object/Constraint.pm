@@ -57,9 +57,12 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     );
 
     has 'reference_columns' => (
-        isa => ArrayRef | Undef,
-        is => 'rw',
-        auto_deref => 1
+        isa => ArrayRef,
+        traits => ['Array'],
+        handles => {
+            reference_columns => 'elements',
+        },
+        default => sub { [] },
     );
 
     has 'match_type' => (
