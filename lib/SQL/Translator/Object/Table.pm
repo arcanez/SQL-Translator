@@ -83,7 +83,6 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         is => 'rw',
         isa => Schema,
         weak_ref => 1,
-        required => 1,
     );
 
     has 'temporary' => (
@@ -96,8 +95,10 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
     around add_column(Column $column does coerce) {
         die "Can't use column name " . $column->name if $self->exists_column($column->name) || $column->name eq '';
+        $column->table($self);
         return $self->$orig($column->name, $column);
     }
+
     around add_constraint(Constraint $constraint) {
         my $name = $constraint->name;
         if ($name eq '') {
@@ -105,8 +106,10 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             while ($self->exists_constraint('ANON' . $idx)) { $idx++ }
             $name = 'ANON' . $idx;
         }
+        $constraint->table($self);
         $self->$orig($name, $constraint)
     }
+
     around add_index(Index $index does coerce) {
         my $name = $index->name;
         if ($name eq '') {
@@ -114,8 +117,10 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             while ($self->exists_index('ANON' . $idx)) { $idx++ }
             $name = 'ANON' . $idx;
         }
+        $index->table($self);
         $self->$orig($name, $index)
     }
+
     around add_sequence(Sequence $sequence) { $self->$orig($sequence->name, $sequence) }
 
     multi method primary_key(Any $) { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }

@@ -75,8 +75,10 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
 
     around add_table(Table $table) {
         die "Can't use table name " . $table->name if $self->exists_table($table->name) || $table->name eq '';
+        $table->schema($self);
         $self->$orig($table->name, $table);
     }
+
     around add_view(View $view) { $self->$orig($view->name, $view) }
     around add_procedure(Procedure $procedure) { $self->$orig($procedure->name, $procedure) }
     around add_trigger(Trigger $trigger) { $self->$orig($trigger->name, $trigger) }

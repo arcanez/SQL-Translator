@@ -7,7 +7,6 @@ class SQL::Translator::Object::Index extends SQL::Translator::Object {
     has 'table' => (
         is => 'rw',
         isa => Table,
-        required => 1,
         weak_ref => 1,
     );
     
