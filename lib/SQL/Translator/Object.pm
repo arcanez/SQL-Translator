@@ -42,11 +42,11 @@ class SQL::Translator::Object {
 
     multi method comments(Str $comment) { $self->add_comment($comment); $self->comments }
     multi method comments(ArrayRef $comments) { $self->add_comment($_) for @$comments; $self->comments }
-    multi method comments(Any $) { wantarray ? @{$self->_comments} : join "\n", $self->_comments }
+    multi method comments(Any $) { wantarray ? $self->_comments : join "\n", $self->_comments }
 
     multi method options(Str $option) { $self->add_option($option); $self->options }
     multi method options(ArrayRef $options) { $self->add_option($_) for @$options; $self->options }
-    multi method options(Any $) { wantarray ? @{$self->_options} : $self->_options }
+    multi method options(Any $) { wantarray ? $self->_options : $self->_options }
 
     multi method extra(Str $extra) { $self->get_extra($extra) }
     multi method extra(HashRef $extra) { $self->add_extra($_, $extra->{$_}) for keys %$extra; $self->extra }
