@@ -38,12 +38,20 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         default => 0
     );
     
-    has 'size' => (
+    has 'length' => (
         is => 'rw',
-        isa => ColumnSize,
-        coerce => 1,
-        auto_deref => 1,
-        default => sub { [ 0 ] },
+        isa => Int,
+        default => 0,
+        lazy => 1,
+        predicate => 'has_length',
+    );
+
+    has 'precision' => (
+        is => 'rw',
+        isa => Int,
+        default => 0,
+        lazy => 1,
+        predicate => 'has_precision',
     );
     
     has 'is_nullable' => (
@@ -102,4 +110,18 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
     method is_unique { }
 
     before name($name?) { die "Can't use column name $name" if $name && $self->table->exists_column($name) && $name ne $self->name; }
+
+    multi method size(Str $size) { my ($length, $precision) = split /,/, $size; $self->length($length); $self->precision($precision) if $precision; $self->size }
+    multi method size(Int $length, Int $precision) { $self->length($length); $self->precision($precision); $self->size }
+    multi method size(ArrayRef $size) { $self->length($size->[0]); $self->precision($size->[1]) if @$size == 2; $self->size }
+
+    multi method size(Any $) {
+        return $self->has_precision
+        ? wantarray
+            ? ($self->length, $self->precision) 
+            : join ',', ($self->length, $self->precision)
+        : $self->length;
+    }
+
+    method BUILD(HashRef $args) { $self->size($args->{size}) if $args->{size} }
 }
