@@ -2,7 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Bool Int Maybe ScalarRef Str);
     use MooseX::MultiMethods;
-    use SQL::Translator::Types qw(Bit ColumnSize Constraint Table Trigger);
+    use SQL::Translator::Types qw(Bit Constraint Table Trigger);
     clean;
 
     use overload

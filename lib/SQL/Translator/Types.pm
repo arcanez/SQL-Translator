@@ -2,7 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Types {
     use MooseX::Types::Moose qw(ArrayRef CodeRef HashRef Int Maybe Str Undef);
     use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View
-                                    Bit DBIHandle ColumnSize Parser Producer Translator)];
+                                    Bit DBIHandle MatchType Parser Producer Translator)];
     
     class_type Column, { class => 'SQL::Translator::Object::Column' };
     class_type Constraint, { class => 'SQL::Translator::Object::Constraint' };
@@ -32,16 +32,13 @@ class SQL::Translator::Types {
     coerce Trigger, from HashRef, via { SQL::Translator::Object::Trigger->new($_) };
     coerce View, from HashRef, via { SQL::Translator::Object::View->new($_) };
 
+    subtype MatchType, as Str, where { /^(full|partial|simple)$/ || $_ eq '' };
+    coerce MatchType, from Str, via { lc $_ };
+
     subtype Bit, as Int, where { $_ == 1 || $_ == 0 };
     coerce Bit,
         from Undef, via { 0 },
         from Str,  via { $_ eq '1' ? 1 : 0 };
-
-    subtype ColumnSize, as ArrayRef[Int];
-    coerce ColumnSize,
-        from Int, via { [ $_ ] },
-        from Str, via { [ split /,/ ] },
-        from Undef, via { [ 0 ] };
 
     subtype DBIHandle, as 'DBI::db';
     

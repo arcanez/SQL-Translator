@@ -2,7 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str Undef);
     use MooseX::MultiMethods;
-    use SQL::Translator::Types qw(Column Table);
+    use SQL::Translator::Types qw(Column MatchType Table);
 
     has 'table' => (
         is => 'rw',
@@ -61,8 +61,9 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     );
 
     has 'match_type' => (
-        isa => Str,
+        isa => MatchType,
         is => 'rw',
+        coerce => 1,
         lazy => 1,
         default => ''
     );
