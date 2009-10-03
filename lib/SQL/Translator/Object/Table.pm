@@ -128,13 +128,24 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     before name($name?) { die "Can't use table name $name, table already exists" if $name && $self->schema->exists_table($name) && $name ne $self->name }
 
     multi method drop_column(Column $column, Int :$cascade = 0) {
-        die "Can't drop non-existant table " . $column->name unless $self->exists_column($column->name);
+        die "Can't drop non-existant column " . $column->name unless $self->exists_column($column->name);
         $self->remove_column($column->name);
 
     }
 
     multi method drop_column(Str $column, Int :$cascade = 0) {
-        die "Can't drop non-existant table " . $column unless $self->exists_column($column);
+        die "Can't drop non-existant column " . $column unless $self->exists_column($column);
         $self->remove_column($column);
+    }
+
+    multi method drop_index(Index $index) {
+        die "Can't drop non-existant index " . $index->name unless $self->exists_index($index->name);
+        $self->remove_index($index->name);
+
+    }
+
+    multi method drop_index(Str $index) {
+        die "Can't drop non-existant index " . $index unless $self->exists_index($index);
+        $self->remove_index($index);
     }
 }
