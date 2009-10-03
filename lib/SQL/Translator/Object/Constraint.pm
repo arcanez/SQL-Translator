@@ -12,7 +12,8 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     
     has 'name' => (
         is => 'rw',
-        isa => Maybe[Str],
+        isa => Str,
+        default => '',
         required => 1
     );
     
