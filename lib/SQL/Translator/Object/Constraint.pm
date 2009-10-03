@@ -1,6 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str Undef);
+    use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Table);
 
     has 'table' => (
@@ -25,10 +26,6 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
             get_columns   => 'values',
             get_column    => 'get',
             add_column    => 'set',
-
-            ## compat
-            get_fields    => 'values',
-            fields        => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );

@@ -19,10 +19,6 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
             get_columns   => 'values',
             get_column    => 'get',
             add_column    => 'set',
-
-            ## compat
-            get_fields    => 'values',
-            fields        => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );

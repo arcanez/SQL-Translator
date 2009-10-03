@@ -28,11 +28,6 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             get_column    => 'get',
             add_column    => 'set',
             remove_column => 'delete',
-
-            ## compat
-            get_fields    => 'values',
-            get_field     => 'get',
-            fields        => 'keys',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );

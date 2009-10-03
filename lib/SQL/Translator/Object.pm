@@ -1,5 +1,5 @@
 use MooseX::Declare;
-class SQL::Translator::Object {
+class SQL::Translator::Object with SQL::Translator::Object::Compat {
     use Tie::IxHash;
     use MooseX::MultiMethods;
     use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
