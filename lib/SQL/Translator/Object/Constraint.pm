@@ -33,7 +33,6 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     has 'type' => (
         is => 'rw',
         isa => Str,
-        required => 1
     );
 
     has 'deferrable' => (
@@ -63,10 +62,10 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
 
     has 'match_type' => (
         isa => Str,
-        is => 'rw'
+        is => 'rw',
+        lazy => 1,
+        default => ''
     );
 
     around add_column(Column $column) { $self->$orig($column->name, $column) }
-
-    method reference_fields { $self->reference_columns }
 }
