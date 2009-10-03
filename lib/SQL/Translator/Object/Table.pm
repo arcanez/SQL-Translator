@@ -95,7 +95,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         return $self->$orig($column->name, $column);
     }
 
-    around add_constraint(Constraint $constraint) {
+    around add_constraint(Constraint $constraint does coerce) {
         my $name = $constraint->name;
         if ($name eq '') {
             my $idx = 0;
@@ -117,7 +117,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         $self->$orig($name, $index)
     }
 
-    around add_sequence(Sequence $sequence) { $self->$orig($sequence->name, $sequence) }
+    around add_sequence(Sequence $sequence does coerce) { $self->$orig($sequence->name, $sequence) }
 
     multi method primary_key(Any $) { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
     multi method primary_key(Str $column) { $self->get_column($column)->is_primary_key(1) }
