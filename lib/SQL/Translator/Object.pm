@@ -40,6 +40,11 @@ class SQL::Translator::Object with SQL::Translator::Object::Compat {
         default => sub { {} },
     );
 
+    has 'error' => (
+        is => 'rw',
+        isa => Str
+    );
+
     multi method comments(Str $comment) { $self->add_comment($comment); $self->comments }
     multi method comments(ArrayRef $comments) { $self->add_comment($_) for @$comments; $self->comments }
     multi method comments(Any $) { wantarray ? $self->_comments : join "\n", $self->_comments }
