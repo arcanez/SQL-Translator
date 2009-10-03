@@ -21,7 +21,16 @@ class SQL::Translator::Types {
     class_type Translator, { class => 'SQL::Translator' };
 
     coerce Column, from HashRef, via { SQL::Translator::Object::Column->new($_) };
+    coerce Constraint, from HashRef, via { SQL::Translator::Object::Constraint->new($_) };
+    coerce ForeignKey, from HashRef, via { SQL::Translator::Object::ForeignKey->new($_) };
     coerce Index, from HashRef, via { SQL::Translator::Object::Index->new($_) };
+    coerce PrimaryKey, from HashRef, via { SQL::Translator::Object::PrimaryKey->new($_) };
+    coerce Procedure, from HashRef, via { SQL::Translator::Object::Procedure->new($_) };
+    coerce Schema, from HashRef, via { SQL::Translator::Object::Schema->new($_) };
+    coerce Sequence, from HashRef, via { SQL::Translator::Object::Sequence->new($_) };
+    coerce Table, from HashRef, via { SQL::Translator::Object::Table->new($_) };
+    coerce Trigger, from HashRef, via { SQL::Translator::Object::Trigger->new($_) };
+    coerce View, from HashRef, via { SQL::Translator::Object::View->new($_) };
 
     subtype Bit, as Int, where { $_ == 1 || $_ == 0 };
     coerce Bit,
