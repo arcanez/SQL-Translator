@@ -42,6 +42,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             get_indices  => 'values',
             get_index    => 'get',
             add_index    => 'set',
+            remove_index => 'delete',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
