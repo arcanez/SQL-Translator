@@ -21,7 +21,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         is => 'rw',
         isa => Str,
         required => 1,
-        trigger => sub { die "Cannot use '' as a column name" if $_[1] eq '' }
+        trigger => sub { my ($self, $new, $old) = @_; if (defined $old) { $self->table->drop_column($old); $self->table->add_column($self) } }
     );
     
     has 'data_type' => (
@@ -109,7 +109,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
     method order { }
     method is_unique { }
 
-    before name($name?) { die "Can't use column name $name" if $name && $self->table->exists_column($name) && $name ne $self->name; }
+    before name($name?) { die "Can't use column name $name" if defined $name && $self->table->exists_column($name) && $name ne $self->name }
 
     multi method size(Str $size) { my ($length, $precision) = split /,/, $size; $self->length($length); $self->precision($precision) if $precision; $self->size }
     multi method size(Int $length, Int $precision) { $self->length($length); $self->precision($precision); $self->size }
@@ -123,5 +123,8 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         : $self->length;
     }
 
-    method BUILD(HashRef $args) { $self->size($args->{size}) if $args->{size} }
+    method BUILD(HashRef $args) {
+        die "Cannot use column name $args->{name}" if $args->{name} eq '';
+        $self->size($args->{size}) if $args->{size}
+    }
 }
