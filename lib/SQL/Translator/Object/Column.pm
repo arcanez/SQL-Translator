@@ -21,7 +21,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         is => 'rw',
         isa => Str,
         required => 1,
-        trigger => sub { my ($self, $new, $old) = @_; if (defined $old) { $self->table->drop_column($old); $self->table->add_column($self) } }
+        trigger => sub { my ($self, $new, $old) = @_; if (defined $old) { $self->table->remove_column($old); $self->table->add_column($self) } }
     );
     
     has 'data_type' => (

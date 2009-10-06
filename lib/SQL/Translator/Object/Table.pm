@@ -57,6 +57,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             get_constraints   => 'values',
             get_constraint    => 'get',
             add_constraint    => 'set',
+            remove_constraint => 'delete',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -86,8 +87,6 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         isa => Bool,
         default => 0
     );
-
-    method add_field(Column $column does coerce) { $self->add_column($column) }
 
     around add_column(Column $column does coerce) {
         die "Can't use column name " . $column->name if $self->exists_column($column->name) || $column->name eq '';
@@ -127,25 +126,21 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
     before name($name?) { die "Can't use table name $name, table already exists" if $name && $self->schema->exists_table($name) && $name ne $self->name }
 
-    multi method drop_column(Column $column, Int :$cascade = 0) {
-        die "Can't drop non-existant column " . $column->name unless $self->exists_column($column->name);
-        $self->remove_column($column->name);
-
+    around remove_column(Column|Str $column, Int :$cascade = 0) {
+        my $name = is_Column($column) ? $column->name : $column;
+        die "Can't drop non-existant column " . $name unless $self->exists_column($name);
+        $self->$orig($name);
     }
 
-    multi method drop_column(Str $column, Int :$cascade = 0) {
-        die "Can't drop non-existant column " . $column unless $self->exists_column($column);
-        $self->remove_column($column);
+    around remove_index(Index|Str $index) {
+        my $name = is_Index($index) ? $index->name : $index;
+        die "Can't drop non-existant index " . $name unless $self->exists_index($name);
+        $self->$orig($name);
     }
 
-    multi method drop_index(Index $index) {
-        die "Can't drop non-existant index " . $index->name unless $self->exists_index($index->name);
-        $self->remove_index($index->name);
-
-    }
-
-    multi method drop_index(Str $index) {
-        die "Can't drop non-existant index " . $index unless $self->exists_index($index);
-        $self->remove_index($index);
+    around remove_constraint(Constraint|Str $constraint) {
+        my $name = is_Constraint($constraint) ? $constraint->name : $constraint;
+        die "Can't drop non-existant constraint " . $name unless $self->exists_constraint($name);
+        $self->$orig($name);
     }
 }

@@ -73,27 +73,22 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
 
-    around add_table(Table $table) {
+    around add_table(Table $table does coerce) {
         die "Can't use table name " . $table->name if $self->exists_table($table->name) || $table->name eq '';
         $table->schema($self);
         $self->$orig($table->name, $table);
     }
 
-    around add_view(View $view) { $self->$orig($view->name, $view) }
-    around add_procedure(Procedure $procedure) { $self->$orig($procedure->name, $procedure) }
-    around add_trigger(Trigger $trigger) { $self->$orig($trigger->name, $trigger) }
+    around add_view(View $view does coerce) { $self->$orig($view->name, $view) }
+    around add_procedure(Procedure $procedure does coerce) { $self->$orig($procedure->name, $procedure) }
+    around add_trigger(Trigger $trigger does coerce) { $self->$orig($trigger->name, $trigger) }
 
     method is_valid { return $self->get_tables ? 1 : undef }
 
-    multi method drop_table(Table $table, Int :$cascade = 0) {
-        die "Can't drop non-existant table " . $table->name unless $self->exists_table($table->name);
-        $self->remove_table($table->name);
-        
-    }
-
-    multi method drop_table(Str $table, Int :$cascade = 0) {
-        die "Can't drop non-existant table " . $table unless $self->exists_table($table);
-        $self->remove_table($table);
+    around remove_table(Table|Str $table, Int :$cascade = 0) {
+        my $name = is_Table($table) ? $table->name : $table;
+        die "Can't drop non-existant table " . $name unless $self->exists_table($name);
+        $self->$orig($name);
     }
 
     method order { }
