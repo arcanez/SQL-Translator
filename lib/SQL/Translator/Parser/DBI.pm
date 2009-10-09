@@ -82,6 +82,7 @@ role SQL::Translator::Parser::DBI {
 
     method _add_columns(Table $table) {
         my $sth = $self->dbh->column_info($self->catalog_name, $self->schema_name, $table->name, '%');
+        my @columns;
         while (my $column_info = $sth->fetchrow_hashref) {
             my $column = SQL::Translator::Object::Column->new({ name => $column_info->{COLUMN_NAME},
                                                                 data_type => $self->_column_data_type($column_info),
@@ -90,8 +91,9 @@ role SQL::Translator::Parser::DBI {
                                                                 is_auto_increment => $self->_is_auto_increment($column_info),
                                                                 is_nullable => $column_info->{NULLABLE},
                                                               });
-            $table->add_column($column);
+            push @columns, { column => $column, pos =>  $column_info->{ORDINAL_POSITION} || $#columns };
         }
+        $table->add_column($_->{column}) for sort { $a->{pos} <=> $b->{pos} } @columns;
     }
 
     method _add_primary_key(Table $table) {
