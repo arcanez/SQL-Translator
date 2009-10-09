@@ -1,7 +1,17 @@
 use MooseX::Declare;
 role SQL::Translator::Parser::DBI::MySQL {
-    use MooseX::Types::Moose qw(HashRef Str);
-    use SQL::Translator::Types qw(View);
+    use MooseX::Types::Moose qw(HashRef Maybe Str);
+    use SQL::Translator::Types qw(View Table Schema);
+
+    has 'schema_name' => (
+      is      => 'rw',
+      isa     => Maybe [Str],
+      lazy    => 1,
+      default => sub {
+        my ($name) = shift->dbh->selectrow_array("select database()");
+        return $name;
+      },
+    );
 
     method _get_view_sql(View $view) {
         #my ($sql) = $self->dbh->selectrow_array('');
