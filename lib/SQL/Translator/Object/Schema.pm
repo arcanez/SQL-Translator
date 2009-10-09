@@ -41,6 +41,7 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
             get_views   => 'values',
             get_view    => 'get',
             add_view    => 'set',
+            remove_view => 'delete',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -55,6 +56,7 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
             get_procedures   => 'values',
             get_procedure    => 'get',
             add_procedure    => 'set',
+            remove_procedure => 'delete',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -69,6 +71,7 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
             get_triggers   => 'values',
             get_trigger    => 'get',
             add_trigger    => 'set',
+            remove_trigger => 'delete',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );
@@ -79,7 +82,12 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
         $self->$orig($table->name, $table);
     }
 
-    around add_view(View $view does coerce) { $self->$orig($view->name, $view) }
+    around add_view(View $view does coerce) {
+        die "Can't use view name " . $view->name if $self->exists_view($view->name) || $view->name eq '';
+        $view->schema($self);
+        $self->$orig($view->name, $view)
+    }
+
     around add_procedure(Procedure $procedure does coerce) { $self->$orig($procedure->name, $procedure) }
     around add_trigger(Trigger $trigger does coerce) { $self->$orig($trigger->name, $trigger) }
 
@@ -88,6 +96,12 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     around remove_table(Table|Str $table, Int :$cascade = 0) {
         my $name = is_Table($table) ? $table->name : $table;
         die "Can't drop non-existant table " . $name unless $self->exists_table($name);
+        $self->$orig($name);
+    }
+
+    around remove_view(View|Str $view) {
+        my $name = is_View($view) ? $view->name : $view;
+        die "Can't drop non-existant view " . $name unless $self->exists_view($name);
         $self->$orig($name);
     }
 
