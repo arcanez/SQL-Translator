@@ -1,7 +1,7 @@
 use MooseX::Declare;
 role SQL::Translator::Object::Compat {
     use MooseX::Types qw(Any ArrayRef Int Str);
-    use SQL::Translator::Types qw(Column Constraint Index Table);
+    use SQL::Translator::Types qw(Column Constraint Index Table View);
 
     use MooseX::MultiMethods;
 
@@ -30,6 +30,7 @@ role SQL::Translator::Object::Compat {
     method drop_column(Column|Str $column, Int :$cascade = 0) { $self->remove_column($column, cascade => $cascade) }
     method drop_index(Index|Str $index) { $self->remove_index($index) }
     method drop_constraint(Constraint|Str $constraint) { $self->remove_constraint($constraint) }
+    method drop_view(View|Str $view) { $self->remove_view($view) }
 
     method get_fields { $self->get_columns }
     method get_field { $self->get_column }
