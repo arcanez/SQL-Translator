@@ -5,6 +5,7 @@ role SQL::Translator::Parser::DBI {
     use DBI::Const::GetInfoReturn;
 
     use MooseX::Types::Moose qw(HashRef Maybe Str);
+    use MooseX::MultiMethods;
 
     use SQL::Translator::Object::Column;
     use SQL::Translator::Object::ForeignKey;
@@ -143,5 +144,11 @@ role SQL::Translator::Parser::DBI {
         my $index = SQL::Translator::Object::Index->new({ name => $index_name, type => $index_type });
         $index->add_column($table->get_column($_)) for @index_cols;
         $table->add_index($index);
+    }
+
+    multi method parse(Schema $data) { $data }
+
+    multi method parse(Any $) {
+        $self->_add_tables($self->schema);
     }
 }
