@@ -104,6 +104,9 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             $name = 'ANON' . $idx;
         }
         $constraint->table($self);
+        if ($constraint->has_type && $constraint->type eq 'PRIMARY KEY') {
+            $self->get_column($_)->is_primary_key(1) for $constraint->column_ids;
+        }
         $self->$orig($name, $constraint)
     }
 

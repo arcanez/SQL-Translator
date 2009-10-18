@@ -35,6 +35,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     has 'type' => (
         is => 'rw',
         isa => Str,
+        predicate => 'has_type',
     );
 
     has 'deferrable' => (
@@ -70,5 +71,12 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
         default => ''
     );
 
-    around add_column(Column $column) { $self->$orig($column->name, $column) }
+    around add_column(Column $column) {
+        if ($self->has_type && $self->type eq 'PRIMARY KEY') {
+            $column->is_primary_key(1);
+        }
+        $self->$orig($column->name, $column)
+    }
+
+    method is_valid { return $self->has_type && scalar $self->column_ids ? 1 : undef }
 }
