@@ -24,7 +24,7 @@ role SQL::Translator::Object::Compat {
         $self->column_ids;
     }
 
-    multi method fields(Any $) { $self->column_ids }
+    multi method fields { $self->column_ids }
 
     method add_field(Column $column does coerce) { $self->add_column($column) }
 

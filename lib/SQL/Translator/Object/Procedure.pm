@@ -35,5 +35,5 @@ class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
 
     multi method parameters(Str $parameter) { $self->add_parameter($parameter) }
     multi method parameters(ArrayRef $parameter) { $self->add_parameter($parameter) }
-    multi method parameters(Any $) { wantarray ? @{$self->_parameters} : $self->_parameters }
+    multi method parameters { wantarray ? @{$self->_parameters} : $self->_parameters }
 }

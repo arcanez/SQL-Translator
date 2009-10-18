@@ -123,7 +123,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
     around add_sequence(Sequence $sequence does coerce) { $self->$orig($sequence->name, $sequence) }
 
-    multi method primary_key(Any $) { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
+    multi method primary_key { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
     multi method primary_key(Str $column) { $self->get_column($column)->is_primary_key(1) }
 
     method is_valid { return $self->get_columns ? 1 : undef }

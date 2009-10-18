@@ -115,7 +115,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
     multi method size(Int $length, Int $precision) { $self->length($length); $self->precision($precision); $self->size }
     multi method size(ArrayRef $size) { $self->length($size->[0]); $self->precision($size->[1]) if @$size == 2; $self->size }
 
-    multi method size(Any $) {
+    multi method size {
         return $self->has_precision
         ? wantarray
             ? ($self->length, $self->precision) 
