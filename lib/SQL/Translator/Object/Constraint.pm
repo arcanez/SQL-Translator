@@ -27,6 +27,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
             get_columns   => 'values',
             get_column    => 'get',
             add_column    => 'set',
+            clear_columns => 'clear',
         },
         default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
     );

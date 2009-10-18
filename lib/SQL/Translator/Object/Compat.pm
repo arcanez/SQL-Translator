@@ -6,6 +6,7 @@ role SQL::Translator::Object::Compat {
     use MooseX::MultiMethods;
 
     multi method fields(Str $columns) {
+        $self->clear_columns;
         my @columns = split /\s*,\s*/, $columns;
         for my $column (@columns) {
             die "Column '$column' does not exist!" unless $self->table->exists_column($column);
@@ -15,6 +16,7 @@ role SQL::Translator::Object::Compat {
     }
 
     multi method fields(ArrayRef $columns) {
+        $self->clear_columns;
         for my $column (@$columns) {
             die "Column '$column' does not exist!" unless $self->table->exists_column($column);
             $self->add_column($self->table->get_column($column));
