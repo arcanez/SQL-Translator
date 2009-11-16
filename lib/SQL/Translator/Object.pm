@@ -40,20 +40,20 @@ class SQL::Translator::Object with SQL::Translator::Object::Compat {
         default => sub { {} },
     );
 
-    has 'error' => (
+    has '_error' => (
         is => 'rw',
         isa => Str
     );
 
     multi method comments(Str $comment) { $self->add_comment($comment); $self->comments }
     multi method comments(ArrayRef $comments) { $self->add_comment($_) for @$comments; $self->comments }
-    multi method comments(Any $) { wantarray ? $self->_comments : join "\n", $self->_comments }
+    multi method comments { wantarray ? $self->_comments : join "\n", $self->_comments }
 
     multi method options(Str $option) { $self->add_option($option); $self->options }
     multi method options(ArrayRef $options) { $self->add_option($_) for @$options; $self->options }
-    multi method options(Any $) { wantarray ? $self->_options : $self->_options }
+    multi method options { wantarray ? $self->_options : $self->_options }
 
     multi method extra(Str $extra) { $self->get_extra($extra) }
     multi method extra(HashRef $extra) { $self->add_extra($_, $extra->{$_}) for keys %$extra; $self->extra }
-    multi method extra(Any $) { wantarray ? %{$self->_extra} : $self->_extra }
+    multi method extra { wantarray ? %{$self->_extra} : $self->_extra }
 }
