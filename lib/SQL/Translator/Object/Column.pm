@@ -29,6 +29,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         isa => Str,
         required => 1,
         default => '',
+        trigger => sub { my ($self, $new, $old) = @_; $self->is_auto_increment(1) if $new =~ /^serial$/i; },
     );
 
     has 'sql_data_type' => (
