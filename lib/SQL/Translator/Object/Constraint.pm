@@ -36,6 +36,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
         is => 'rw',
         isa => Str,
         predicate => 'has_type',
+        required => 1,
     );
 
     has 'deferrable' => (
@@ -61,6 +62,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
             reference_columns => 'elements',
         },
         default => sub { [] },
+        required => 1,
     );
 
     has 'match_type' => (
