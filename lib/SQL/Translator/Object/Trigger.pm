@@ -1,8 +1,21 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
-    use SQL::Translator::Types qw(Column);
-    
+    use MooseX::MultiMethods;
+    use SQL::Translator::Types qw(Column Schema Table);
+
+    has 'schema' => (
+        is => 'rw',
+        isa => Schema,
+        weak_ref => 1,
+    );
+
+    has 'table' => (
+        is => 'rw',
+        isa => Table,
+        weak_ref => 1,
+    );
+
     has 'name' => (
         is => 'ro',
         isa => Str,
@@ -27,7 +40,8 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     has 'on_table' => (
         is => 'rw', 
         isa => Str,
-        required => 1
+        required => 1,
+#        trigger => sub { my ($self, $new, $old) = @_; $self->table($self->schema->get_table($new)) },
     );
 
     has 'action' => (
@@ -41,11 +55,22 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
         required => 1
     );
 
-    has 'database_events' => (
+    has '_database_events' => (
         is => 'rw',
+        traits => ['Array'],
         isa => ArrayRef,
-        required => 1
+        handles => {
+            _database_eventss           => 'elements',
+            add_database_eventn         => 'push',
+            remove_last_database_option => 'pop',
+        },
+        default => sub { [] },
+        required => 1,
     );
 
     around add_column(Column $column) { $self->$orig($column->name, $column) }
+
+    multi method database_events(Str $database_event) { $self->add_database_event($database_event); $self->database_events }
+    multi method database_events(ArrayRef $database_events) { $self->add_database_event($_) for @$database_events; $self->database_events }
+    multi method database_events { wantarray ? $self->_database_events : $self->_database_events }
 }
