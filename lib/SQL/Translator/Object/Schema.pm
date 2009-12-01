@@ -89,7 +89,10 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     }
 
     around add_procedure(Procedure $procedure does coerce) { $self->$orig($procedure->name, $procedure) }
-    around add_trigger(Trigger $trigger does coerce) { $self->$orig($trigger->name, $trigger) }
+    around add_trigger(Trigger $trigger does coerce) {
+        $trigger->schema($self);
+        $self->$orig($trigger->name, $trigger);;
+    }
 
     method is_valid { return $self->get_tables ? 1 : undef }
 
