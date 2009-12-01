@@ -2,6 +2,7 @@ use MooseX::Declare;
 role SQL::Translator::Parser::DDL::SQLite {
     use MooseX::Types::Moose qw(Str);
     use MooseX::MultiMethods;
+    use Moose::Autobox;
     use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     use SQL::Translator::Types qw(Schema);
     use aliased 'SQL::Translator::Object::Column';
@@ -44,7 +45,7 @@ role SQL::Translator::Parser::DDL::SQLite {
         for my $table_name ( @tables ) {
             my $tdata =  $result->{'tables'}{ $table_name };
             my $table = Table->new({ name  => $tdata->{'name'}, schema => $schema });
-            $table->comments( $tdata->{'comments'} );
+            $table->comments( $tdata->{'comments'}->flatten ) if $tdata->{comments};
             $schema->add_table($table);
     
             for my $fdata ( @{ $tdata->{'fields'} } ) {
@@ -56,7 +57,6 @@ role SQL::Translator::Parser::DDL::SQLite {
                     default_value     => $fdata->{'default'},
                     is_auto_increment => $fdata->{'is_auto_inc'},
                     is_nullable       => $fdata->{'is_nullable'},
-                    comments          => $fdata->{'comments'},
                     table             => $table,
                 });
                 $table->add_column($field);

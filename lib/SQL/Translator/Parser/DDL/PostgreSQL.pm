@@ -2,6 +2,7 @@ use MooseX::Declare;
 role SQL::Translator::Parser::DDL::PostgreSQL {
     use MooseX::Types::Moose qw(Str);
     use MooseX::MultiMethods;
+    use Moose::Autobox;
     use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     use SQL::Translator::Types qw(Schema);
     use aliased 'SQL::Translator::Object::Column';
@@ -37,7 +38,7 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
             $schema->add_table($table);
     
             $table->extra({ temporary => 1 }) if $tdata->{'temporary'};
-            $table->comments( $tdata->{'comments'} );
+            $table->comments( $tdata->{'comments'}->flatten ) if $tdata->{comments};
     
             my @fields = sort { $tdata->{'fields'}{ $a }{'order'} <=> $tdata->{'fields'}{ $b }{'order'} } keys %{ $tdata->{'fields'} };
     
