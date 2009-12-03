@@ -131,8 +131,8 @@ role SQL::Translator::Producer::SQL::MySQL {
                 for my $meth (qw/table reference_table/) {
                     my $table = $schema->get_table($c->$meth) || next;
                     # This normalizes the types to ENGINE and returns the value if its there
-                    next if $extra_to_options->($table, 'mysql_table_type', ['ENGINE', 'TYPE']);
-                    $table->options({ 'ENGINE' => 'InnoDB' });
+                    next if $extra_to_options->($table, 'mysql_table_type', ['ENGINE', 'TYPE']); 
+#                    $table->options( [ { ENGINE => 'InnoDB' } ] );
                 }
             } # foreach constraints
     
@@ -338,7 +338,7 @@ role SQL::Translator::Producer::SQL::MySQL {
       my $collate          = $table->extra->{'mysql_collate'};
       my $union            = undef;
 
-      for my $t1_option_ref ($table->_options) {
+      for my $t1_option_ref ($table->options) {
         my($key, $value) = %{$t1_option_ref};
         $table_type_defined = 1
           if uc $key eq 'ENGINE' or uc $key eq 'TYPE';
