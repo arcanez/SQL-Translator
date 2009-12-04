@@ -61,7 +61,7 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
         isa => ArrayRef,
         handles => {
             _database_eventss           => 'elements',
-            add_database_eventn         => 'push',
+            add_database_event          => 'push',
             remove_last_database_option => 'pop',
         },
         default => sub { [] },
