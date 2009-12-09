@@ -3,6 +3,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Any Bool HashRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
+    use SQL::Translator::Object::Constraint;
     clean;
 
     use overload
@@ -123,10 +124,25 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
     around add_sequence(Sequence $sequence does coerce) { $self->$orig($sequence->name, $sequence) }
 
-    multi method primary_key { grep /^PRIMARY KEY$/, $_->type for $self->get_constraints }
+    multi method primary_key {
+        my $constraints = $self->constraints;
+        for my $key (keys %$constraints) {
+            return $constraints->{$key} if $constraints->{$key}{type} eq 'PRIMARY KEY';
+        }
+        return undef;
+    }
+
     multi method primary_key(Str $column) {
         die "Column $column does not exist!" unless $self->exists_column($column);
         $self->get_column($column)->is_primary_key(1);
+
+        my $primary_key = $self->primary_key;
+        unless (defined $primary_key) {
+            $primary_key = SQL::Translator::Object::Constraint->new({ type => 'PRIMARY KEY' });
+            $self->add_constraint($primary_key);
+        }
+        $primary_key->add_column(SQL::Translator::Object::Column->new({ name => $column })) unless $primary_key->exists_column($column);
+        return $primary_key;
     }
 
     method is_valid { return $self->get_columns ? 1 : undef }
