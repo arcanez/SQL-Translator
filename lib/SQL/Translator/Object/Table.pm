@@ -141,7 +141,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             $primary_key = SQL::Translator::Object::Constraint->new({ type => 'PRIMARY KEY' });
             $self->add_constraint($primary_key);
         }
-        $primary_key->add_column(SQL::Translator::Object::Column->new({ name => $column })) unless $primary_key->exists_column($column);
+        $primary_key->add_field({ name => $column }) unless $primary_key->exists_column($column); ## FIX ME, change back to add_column once around add_column(coerce .. ) works
         return $primary_key;
     }
 
