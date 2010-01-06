@@ -1,7 +1,7 @@
 use MooseX::Declare;
 role SQL::Translator::Object::Compat {
     use MooseX::Types qw(Any ArrayRef Int Str);
-    use SQL::Translator::Types qw(Column Constraint Index Table Trigger View);
+    use SQL::Translator::Types qw(Column Constraint Index Procedure Table Trigger View);
 
     use MooseX::MultiMethods;
 
@@ -31,6 +31,7 @@ role SQL::Translator::Object::Compat {
     method drop_column(Column|Str $column, Int :$cascade = 0) { $self->remove_column($column, cascade => $cascade) }
     method drop_constraint(Constraint|Str $constraint) { $self->remove_constraint($constraint) }
     method drop_index(Index|Str $index) { $self->remove_index($index) }
+    method drop_procedure(Procedure|Str $procedure) { $self->remove_procedure($procedure) }
     method drop_table(Table|Str $table, Int :$cascade = 0) { $self->remove_table($table, cascade => $cascade) }
     method drop_trigger(Trigger|Str $trigger) { $self->remove_trigger($trigger) }
     method drop_view(View|Str $view) { $self->remove_view($view) }

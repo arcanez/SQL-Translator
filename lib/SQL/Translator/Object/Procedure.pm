@@ -2,6 +2,13 @@ use MooseX::Declare;
 class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Str);
     use MooseX::MultiMethods;
+    use SQL::Translator::Types qw(Schema);
+
+    has 'schema' => (
+        is => 'rw',
+        isa => Schema,
+        weak_ref => 1,
+    );
     
     has 'name' => (
         is => 'rw',
@@ -35,5 +42,5 @@ class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
 
     multi method parameters(Str $parameter) { $self->add_parameter($parameter) }
     multi method parameters(ArrayRef $parameter) { $self->add_parameter($parameter) }
-    multi method parameters { wantarray ? @{$self->_parameters} : $self->_parameters }
+    multi method parameters { wantarray ? $self->_parameters : $self->_parameters }
 }
