@@ -60,6 +60,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
         traits => ['Array'],
         handles => {
             reference_columns => 'elements',
+            add_reference_column => 'push',
         },
         default => sub { [] },
         required => 1,
