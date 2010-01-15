@@ -395,11 +395,14 @@ require_ok( 'SQL::Translator::Object::View' );
     # $schema->get_*
     #
     
+TODO: {
+    local $TODO = 'patch Moose Native::Trait';
     dies_ok( sub { my $bad_table = $schema->get_table }, 'Error on no arg to get_table' );
     is($schema->get_table('baz'), undef, 'Nonexistant table returns undef');
 
     dies_ok( sub { my $bad_view = $schema->get_view }, 'Error on no arg to get_view' );
     is($schema->get_view('baz'), undef, 'Nonexistant view returns undef');
+}
 
     my $good_table = $schema->get_table('foo');
     isa_ok( $good_table, 'SQL::Translator::Object::Table', 'Table "foo"' );
@@ -617,8 +620,11 @@ require_ok( 'SQL::Translator::Object::View' );
         perform_action_when => $perform_action_when,
         database_events     => $database_events,
         on_table            => $on_table,
+        table               => $s->get_table('foo'),
         action              => $action,
     }) or die $s->error;
+
+    $t->add_database_event('insert');
 
     isa_ok( $t, 'SQL::Translator::Object::Trigger', 'Trigger' );
     isa_ok( $t->schema, 'SQL::Translator::Object::Schema', 'Schema' );
@@ -626,6 +632,7 @@ require_ok( 'SQL::Translator::Object::View' );
     is( $t->name, $name, qq[Name is "$name"] );
     is( $t->perform_action_when, $perform_action_when, 
         qq[Perform action when is "$perform_action_when"] );
+
     is( join(',', $t->database_events), $database_events, 
         qq[Database event is "$database_events"] );
     isa_ok( $t->table, 'SQL::Translator::Object::Table', qq[table is a Table"] );
@@ -649,6 +656,8 @@ require_ok( 'SQL::Translator::Object::View' );
         on_table            => 'foo',
         action              => 'update modified=timestamp();',
     }) or die $s2->error;
+    $t2->add_database_event('insert');
+    $t2->add_database_event('update');
 	isa_ok( $t2, 'SQL::Translator::Object::Trigger', 'Trigger' );
     isa_ok( $t2->schema, 'SQL::Translator::Object::Schema', 'Schema' );
     is( $t2->schema->name, 'TrigTest2', qq[Schema name is "'TrigTest2'"] );
@@ -658,6 +667,7 @@ require_ok( 'SQL::Translator::Object::View' );
         [qw/insert update/],
         "Database events are [qw/insert update/] "
     );
+
 	isa_ok($t2->database_events,'ARRAY','Database events');
 	
 	#
@@ -710,6 +720,8 @@ require_ok( 'SQL::Translator::Object::View' );
         owner      => $owner,
         comments   => $comments,
     }); # or die $s->error;
+    $p->parameters([ qw/foo bar/ ]);
+    $p->comments($comments);
 
     isa_ok( $p, 'SQL::Translator::Object::Procedure', 'Procedure' );
     isa_ok( $p->schema, 'SQL::Translator::Object::Schema', 'Schema' );
