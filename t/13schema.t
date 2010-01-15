@@ -529,7 +529,7 @@ TODO: {
 #    is( $t->primary_key('person_id'), undef, 
 #            q[Can't make PK on "person_id"...] );
 #    like( $t->error, qr/invalid field/i, "...because it doesn't exist" );
-    dies_ok( sub { $t->primary_key }, "...because it doesn't exist" );
+    dies_ok( sub { $t->primary_key('person_id') }, "...because it doesn't exist" );
 
     $t->add_field({ name => 'person_id' });
     my $c = $t->primary_key('person_id');
@@ -564,8 +564,9 @@ TODO: {
         fields          => 'person_id',
         reference_table => 'person',
         table           => $t1,
-        reference_fields => 'id',
+#        reference_fields => 'id',
     });
+    $c2->add_reference_column($t1->get_column('id'));
 
     is( join('', $c2->reference_fields), 'id', 'FK found PK "person.id"' );
 }
@@ -586,8 +587,8 @@ TODO: {
         schema => $s,
     });
 
-#    $v->add_field({ name => 'name' });
-#    $v->add_field({ name => 'age' });
+    $v->add_column({ name => 'name' });
+    $v->add_column({ name => 'age' });
 
     isa_ok( $v, 'SQL::Translator::Object::View', 'View' );
     isa_ok( $v->schema, 'SQL::Translator::Object::Schema', 'Schema' );
