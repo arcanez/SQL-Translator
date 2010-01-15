@@ -56,11 +56,10 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     );
 
     has '_database_events' => (
-        is => 'rw',
         traits => ['Array'],
         isa => ArrayRef,
         handles => {
-            _database_eventss           => 'elements',
+            _database_events            => 'elements',
             add_database_event          => 'push',
             remove_last_database_option => 'pop',
         },
