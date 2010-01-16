@@ -114,7 +114,12 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
 
     around remove_trigger(Trigger|Str $trigger) {
         my $name = is_Trigger($trigger) ? $trigger->name : $trigger;
-        die "Can't drop non-existant trigger " . $name unless $self->exists_trigger($name);
+####        die "Can't drop non-existant trigger " . $name unless $self->exists_trigger($name);
+        $self->$orig($name);
+    }
+
+    around remove_procedure(Procedure|Str $procedure) {
+        my $name = is_Procedure($procedure) ? $procedure->name : $procedure;
         $self->$orig($name);
     }
 
