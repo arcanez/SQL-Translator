@@ -321,11 +321,11 @@ method create_trigger(Trigger $trigger, $options?) {
   my @statements;
 
   my $trigger_name = $trigger->name;
-  my $events = $trigger->database_events;
-  for my $evt ( @$events ) {
+  my @events = $trigger->database_events;
+  for my $evt ( @events ) {
 
     my $trig_name = $trigger_name;
-    if (@$events > 1) {
+    if (@events > 1) {
       $trig_name .= "_$evt";
 
 #      warn "Multiple database events supplied for trigger '$trigger_name', ",
