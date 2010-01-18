@@ -76,7 +76,7 @@ multi method parse(Any $data) {
             my $field = Column->new(%fdata);
             $table->add_column($field);
 
-            $table->primary_key( $field->name ) if $fdata{'is_primary_key'};
+            $field->is_primary_key(1) if $fdata{is_primary_key};
 
             #
             # TODO:

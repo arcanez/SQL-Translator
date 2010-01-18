@@ -58,7 +58,7 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
                 $field->comments($fdata->{comments});
 
                 $table->add_column($field);
-                $table->primary_key($field->name) if $fdata->{is_primary_key};
+                $field->is_primary_key(1) if $fdata->{is_primary_key};
     
                 for my $cdata ( @{ $fdata->{constraints} } ) {
                     next unless lc $cdata->{type} eq 'foreign_key';

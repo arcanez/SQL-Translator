@@ -70,7 +70,7 @@ role SQL::Translator::Parser::DDL::MySQL {
                 $field->comments($fdata->{comments});
                 $table->add_column($field);
     
-                $table->primary_key( $field->name ) if $fdata->{'is_primary_key'};
+                $field->is_primary_key(1) if $fdata->{is_primary_key};
 
                 my %extra;
                 for my $qual ( qw[ binary unsigned zerofill list collate ],
