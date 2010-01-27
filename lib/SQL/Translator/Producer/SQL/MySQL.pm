@@ -805,6 +805,7 @@ HEADER_COMMENT
     use constant COLLISION_TAG_LENGTH => 8;
 
     method truncate_id_uniquely(Str $desired_name, Int $max_symbol_length) {
+        use Digest::SHA1 qw(sha1_hex);
         return $desired_name
           unless defined $desired_name && length $desired_name > $max_symbol_length;
 
