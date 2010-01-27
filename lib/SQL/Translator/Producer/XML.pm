@@ -86,12 +86,12 @@ method produce {
         #
         xml_obj_children( $xml, $table,
             { tag   => 'constraint',
-#            methods => [qw/
-#                name type fields reference_table reference_fields
-#                on_delete on_update match_type expression options deferrable
-#                extra
-#            /],
-             methods => [qw/name type expression options deferrable extra/], }
+            methods => [qw/
+                name type fields reference_table reference_fields
+                on_delete on_update match_type expression options deferrable
+                extra
+            /], }
+#             methods => [qw/name type expression options deferrable extra/], }
         );
 
         #
@@ -219,7 +219,7 @@ method xml_obj($xml: $obj, HashRef $args?) {
     while ( my ($name,$val) = splice @tags,0,2 ) {
         if ( ref $val eq 'HASH' ) {
              $xml->emptyTag( [ $Namespace => $name ],
-                 map { ($_, $val->{$_}) } sort keys %$val );
+                 map { ($_, $val->{$_}) } keys %$val ); ### SORT
         }
         else {
             $xml->dataElement( [ $Namespace => $name ], $val );
