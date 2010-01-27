@@ -1,13 +1,8 @@
 use warnings;
 use strict;
-use Test::SQL::Translator;
+use Test::More;
 use Test::Differences;
 use FindBin qw/$Bin/;
-
-BEGIN {
-    maybe_plan(1, 'SQL::Translator::Parser::XML',
-                  'SQL::Translator::Producer::XML');
-}
 
 # It's very hard to read and modify YAML by hand. Thus we
 # use an XML file for definitions, and generate a YAML from
@@ -31,11 +26,15 @@ sub _parse_to_xml {
   my $tr = SQL::Translator->new;
   $tr->no_comments (1); # this will drop the XML header
 
+  open (my $fh, '<', $fn) or die "$fn: $!"; 
+
   my $xml = $tr->translate (
     parser => $type,
-    file => $fn,
+    data => do { local $/; <$fh> },
     producer => 'XML',
   ) or die $tr->error;
 
   return $xml;
 }
+
+done_testing;
