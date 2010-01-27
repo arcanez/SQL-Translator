@@ -46,7 +46,7 @@ role SQL::Translator::Parser::DDL::YAML {
 
                 my $column = Column->new($fdata);
                 $table->add_column($column);
-                $table->primary_key($column->name) if $fdata->{is_primary_key};
+                $column->is_primary_key(1) if $fdata->{is_primary_key};
             }
     
             for my $idata ( @{ $tdata->{'indices'} || [] } ) { 
