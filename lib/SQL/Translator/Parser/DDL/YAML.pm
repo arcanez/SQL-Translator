@@ -60,8 +60,9 @@ role SQL::Translator::Parser::DDL::YAML {
     
             for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
                  $cdata->{table} = $table;
-                 $cdata->{reference_columns} = delete $cdata->{reference_fields};
+                 $cdata->{reference_columns} = delete $cdata->{reference_fields} || [];
                  my $columns = delete $cdata->{fields} || [];
+                 $columns = ref $columns eq 'ARRAY' ? $columns : [ $columns ];
                  my $constraint = Constraint->new($cdata);
                  $constraint->add_column($table->get_column($_)) for @$columns;
                  $table->add_constraint($constraint);
