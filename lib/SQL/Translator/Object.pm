@@ -7,6 +7,7 @@ class SQL::Translator::Object with SQL::Translator::Object::Compat {
     has '_comments' => (
         traits => ['Array'],
         isa => ArrayRef,
+        coerce => 1,
         handles => {
             _comments           => 'elements',
             add_comment         => 'push',
@@ -18,6 +19,7 @@ class SQL::Translator::Object with SQL::Translator::Object::Compat {
     has '_options' => (
         traits => ['Array'],
         isa => ArrayRef,
+        coerce => 1,
         handles => {
             _options           => 'elements',
             add_option         => 'push',
