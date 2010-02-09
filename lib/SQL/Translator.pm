@@ -5,6 +5,8 @@ class SQL::Translator {
     use SQL::Translator::Types qw(DBIHandle Parser Producer Schema);
     use SQL::Translator::Object::Schema;
 
+    our $VERSION = '0.001';
+
     has 'parser' => (
         isa => Str,
         is => 'rw',
@@ -65,6 +67,12 @@ class SQL::Translator {
     has 'version' => (isa => Str, is => 'rw');
     has 'filename' => (isa => Str, is => 'rw');
 
+    has '_producer_mapping' => (
+        isa => HashRef,
+        is => 'ro',
+        default => sub { { MySQL => 'SQL::MySQL', SQLite => 'SQL::SQLite', PostgreSQL => 'SQL::PostgreSQL', XML => 'XML', YAML => 'YAML' } }
+    );
+
     method _build__parser {
         my $class = 'SQL::Translator::Parser';
     
@@ -81,16 +89,13 @@ class SQL::Translator {
     }
     
     method _build__producer {
+        my $mapping = $self->_producer_mapping;
+
         my $class = 'SQL::Translator::Producer';
-        my $role = $class . '::' . $self->producer;
+        my $role = $class . '::' . $mapping->{$self->producer};
 
         Class::MOP::load_class($class);
-        try {
-            Class::MOP::load_class($role)
-        } catch ($e) {
-            $role = $class . '::SQL::' . $self->producer;
-            Class::MOP::load_class($role)
-        }
+        Class::MOP::load_class($role);
     
         my $producer = $class->new({ translator => $self });
         $role->meta->apply($producer);
