@@ -32,6 +32,8 @@ class SQL::Translator::Types {
     coerce Trigger, from HashRef, via { SQL::Translator::Object::Trigger->new($_) };
     coerce View, from HashRef, via { SQL::Translator::Object::View->new($_) };
 
+    coerce ArrayRef, from Str, via { [ $_ ] };
+
     subtype MatchType, as Str, where { /^(full|partial|simple)$/ || $_ eq '' };
     coerce MatchType, from Str, via { lc $_ };
 
