@@ -108,8 +108,9 @@ require_ok( 'SQL::Translator::Object::View' );
     my $person_table = SQL::Translator::Object::Table->new({ 
         name     => 'person', 
         schema   => $schema,
+        comments => 'foo',
     });
-    $person_table->comments('foo');
+
     $schema->add_table($person_table);
     is( $person_table->name, 'person', 'Table name is "person"' );
     is( $person_table->is_valid, undef, 'Table is not yet valid' );
@@ -120,7 +121,7 @@ require_ok( 'SQL::Translator::Object::View' );
     #
     # Field default new
     #
-    my $person_table_column = SQL::Translator::Object::Column->new( name => 'foo' );
+    my $person_table_column = SQL::Translator::Object::Column->new( name => 'foo', extra => { foo => 'bar', baz => 'quux' } );
     my $f1 = $person_table->add_column($person_table_column);
     isa_ok( $f1, 'SQL::Translator::Object::Column', 'Column' );
     is( $f1->name, 'foo', 'Field name is "foo"' );
@@ -202,8 +203,6 @@ require_ok( 'SQL::Translator::Object::View' );
     is( $f1->size('30'), '30', 'Field size is "30"' );
     is( $f1->is_primary_key(0), '0', 'Field is_primary_key is negative' );
 
-    $f1->extra({ foo => 'bar' });
-    $f1->extra({ baz => 'quux' });
     my %extra = $f1->extra;
     is( $extra{'foo'}, 'bar', 'Field extra "foo" is "bar"' );
     is( $extra{'baz'}, 'quux', 'Field extra "baz" is "quux"' );
@@ -722,7 +721,6 @@ TODO: {
         comments   => $comments,
     }); # or die $s->error;
     $p->parameters([ qw/foo bar/ ]);
-    $p->comments($comments);
 
     isa_ok( $p, 'SQL::Translator::Object::Procedure', 'Procedure' );
     isa_ok( $p->schema, 'SQL::Translator::Object::Schema', 'Schema' );
