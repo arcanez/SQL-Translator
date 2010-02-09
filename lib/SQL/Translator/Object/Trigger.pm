@@ -72,4 +72,6 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     multi method database_events(Str $database_event) { $self->add_database_event($database_event); $self->database_events }
     multi method database_events(ArrayRef $database_events) { $self->add_database_event($_) for @$database_events; $self->database_events }
     multi method database_events { $self->_database_events }
+
+    method is_valid { 1 }
 }
