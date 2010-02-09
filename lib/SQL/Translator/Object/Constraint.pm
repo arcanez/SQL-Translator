@@ -74,6 +74,9 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
         default => ''
     );
 
+    has 'on_delete' => ( is => 'rw', required => 0);
+    has 'on_update' => ( is => 'rw', required => 0);
+
     around add_column(Column $column) {
         if ($self->has_type && $self->type eq 'PRIMARY KEY') {
             $column->is_primary_key(1);
