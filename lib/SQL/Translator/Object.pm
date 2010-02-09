@@ -58,4 +58,14 @@ class SQL::Translator::Object with SQL::Translator::Object::Compat {
     multi method extra(Str $extra) { $self->get_extra($extra) }
     multi method extra(HashRef $extra) { $self->add_extra($_, $extra->{$_}) for keys %$extra; $self->extra }
     multi method extra { wantarray ? %{$self->_extra} : $self->_extra }
+
+    around BUILDARGS(ClassName $self: @args) {
+        my $args = $self->$orig(@args);
+
+        $args->{_comments} = delete $args->{comments} || [];
+        $args->{_options} = delete $args->{options} || [];
+        $args->{_extra} = delete $args->{extra} || {};
+
+        return $args;
+     }
 }
