@@ -56,6 +56,7 @@ role SQL::Translator::Parser::DDL::SQLite {
                     default_value     => $fdata->{'default'},
                     is_auto_increment => $fdata->{'is_auto_inc'},
                     is_nullable       => $fdata->{'is_nullable'},
+                    comments          => $fdata->{'comments'},
                     table             => $table,
                 });
                 $table->add_column($field);
