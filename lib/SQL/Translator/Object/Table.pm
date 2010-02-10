@@ -3,6 +3,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Any Bool HashRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
+    use SQL::Translator::Object::Column;
     use SQL::Translator::Object::Constraint;
     clean;
 
@@ -166,5 +167,16 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         my $name = is_Constraint($constraint) ? $constraint->name : $constraint;
         die "Can't drop non-existant constraint " . $name unless $self->exists_constraint($name);
         $self->$orig($name);
+    }
+
+    around BUILDARGS(ClassName $self: @args) {
+        my $args = $self->$orig(@args);
+
+        my $fields = delete $args->{fields};
+
+        tie %{$args->{columns}}, 'Tie::IxHash';
+        $args->{columns}{$_} = SQL::Translator::Object::Column->new( name => $_ ) for @$fields;
+
+        return $args;
     }
 }
