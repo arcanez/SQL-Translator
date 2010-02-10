@@ -12,28 +12,24 @@ role SQL::Translator::Producer::SQL::SQLite {
         return $data_type_mapping;
     };
 
-method header_comment($producer, $comment_char) {
-    $producer ||= caller;
-    my $now = scalar localtime;
-my $DEFAULT_COMMENT = '-- ';
+    method header_comment(Str $comment_char? = '-- ') {
+        my $producer = __PACKAGE__;
+        my $now = scalar localtime;
 
-    $comment_char = $DEFAULT_COMMENT
-        unless defined $comment_char;
-
-    my $header_comment =<<"HEADER_COMMENT";
+        my $header_comment = <<"HEADER_COMMENT";
 ${comment_char}
 ${comment_char}Created by $producer
 ${comment_char}Created on $now
 ${comment_char}
 HEADER_COMMENT
 
-    # Any additional stuff passed in
-    for my $additional_comment (@_) {
-        $header_comment .= "${comment_char}${additional_comment}\n";
-    }
+        # Any additional stuff passed in
+        for my $additional_comment (@_) {
+            $header_comment .= "${comment_char}${additional_comment}\n";
+        }
 
-    return $header_comment;
-}
+        return $header_comment;
+    }
 
 method produce {
     my $translator     = $self->translator;
@@ -45,8 +41,6 @@ method produce {
     my $producer_args  = $translator->producer_args;
     my $sqlite_version = $producer_args->{sqlite_version} || 0;
     my $no_txn         = $producer_args->{no_transaction};
-
-#    debug("PKG: Beginning production\n");
 
 #    %global_names = ();   #reset
 
@@ -209,7 +203,6 @@ method create_table(Table $table, HashRef $options) {
 
 method create_field(Column $field, $options?) {
     my $field_name = $field->name;
-#    debug("PKG: Looking at field '$field_name'\n");
     my $field_comments = $field->comments 
         ? "-- " . $field->comments . "\n  " 
         : '';
@@ -280,9 +273,7 @@ method create_field(Column $field, $options?) {
 #            ],
 #        );
 #    }
-
     return $field_def;
-
 }
 
 method create_index(Index $index, $options?) {
