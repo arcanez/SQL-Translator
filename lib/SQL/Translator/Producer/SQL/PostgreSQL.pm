@@ -1,5 +1,5 @@
 use MooseX::Declare;
-role  SQL::Translator::Producer::SQL::PostgreSQL {
+role SQL::Translator::Producer::SQL::PostgreSQL {
     use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     use SQL::Translator::Types qw(Column Constraint Index Table View);
 my ( %index_name );
@@ -332,7 +332,6 @@ method create_view(View $view, $options?) {
     my $add_drop_view = $options->{add_drop_view};
 
     my $view_name = $view->name;
-#    debug("PKG: Looking at view '${view_name}'\n");
 
     my $create = '';
     $create .= "--\n-- View: ${qt}${view_name}${qt}\n--\n"
@@ -406,18 +405,7 @@ method create_view(View $view, $options?) {
         # Default value 
         #
         my $default = $field->default_value;
-
-#        if ( defined $default ) {
-#            SQL::Translator::Producer->_apply_default_value(
-#              \$field_def,
-#              $default,
-#              [
-#                'NULL'              => \'NULL',
-#                'now()'             => 'now()',
-#                'CURRENT_TIMESTAMP' => 'CURRENT_TIMESTAMP',
-#              ],
-#            );
-#        }
+        $field_def .= $self->_default_value($default, [ 'NULL'=> \'NULL', 'now()' => 'now()', 'CURRENT_TIMESTAMP' => 'CURRENT_TIMESTAMP', ] ) if defined $default;
 
         #
         # Not null constraint

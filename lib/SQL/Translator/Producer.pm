@@ -1,7 +1,7 @@
 use MooseX::Declare;
 class SQL::Translator::Producer {
     use SQL::Translator::Constants qw(:sqlt_types);
-    use MooseX::Types::Moose qw(Bool HashRef Str);
+    use MooseX::Types::Moose qw(ArrayRef Bool HashRef ScalarRef Str);
     use SQL::Translator::Types qw(Column Table Translator);
     
     has 'data_type_mapping' => (
@@ -60,5 +60,22 @@ class SQL::Translator::Producer {
         $column_def .= '(' . $column->size . ')' if $column->size;
         $column_def .= ' NOT NULL' unless $column->is_nullable;
         $column_def;
+    }
+
+    method _default_value(ScalarRef|Str $default, ArrayRef $exceptions) {
+      if ($exceptions and ! ref $default) {
+        for (my $i = 0; $i < @$exceptions; $i += 2) {
+          my ($pat, $val) = @$exceptions[ $i, $i + 1 ];
+          if (ref $pat and $default =~ $pat) {
+          $default = $val;
+          last;
+          } elsif (lc $default eq lc $pat) {
+              $default = $val;
+              last
+          }
+        }
+      }
+
+      return ref($default) ? " DEFAULT $$default" : " DEFAULT '$default'";
     }
 }
