@@ -85,7 +85,7 @@ my $base_file = "$Bin/data/roundtrip_autogen.yaml";
 open (my $base_fh, '<', $base_file) or die "$base_file: $!";
 
 my $base_t = SQL::Translator->new;
-$base_t->$_ (1) for qw/add_drop_table no_comments/;
+$base_t->$_(1) for qw/add_drop_table no_comments/;
 
 my $base_schema = $base_t->translate(
   parser => 'YAML',
@@ -183,7 +183,7 @@ sub check_roundtrip {
 #    producer_args => $args->{producer_args},
 #  );
 
-  my $rt_out = $parser_t->translate (
+  my $rt_out = $parser_t->translate(
     data => $mid_schema,
     producer => $args->{engine},
     producer_args => $args->{producer_args} || {},
