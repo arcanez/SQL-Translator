@@ -50,7 +50,7 @@ method produce {
 
     for my $table ( $schema->get_tables ) {
         push @create, $self->create_table($table, { no_comments => $no_comments,
-                                             sqlite_version => $sqlite_version,
+                                          sqlite_version => $sqlite_version,
                                           add_drop_table => $add_drop_table,});
     }
 
