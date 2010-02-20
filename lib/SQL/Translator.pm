@@ -43,6 +43,7 @@ class SQL::Translator {
         isa => Schema,
         is => 'rw',
         lazy => 1,
+        clearer => '_clear_schema',
         default => sub { SQL::Translator::Object::Schema->new },
     );
 
@@ -109,6 +110,7 @@ class SQL::Translator {
         $parser ||= $self->parser;
         if (defined $parser) {
             $self->_clear_parser;
+            $self->_clear_schema;
             $self->parser($parser);
             $self->parse($data);
             $return = $self->schema;
