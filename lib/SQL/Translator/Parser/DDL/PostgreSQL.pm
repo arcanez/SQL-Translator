@@ -105,6 +105,7 @@ role SQL::Translator::Parser::DDL::PostgreSQL {
           $sql =~ s/\A\s+|\s+\z//g;
           my $view = View->new({
             name    => $vinfo->{view_name},
+            fields  => $vinfo->{fields},
             sql     => $sql,
           });
 
