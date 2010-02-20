@@ -253,13 +253,10 @@ role SQL::Translator::Producer::SQL::MySQL {
         if( my $sql = $view->sql ){
           $create .= " AS (\n    ${sql}\n  )";
         }
-    #    $create .= "";
         return $create;
     }
     
     method create_table($table, $options) {
-#        my ($table, $options) = @_;
-    
         my $qt = $options->{quote_table_names} || '';
         my $qf = $options->{quote_field_names} || '';
     
