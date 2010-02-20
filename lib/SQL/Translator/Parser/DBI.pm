@@ -14,7 +14,7 @@ role SQL::Translator::Parser::DBI {
     use SQL::Translator::Object::Table;
     use SQL::Translator::Object::View;
 
-    use SQL::Translator::Types qw(Schema Table);
+    use SQL::Translator::Types qw(Schema Table Column);
 
     has 'quoter' => (
         is => 'rw',
@@ -58,6 +58,8 @@ role SQL::Translator::Parser::DBI {
 
     method _column_data_type(HashRef $column_info) { $column_info->{DATA_TYPE} }
 
+    method _add_column_extra(Column $column, HashRef $column_info) { return }
+
     method _add_tables(Schema $schema) {
         my $sth = $self->dbh->table_info($self->catalog_name, $self->schema_name, '%', "TABLE,VIEW,'LOCAL TEMPORARY','GLOBAL TEMPORARY'");
         while (my $table_info = $sth->fetchrow_hashref) {
@@ -91,6 +93,7 @@ role SQL::Translator::Parser::DBI {
                                                                 is_auto_increment => $self->_is_auto_increment($column_info),
                                                                 is_nullable => $column_info->{NULLABLE},
                                                               });
+            $self->_add_column_extra($column, $column_info);
             push @columns, { column => $column, pos =>  $column_info->{ORDINAL_POSITION} || $#columns };
         }
         $table->add_column($_->{column}) for sort { $a->{pos} <=> $b->{pos} } @columns;

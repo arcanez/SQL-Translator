@@ -1,7 +1,7 @@
 use MooseX::Declare;
 role SQL::Translator::Parser::DBI::MySQL {
     use MooseX::Types::Moose qw(HashRef Maybe Str);
-    use SQL::Translator::Types qw(View Table Schema);
+    use SQL::Translator::Types qw(View Table Schema Column);
 
     has 'schema_name' => (
       is      => 'rw',
@@ -28,6 +28,17 @@ role SQL::Translator::Parser::DBI::MySQL {
         $default_value =~ s/::.*$// if defined $default_value;
 
         return $default_value;
+    }
+
+    method _column_data_type(HashRef $column_info) { $column_info->{TYPE_NAME} }
+
+    method _add_column_extra(Column $column, HashRef $column_info) {
+        $column->add_extra(unsigned => 1) if $column_info->{mysql_type_name} =~ /unsigned/;
+        $column->add_extra(zerofill => 1) if $column_info->{mysql_type_name} =~ /zerofill/;
+        $column->add_extra(values => $column_info->{mysql_values}) if $column_info->{mysql_values};
+        if (my ($size) = $column_info->{mysql_type_name} =~ /\((\d+,\d+)\)/) {
+            $column->size($size);
+        }
     }
 
     method _add_foreign_keys(Table $table, Schema $schema) {
