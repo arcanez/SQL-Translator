@@ -12,6 +12,7 @@ tests           't/*.t';
 requires        'aliased',                      '0.30';
 requires        'FindBin';
 requires        'Moose',                        '0.90';
+requires        'MooseX::Aliases',              '0.08';
 requires        'MooseX::Declare',              '0.31';
 requires        'MooseX::Types',                '0.20';
 requires        'MooseX::Method::Signatures',   '0.29';

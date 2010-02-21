@@ -2,6 +2,7 @@ use MooseX::Declare;
 class SQL::Translator {
     use TryCatch;
     use MooseX::Types::Moose qw(Bool HashRef Int Str Undef);
+    use MooseX::Aliases;
     use SQL::Translator::Types qw(DBIHandle Parser Producer Schema);
     use SQL::Translator::Object::Schema;
 
@@ -10,13 +11,13 @@ class SQL::Translator {
     has 'parser' => (
         isa => Str,
         is => 'rw',
-        init_arg => 'from',
+        alias => 'from',
     );
     
     has 'producer' => (
         isa => Str,
         is => 'rw',
-        init_arg => 'to',
+        alias => 'to',
     );
     
     has '_parser' => (
@@ -24,6 +25,7 @@ class SQL::Translator {
         is => 'rw',
         lazy_build => 1,
         handles => [ qw(parse) ],
+        predicate => 'has_parser',
     );
     
     has '_producer' => (
@@ -31,6 +33,7 @@ class SQL::Translator {
         is => 'rw',
         lazy_build => 1,
         handles => [ qw(produce) ],
+        predicate => 'has_producer',
     );
     
     has 'dbh' => (
@@ -107,7 +110,9 @@ class SQL::Translator {
     method translate(:$data, :$producer?, :$producer_args?, :$parser?, :$parser_args?) {
         my $return;
 
-        $parser ||= $self->parser;
+        $self->_clear_schema if defined $parser;
+
+        $parser ||= $self->parser unless $self->has_parser;
         if (defined $parser) {
             $self->_clear_parser;
             $self->parser($parser);
@@ -115,7 +120,7 @@ class SQL::Translator {
             $return = $self->schema;
         }
 
-        $producer ||= $self->producer;
+        $producer ||= $self->producer unless $self->has_producer;
         if (defined $producer) {
             $self->_clear_producer;
             $self->producer($producer);
