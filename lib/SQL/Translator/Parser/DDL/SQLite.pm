@@ -37,51 +37,50 @@ role SQL::Translator::Parser::DDL::SQLite {
     
         my $schema = $translator->schema;
         my @tables = 
-            map   { $_->[1] }
-            map   { [ $result->{'tables'}{ $_ }->{'order'}, $_ ] }
-            keys %{ $result->{'tables'} };
-    
+            sort  { $result->{tables}{$a}{order} <=> $result->{tables}{$b}{order} }
+            keys %{ $result->{tables} };
+
         for my $table_name ( @tables ) {
-            my $tdata =  $result->{'tables'}{ $table_name };
-            my $table = Table->new({ name  => $tdata->{'name'}, schema => $schema });
-            $table->comments( $tdata->{'comments'}->flatten ) if $tdata->{comments};
+            my $tdata = $result->{tables}{ $table_name };
+            my $table = Table->new({ name  => $tdata->{name}, schema => $schema });
+            $table->comments( $tdata->{comments}->flatten ) if $tdata->{comments};
             $schema->add_table($table);
     
-            for my $fdata ( @{ $tdata->{'fields'} } ) {
+            for my $fdata ( @{ $tdata->{fields} } ) {
                 my $field = Column->new({
-                    name              => $fdata->{'name'},
-                    data_type         => $fdata->{'data_type'},
+                    name              => $fdata->{name},
+                    data_type         => $fdata->{data_type},
                     sql_data_type     => $self->data_type_mapping->{$fdata->{data_type}} || -999999,
-                    size              => $fdata->{'size'},
-                    default_value     => $fdata->{'default'},
-                    is_auto_increment => $fdata->{'is_auto_inc'},
-                    is_nullable       => $fdata->{'is_nullable'},
-                    comments          => $fdata->{'comments'},
+                    size              => $fdata->{size},
+                    default_value     => $fdata->{default},
+                    is_auto_increment => $fdata->{is_auto_inc},
+                    is_nullable       => $fdata->{is_nullable},
+                    comments          => $fdata->{comments},
                     table             => $table,
                 });
                 $table->add_column($field);
     
-                $table->primary_key( $field->name ) if $fdata->{'is_primary_key'};
+                $table->primary_key( $field->name ) if $fdata->{is_primary_key};
     
-                for my $cdata ( @{ $fdata->{'constraints'} } ) {
-                    next unless $cdata->{'type'} eq 'foreign_key';
-                    $cdata->{'fields'} ||= [ $field->name ];
-                    push @{ $tdata->{'constraints'} }, $cdata;
+                for my $cdata ( @{ $fdata->{constraints} } ) {
+                    next unless $cdata->{type} eq 'foreign_key';
+                    $cdata->{fields} ||= [ $field->name ];
+                    push @{ $tdata->{constraints} }, $cdata;
                 }
             }
     
-            for my $idata ( @{ $tdata->{'indices'} || [] } ) {
+            for my $idata ( @{ $tdata->{indices} || [] } ) {
                 my @columns = delete $idata->{fields};
                 my $index = Index->new({
-                    name    => $idata->{'name'},
-                    type    => uc $idata->{'type'},
+                    name    => $idata->{name},
+                    type    => uc $idata->{type},
                     table   => $table,
                 });
                 $index->add_column($table->get_column(@$_[0])) for @columns;
                 $table->add_index($index);
             }
     
-            for my $cdata ( @{ $tdata->{'constraints'} || [] } ) {
+            for my $cdata ( @{ $tdata->{constraints} || [] } ) {
                 my $constraint;
                 if (uc $cdata->{type} eq 'PRIMARY_KEY') {
                     $constraint = PrimaryKey->new({ name => $cdata->{name} || 'primary_key', table => $table });
@@ -104,21 +103,22 @@ role SQL::Translator::Parser::DDL::SQLite {
             }
         }
     
-        for my $def ( @{ $result->{'views'} || [] } ) {
+        for my $def ( @{ $result->{views} || [] } ) {
             my $view = View->new({
-                name  => $def->{'name'},
-                sql   => $def->{'sql'},
+                name   => $def->{name},
+                fields => $def->{fields},
+                sql    => $def->{sql},
             });
             $schema->add_view($view);
         }
     
-        for my $def ( @{ $result->{'triggers'} || [] } ) {
+        for my $def ( @{ $result->{triggers} || [] } ) {
             my $trigger = Trigger->new({
-                name                => $def->{'name'},
-                perform_action_when => $def->{'when'},
-                database_events     => $def->{'db_events'},
-                action              => $def->{'action'},
-                on_table            => $def->{'on_table'},
+                name                => $def->{name},
+                perform_action_when => $def->{when},
+                database_events     => $def->{db_events},
+                action              => $def->{action},
+                on_table            => $def->{on_table},
             });
             $schema->add_trigger($trigger);
         }
