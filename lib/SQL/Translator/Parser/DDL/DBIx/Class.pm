@@ -1,4 +1,11 @@
 use MooseX::Declare;
+BEGIN {
+  use Moose::Util::TypeConstraints;
+
+  class_type 'DBIx::Class::Schema';
+
+  no Moose::Util::TypeConstraints;
+}
 role SQL::Translator::Parser::DDL::DBIx::Class {
     use MooseX::Types::Moose qw();
     use MooseX::MultiMethods;
@@ -13,7 +20,7 @@ role SQL::Translator::Parser::DDL::DBIx::Class {
     use aliased 'SQL::Translator::Object::Table';
     use aliased 'SQL::Translator::Object::View';
 
-    multi method parse(Schema $data) { $data }
+    multi method parse(DBIx::Class::Schema $data) { $data }
 
     multi method parse(Str $data) {
     }
