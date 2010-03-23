@@ -2,7 +2,9 @@ use MooseX::Declare;
 class SQL::Translator::Types {
     use MooseX::Types::Moose qw(ArrayRef CodeRef HashRef Int Maybe Str Undef);
     use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View
-                                    Bit DBIHandle MatchType Parser Producer Translator)];
+                                    Bit DBIHandle MatchType Parser Producer Translator DBICSchema)];
+
+    class_type DBICSchema, { class => 'DBIx::Class::Schema' };;
     
     class_type Column, { class => 'SQL::Translator::Object::Column' };
     class_type Constraint, { class => 'SQL::Translator::Object::Constraint' };
