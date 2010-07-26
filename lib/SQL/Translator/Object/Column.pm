@@ -61,6 +61,12 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         required => 1,
         default => 1
     );
+
+    has 'is_unique' => (
+        is => 'rw',
+        isa => Bool,
+        default => 0,
+    );
     
     has 'default_value' => (
         is => 'rw',
