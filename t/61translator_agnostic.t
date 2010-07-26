@@ -26,7 +26,7 @@ my $new_t = SQL::Translator->new;
 $new_t->$_(1) for qw/add_drop_table no_comments/;
 
 my $sql = $new_t->translate(
-  producer => 'SQLite'
+  producer => 'SQLite',
   data => $base_schema,
 );
 
