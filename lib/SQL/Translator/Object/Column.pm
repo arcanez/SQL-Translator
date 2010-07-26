@@ -103,6 +103,11 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         isa => Trigger,
     );
 
+    has '_order' => (
+        is => 'rw',
+        isa => Int,
+    );
+
     around size(@args) {
         $self->$orig(@args) if @args;
         my @sizes = $self->$orig;
@@ -112,9 +117,6 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
 
     method full_name { $self->table->name . '.' . $self->name }
     method schema { $self->table->schema }
-
-    method order { }
-    method is_unique { }
 
     before name($name?) { die "Can't use column name $name" if defined $name && $self->table->exists_column($name) && $name ne $self->name }
 
@@ -130,8 +132,19 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         : $self->length;
     }
 
+    multi method order(Int $order) { $self->_order($order); }
+    multi method order {
+        my $order = $self->_order;
+        unless (defined $order && $order) {
+            my $columns = Tie::IxHash->new( map { $_->name => $_ } $self->table->get_columns );
+            $order = ($columns->Indices($self->name) + 1) || 0;
+            $self->_order($order);
+        }
+        return $order;
+    }
+
     method BUILD(HashRef $args) {
         die "Cannot use column name $args->{name}" if $args->{name} eq '';
-        $self->size($args->{size}) if $args->{size}
+        $self->size($args->{size}) if $args->{size};
     }
 }
