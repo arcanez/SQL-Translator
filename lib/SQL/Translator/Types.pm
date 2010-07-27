@@ -42,7 +42,7 @@ class SQL::Translator::Types {
     subtype Bit, as Int, where { $_ == 1 || $_ == 0 };
     coerce Bit,
         from Undef, via { 0 },
-        from Str,  via { $_ eq '1' ? 1 : 0 };
+        from Str, via { length() ? 1 : 0 };
 
     subtype DBIHandle, as 'DBI::db';
     
