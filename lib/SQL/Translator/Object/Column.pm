@@ -59,7 +59,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         is => 'rw',
         isa => Bit,
         required => 1,
-        default => 1
+        default => 1,
     );
 
     has 'is_unique' => (
@@ -137,7 +137,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
         my $order = $self->_order;
         unless (defined $order && $order) {
             my $columns = Tie::IxHash->new( map { $_->name => $_ } $self->table->get_columns );
-            $order = ($columns->Indices($self->name) + 1) || 0;
+            $order = $columns->Indices($self->name) || 0; $order++;
             $self->_order($order);
         }
         return $order;

@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
-    use MooseX::Types::Moose qw(Any Bool HashRef Str);
+    use MooseX::Types::Moose qw(Any Bool HashRef Int Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
     use SQL::Translator::Object::Column;
@@ -92,6 +92,11 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         default => 0
     );
 
+    has '_order' => (
+        is => 'rw',
+        isa => Int,
+    );
+
     around add_column(Column $column does coerce) {
         die "Can't use column name " . $column->name if $self->exists_column($column->name) || $column->name eq '';
         $column->table($self);
@@ -146,8 +151,18 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         return $primary_key;
     }
 
+    multi method order(Int $order) { $self->_order($order); }
+    multi method order {
+        my $order = $self->_order;
+        unless (defined $order && $order) {
+            my $tables = Tie::IxHash->new( map { $_->name => $_ } $self->schema->get_tables );
+            $order = $tables->Indices($self->name) || 0; $order++;
+            $self->_order($order);
+        }
+        return $order;
+    }
+
     method is_valid { return $self->get_columns ? 1 : undef }
-    method order { }
 
     before name($name?) { die "Can't use table name $name, table already exists" if $name && $self->schema->exists_table($name) && $name ne $self->name }
 

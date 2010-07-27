@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
-    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Maybe Str Undef);
+    use MooseX::Types::Moose qw(ArrayRef Bool HashRef Int Maybe Str Undef);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column MatchType Table);
 
@@ -74,6 +74,11 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
         default => ''
     );
 
+    has '_order' => (
+        isa => Int,
+        is => 'rw',
+    );
+
     has 'on_delete' => ( is => 'rw', required => 0);
     has 'on_update' => ( is => 'rw', required => 0);
 
@@ -82,6 +87,17 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
             $column->is_primary_key(1);
         }
         $self->$orig($column->name, $column)
+    }
+
+    multi method order(Int $order) { $self->_order($order); }
+    multi method order {
+        my $order = $self->_order;
+        unless (defined $order && $order) {
+            my $tables = Tie::IxHash->new( map { $_->name => $_ } $self->schema->get_tables );
+            $order = $tables->Indices($self->name) || 0; $order++;
+            $self->_order($order);
+        }
+        return $order;
     }
 
     method is_valid { return $self->has_type && scalar $self->column_ids ? 1 : undef }

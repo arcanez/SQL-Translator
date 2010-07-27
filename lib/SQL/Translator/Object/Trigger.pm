@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
-    use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
+    use MooseX::Types::Moose qw(Any ArrayRef HashRef Int Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Column Schema Table);
 
@@ -67,11 +67,27 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
         required => 1,
     );
 
+    has '_order' => (
+        isa => Int,
+        is => 'rw',
+    );
+
     around add_column(Column $column) { $self->$orig($column->name, $column) }
 
     multi method database_events(Str $database_event) { $self->add_database_event($database_event); $self->database_events }
     multi method database_events(ArrayRef $database_events) { $self->add_database_event($_) for @$database_events; $self->database_events }
     multi method database_events { $self->_database_events }
+
+    multi method order(Int $order) { $self->_order($order); }
+    multi method order {
+        my $order = $self->_order;
+        unless (defined $order && $order) {
+            my $triggers = Tie::IxHash->new( map { $_->name => $_ } $self->schema->get_triggers );
+            $order = $triggers->Indices($self->name) || 0; $order++;
+            $self->_order($order);
+        }
+        return $order;
+    }
 
     method is_valid { 1 }
 }
