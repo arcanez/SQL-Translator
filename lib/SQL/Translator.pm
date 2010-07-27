@@ -7,6 +7,7 @@ class SQL::Translator {
     use SQL::Translator::Object::Schema;
 
     our $VERSION = '0.001';
+    $VERSION = eval $VERSION;
 
     has 'parser' => (
         isa => Str,
@@ -62,13 +63,13 @@ class SQL::Translator {
         predicate => 'has_producer_args',
     );
     
+    has 'version' => (isa => Str, is => 'ro', default => $VERSION);
     has 'add_drop_table' => (isa => Bool, is => 'rw', default => 0);
     has 'no_comments' => (isa => Bool, is => 'rw', default => 0);
     has 'show_warnings' => (isa => Bool, is => 'rw', default => 1);
     has 'trace' => (isa => Bool, is => 'rw', default => 0);
     has 'quote_table_names' => (isa => Bool, is => 'rw', default => 0);
     has 'quote_field_names' => (isa => Bool, is => 'rw', default => 0);
-    has 'version' => (isa => Str, is => 'rw');
     has 'filename' => (isa => Str, is => 'rw');
 
     has '_producer_mapping' => (
