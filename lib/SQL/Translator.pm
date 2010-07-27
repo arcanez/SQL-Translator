@@ -66,7 +66,7 @@ class SQL::Translator {
     has 'version' => (isa => Str, is => 'ro', default => $VERSION);
     has 'add_drop_table' => (isa => Bool, is => 'rw', default => 0);
     has 'no_comments' => (isa => Bool, is => 'rw', default => 0);
-    has 'show_warnings' => (isa => Bool, is => 'rw', default => 1);
+    has 'show_warnings' => (isa => Bool, is => 'rw', default => 0);
     has 'trace' => (isa => Bool, is => 'rw', default => 0);
     has 'quote_table_names' => (isa => Bool, is => 'rw', default => 0);
     has 'quote_field_names' => (isa => Bool, is => 'rw', default => 0);
