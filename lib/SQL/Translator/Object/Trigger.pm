@@ -90,4 +90,12 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     }
 
     method is_valid { 1 }
+
+    around BUILDARGS(ClassName $self: @args) {
+        my $args = $self->$orig(@args);
+
+        $args->{_database_events} = delete $args->{database_events} || [];
+
+        return $args;
+     }
 }
