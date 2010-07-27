@@ -32,14 +32,13 @@ role SQL::Translator::Producer::YAML {
     
     method _create_table(Table $table) {
         return {
-            'name'        => scalar $table->name,
+            'name'        => $table->name,
             'options'     => $table->options || [],
             $table->comments ? ('comments'    => $table->comments ) : (),
             'constraints' => [ map { $self->_create_constraint($_) } $table->get_constraints ],
             'indices'     => [ map { $self->_create_index($_) } $table->get_indices ],
-            'fields'      => { map { ($_->name => $self->_create_field($_)) } $table->get_fields,
+            'fields'      => { map { ($_->name => $self->_create_field($_)) } $table->get_fields, },
             'order'       => $table->order,
-            },
             keys %{$table->extra} ? ('extra' => { $table->extra } ) : (),
         };
     }
