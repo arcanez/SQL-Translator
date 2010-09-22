@@ -54,7 +54,7 @@ role SQL::Translator::Parser::DDL::SQLite {
                     size              => $fdata->{size},
                     default_value     => $fdata->{default},
                     is_auto_increment => $fdata->{is_auto_inc},
-                    is_nullable       => $fdata->{is_nullable},
+                    is_nullable       => $fdata->{is_primary_key} ? 0 : $fdata->{is_nullable},
                     comments          => $fdata->{comments},
                     table             => $table,
                 });
@@ -84,8 +84,12 @@ role SQL::Translator::Parser::DDL::SQLite {
                 my $constraint;
                 if (uc $cdata->{type} eq 'PRIMARY_KEY') {
                     $constraint = PrimaryKey->new({ name => $cdata->{name} || 'primary_key', table => $table });
-                    $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
-                $table->get_column($_)->is_primary_key(1) for @{$cdata->{fields}};
+
+                    for my $field (@{$cdata->{fields}}) {
+                        $table->get_column($field)->is_primary_key(1);
+                        $table->get_column($field)->is_nullable(0);
+                        $constraint->add_column($table->get_column($field));
+                    }
                 } elsif (uc $cdata->{type} eq 'FOREIGN_KEY') {
                     $constraint = ForeignKey->new({ name => $cdata->{name} || 'foreign_key',
                                                     table => $table,
@@ -93,12 +97,19 @@ role SQL::Translator::Parser::DDL::SQLite {
                                                     reference_columns => ref $cdata->{reference_fields} ? $cdata->{reference_fields} : [ $cdata->{reference_fields} ],
                                                     on_delete => $cdata->{on_delete} || $cdata->{on_delete_do},
                                                     on_update => $cdata->{on_update} || $cdata->{on_update_do} });
-                    $table->get_column($_)->is_foreign_key(1) for @{$cdata->{fields}};
-                    $table->get_column($_)->foreign_key_reference($constraint) for @{$cdata->{fields}};
+                    for my $field (@{$cdata->{fields}}) {
+                        $table->get_column($field)->is_foreign_key(1);
+                        $table->get_column($field)->foreign_key_reference($constraint);
+                        $constraint->add_column($table->get_column($field));
+                    }
                 } else {
                     $constraint = Constraint->new({ name => $cdata->{name} || 'constraint', type => uc $cdata->{type}, table => $table });
+                    if (uc $cdata->{type} eq 'UNIQUE') {
+                        $table->get_column($_)->is_unique(1) for @{$cdata->{fields}};
+                    }
                     $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 }
+  
                 $table->add_constraint($constraint);
             }
         }
