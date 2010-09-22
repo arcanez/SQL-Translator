@@ -62,6 +62,11 @@ class SQL::Translator {
         is => 'rw',
         predicate => 'has_producer_args',
     );
+
+    has 'data' => (
+        isa => Str,
+        is => 'rw',
+    );
     
     has 'version' => (isa => Str, is => 'ro', default => $VERSION);
     has 'add_drop_table' => (isa => Bool, is => 'rw', default => 0);
@@ -112,6 +117,7 @@ class SQL::Translator {
         my $return;
 
         $self->_clear_schema if defined $parser;
+        $data ||= $self->data;
 
         $parser ||= $self->parser unless $self->has_parser;
         if (defined $parser) {
