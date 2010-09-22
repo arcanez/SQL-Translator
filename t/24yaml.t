@@ -110,7 +110,7 @@ schema:
           expression: ''
           fields: []
           match_type: ''
-          name: ''
+          name: constraint
           on_delete: ''
           on_update: ''
           options: []
@@ -123,7 +123,7 @@ schema:
             - pet_id
             - person_id
           match_type: ''
-          name: ''
+          name: primary_key
           on_delete: ''
           on_update: ''
           options: []
@@ -135,7 +135,7 @@ schema:
           fields:
             - person_id
           match_type: ''
-          name: ''
+          name: foreign_key
           on_delete: ''
           on_update: ''
           options: []
