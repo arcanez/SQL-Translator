@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
-    use MooseX::Types::Moose qw(Bool Int Maybe ScalarRef Str);
+    use MooseX::Types::Moose qw(Int Maybe ScalarRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Bit Constraint Table Trigger);
     clean;
@@ -64,7 +64,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
 
     has 'is_unique' => (
         is => 'rw',
-        isa => Bool,
+        isa => Bit,
         default => 0,
     );
     
@@ -83,13 +83,13 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
 
     has 'is_primary_key' => (
         is => 'rw',
-        isa => Bool,
+        isa => Bit,
         default => 0
     );
 
     has 'is_foreign_key' => (
         is => 'rw',
-        isa => Bool,
+        isa => Bit,
         default => 0
     );
 
