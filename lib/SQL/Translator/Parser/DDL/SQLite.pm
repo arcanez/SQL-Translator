@@ -42,7 +42,7 @@ role SQL::Translator::Parser::DDL::SQLite {
 
         for my $table_name ( @tables ) {
             my $tdata = $result->{tables}{ $table_name };
-            my $table = Table->new({ name  => $tdata->{name}, schema => $schema });
+            my $table = Table->new({ name => $tdata->{name}, schema => $schema });
             $table->comments( $tdata->{comments}->flatten ) if $tdata->{comments};
             $schema->add_table($table);
     
@@ -58,10 +58,10 @@ role SQL::Translator::Parser::DDL::SQLite {
                     comments          => $fdata->{comments},
                     table             => $table,
                 });
+
                 $table->add_column($field);
-    
                 $table->primary_key( $field->name ) if $fdata->{is_primary_key};
-    
+
                 for my $cdata ( @{ $fdata->{constraints} } ) {
                     next unless $cdata->{type} eq 'foreign_key';
                     $cdata->{fields} ||= [ $field->name ];
