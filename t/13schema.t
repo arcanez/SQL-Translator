@@ -202,6 +202,7 @@ require_ok( 'SQL::Translator::Object::View' );
     is( $f1->data_type('varchar'), 'varchar', 'Field data type is "varchar"' );
     is( $f1->size('30'), '30', 'Field size is "30"' );
     is( $f1->is_primary_key(0), '0', 'Field is_primary_key is negative' );
+    $person_table->add_field( $f1 );
 
     my %extra = $f1->extra;
     is( $extra{'foo'}, 'bar', 'Field extra "foo" is "bar"' );
