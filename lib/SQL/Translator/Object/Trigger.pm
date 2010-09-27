@@ -94,7 +94,8 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
     around BUILDARGS(ClassName $self: @args) {
         my $args = $self->$orig(@args);
 
-        $args->{_database_events} = delete $args->{database_events} || [];
+        my $database_events = delete $args->{database_events};
+        $args->{_database_events} = ref $database_events ? $database_events : [ $database_events ];
 
         return $args;
      }
