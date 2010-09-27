@@ -105,8 +105,8 @@ role SQL::Translator::Parser::DDL::YAML {
             map   { [ $data->{'procedures'}{ $_ }{'order'}, $_ ] }
             keys %{ $data->{'procedures'} };
     
-        for my $tdata ( @procedures ) {
-             my $procedure = Procedure->new($tdata);
+        for my $pdata ( @procedures ) {
+             my $procedure = Procedure->new($pdata);
              $schema->add_procedure($procedure);
         }
     
