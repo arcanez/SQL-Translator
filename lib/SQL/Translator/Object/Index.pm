@@ -19,7 +19,7 @@ class SQL::Translator::Object::Index extends SQL::Translator::Object {
 
     has 'columns' => (
         is => 'rw',
-        isa => IxHash, #ColumnHash,
+        isa => IxHash, #ColumnHash, 
         handles => {
             exists_column => 'EXISTS',
             column_ids    => 'Keys',
