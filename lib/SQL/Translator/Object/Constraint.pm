@@ -2,7 +2,8 @@ use MooseX::Declare;
 class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     use MooseX::Types::Moose qw(ArrayRef Bool HashRef Int Maybe Str Undef);
     use MooseX::MultiMethods;
-    use SQL::Translator::Types qw(Column MatchType Table);
+    use SQL::Translator::Types qw(Column MatchType Table ColumnHash IxHash);
+    use Tie::IxHash;
 
     has 'table' => (
         is => 'rw',
@@ -18,18 +19,19 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     );
     
     has 'columns' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Column],
+        isa => IxHash, #ColumnHash,
         handles => {
-            exists_column => 'exists',
-            column_ids    => 'keys',
-            get_columns   => 'values',
-            get_column    => 'get',
-            add_column    => 'set',
-            clear_columns => 'clear',
+            exists_column => 'EXISTS',
+            column_ids    => 'Keys',
+            get_columns   => 'Values',
+            get_column    => 'FETCH',
+            add_column    => 'STORE',
+            remove_column => 'DELETE',
+            clear_columns => 'CLEAR',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
     
     has 'type' => (

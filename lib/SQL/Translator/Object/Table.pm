@@ -2,9 +2,10 @@ use MooseX::Declare;
 class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Any Bool HashRef Int Str);
     use MooseX::MultiMethods;
-    use SQL::Translator::Types qw(Column Constraint Index Schema Sequence);
+    use SQL::Translator::Types qw(Column Constraint Index Schema Sequence ColumnHash ConstraintHash IndexHash SequenceHash IxHash);
     use SQL::Translator::Object::Column;
     use SQL::Translator::Object::Constraint;
+    use Tie::IxHash;
     clean;
 
     use overload
@@ -20,64 +21,65 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     );
     
     has 'columns' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Column],
+        isa => IxHash, #ColumnHash,
         handles => {
-            exists_column => 'exists',
-            column_ids    => 'keys',
-            get_columns   => 'values',
-            get_column    => 'get',
-            add_column    => 'set',
-            remove_column => 'delete',
-            clear_columns => 'clear',
+            exists_column => 'EXISTS',
+            column_ids    => 'Keys',
+            get_columns   => 'Values',
+            get_column    => 'FETCH',
+            add_column    => 'STORE',
+            remove_column => 'DELETE',
+            has_columns   => 'Length',
+            clear_columns => 'CLEAR',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
     
     has 'indexes' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Index],
+        isa => IxHash, #IndexHash,
         handles => {
-            exists_index => 'exists',
-            index_ids    => 'keys',
-            get_indices  => 'values',
-            get_index    => 'get',
-            add_index    => 'set',
-            remove_index => 'delete',
+            exists_index => 'EXISTS',
+            index_ids    => 'Keys',
+            get_indices  => 'Values',
+            get_index    => 'FETCH',
+            add_index    => 'STORE',
+            remove_index => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
     
     has 'constraints' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Constraint],
+        isa => IxHash, #ConstraintHash,
         handles => {
-            exists_constraint => 'exists',
-            constraint_ids    => 'keys',
-            get_constraints   => 'values',
-            get_constraint    => 'get',
-            add_constraint    => 'set',
-            remove_constraint => 'delete',
+            exists_constraint => 'EXISTS',
+            constraint_ids    => 'Keys',
+            get_constraints   => 'Values',
+            get_constraint    => 'FETCH',
+            add_constraint    => 'STORE',
+            remove_constraint => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
     
     has 'sequences' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Sequence],
+        isa => IxHash, #SequenceHash,
         handles => {
-            exists_sequence => 'exists',
-            sequence_ids    => 'keys',
-            get_sequences   => 'values',
-            get_sequence    => 'get',
-            add_sequence    => 'set',
-            remove_sequence => 'delete',
+            exists_sequence => 'EXISTS',
+            sequence_ids    => 'Keys',
+            get_sequences   => 'Values',
+            get_sequence    => 'FETCH',
+            add_sequence    => 'STORE',
+            remove_sequence => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() },
     );
 
     has 'schema' => (
@@ -189,7 +191,6 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
         my $fields = delete $args->{fields};
 
-        tie %{$args->{columns}}, 'Tie::IxHash';
         $args->{columns}{$_} = SQL::Translator::Object::Column->new( name => $_ ) for @$fields;
 
         return $args;

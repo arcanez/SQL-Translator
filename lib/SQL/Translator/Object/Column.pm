@@ -3,6 +3,7 @@ class SQL::Translator::Object::Column extends SQL::Translator::Object is dirty {
     use MooseX::Types::Moose qw(Int Maybe ScalarRef Str);
     use MooseX::MultiMethods;
     use SQL::Translator::Types qw(Bit Constraint Table Trigger);
+    use Tie::IxHash;
     clean;
 
     use overload

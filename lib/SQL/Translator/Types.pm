@@ -1,8 +1,11 @@
 use MooseX::Declare;
 class SQL::Translator::Types {
     use MooseX::Types::Moose qw(ArrayRef CodeRef HashRef Int Maybe Str Undef);
+    use MooseX::Types::Parameterizable qw(Parameterizable);
     use MooseX::Types -declare, [qw(Column Constraint ForeignKey Index PrimaryKey Procedure Schema Sequence Table Trigger View
-                                    Bit DBIHandle MatchType Parser Producer Translator DBICSchema)];
+                                    Bit DBIHandle MatchType Parser Producer Translator DBICSchema IxHash
+                                    ColumnHash ConstraintHash IndexHash ProcedureHash SequenceHash TableHash TriggerHash ViewHash)];
+    use Tie::IxHash;
 
     class_type DBICSchema, { class => 'DBIx::Class::Schema' };
     
@@ -57,5 +60,16 @@ class SQL::Translator::Types {
     sub coerce_dbihandle_from_str { }
     sub coerce_dbihandle_from_arrayref { }
     sub coerce_dbihandle_from_coderef { }
-    
+
+    subtype IxHash, as 'Tie::IxHash';
+    coerce IxHash, from HashRef, via { Tie::IxHash->new($_) };
+
+    subtype ColumnHash, as Parameterizable[IxHash, Maybe[Column]];
+    subtype ConstraintHash, as Parameterizable[IxHash, Maybe[Constraint]];
+    subtype IndexHash, as Parameterizable[IxHash, Maybe[Index]];
+    subtype ProcedureHash, as Parameterizable[IxHash, Maybe[Procedure]];
+    subtype SequenceHash, as Parameterizable[IxHash, Maybe[Sequence]];
+    subtype TableHash, as Parameterizable[IxHash, Maybe[Table]];
+    subtype TriggerHash, as Parameterizable[IxHash, Maybe[Trigger]];
+    subtype ViewHash, as Parameterizable[IxHash, Maybe[View]];
 }    
