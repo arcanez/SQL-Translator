@@ -170,7 +170,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         return $order;
     }
 
-    method is_valid { return $self->get_columns ? 1 : undef }
+    method is_valid { return $self->has_columns ? 1 : undef }
 
     before name($name?) { die "Can't use table name $name, table already exists" if $name && $self->schema->exists_table($name) && $name ne $self->name }
 
