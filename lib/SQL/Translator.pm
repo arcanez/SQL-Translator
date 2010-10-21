@@ -83,6 +83,11 @@ class SQL::Translator {
         default => sub { { MySQL => 'SQL::MySQL', SQLite => 'SQL::SQLite', PostgreSQL => 'SQL::PostgreSQL', XML => 'XML', YAML => 'YAML' } }
     );
 
+    has 'error' => (
+        is => 'rw',
+        isa => Str,
+    );
+
     method _build__parser {
         my $class = 'SQL::Translator::Parser';
     
