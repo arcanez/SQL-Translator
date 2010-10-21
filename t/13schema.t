@@ -625,8 +625,6 @@ TODO: {
         action              => $action,
     }) or die $s->error;
 
-    $t->add_database_event('insert');
-
     isa_ok( $t, 'SQL::Translator::Object::Trigger', 'Trigger' );
     isa_ok( $t->schema, 'SQL::Translator::Object::Schema', 'Schema' );
     is( $t->schema->name, 'TrigTest', qq[Schema name is "'TrigTest'"] );
