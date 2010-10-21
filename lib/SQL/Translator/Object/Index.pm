@@ -40,7 +40,10 @@ class SQL::Translator::Object::Index extends SQL::Translator::Object {
         default => 'NORMAL',
     );
 
-    around add_column(Column $column) { $self->$orig($column->name, $column) }
+    around add_column(Column $column) {
+        $self->$orig($column->name, $column);
+        return $self->get_column($column->name);
+    }
 
     method is_valid { $self->table && scalar $self->get_columns ? 1 : undef }
 }

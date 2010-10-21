@@ -102,7 +102,8 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     around add_column(Column $column does coerce) {
         die "Can't use column name " . $column->name if $self->exists_column($column->name) || $column->name eq '';
         $column->table($self);
-        return $self->$orig($column->name, $column);
+        $self->$orig($column->name, $column);
+        return $self->get_column($column->name);
     }
 
     around add_constraint(Constraint $constraint does coerce) {
@@ -116,7 +117,8 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         if ($constraint->has_type && $constraint->type eq 'PRIMARY KEY') {
             $self->get_column($_)->is_primary_key(1) for $constraint->column_ids;
         }
-        $self->$orig($name, $constraint)
+        $self->$orig($name, $constraint);
+        return $self->get_constraint($name);
     }
 
     around add_index(Index $index does coerce) {
@@ -127,10 +129,14 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             $name = 'ANON' . $idx;
         }
         $index->table($self);
-        $self->$orig($name, $index)
+        $self->$orig($name, $index);
+        return $self->get_index($name);
     }
 
-    around add_sequence(Sequence $sequence does coerce) { $self->$orig($sequence->name, $sequence) }
+    around add_sequence(Sequence $sequence does coerce) {
+        $self->$orig($sequence->name, $sequence);
+        return $self->get_sequence($sequence->name);
+    }
 
     multi method primary_key {
         my $constraints = $self->constraints;

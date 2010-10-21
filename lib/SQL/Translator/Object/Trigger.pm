@@ -74,7 +74,10 @@ class SQL::Translator::Object::Trigger extends SQL::Translator::Object {
         is => 'rw',
     );
 
-    around add_column(Column $column) { $self->$orig($column->name, $column) }
+    around add_column(Column $column) {
+        $self->$orig($column->name, $column);
+        return $self->get_column($column->name);
+    }
 
     multi method database_events(Str $database_event) { $self->add_database_event($database_event); $self->database_events }
     multi method database_events(ArrayRef $database_events) { $self->add_database_event($_) for @$database_events; $self->database_events }

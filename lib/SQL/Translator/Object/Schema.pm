@@ -18,85 +18,89 @@ class SQL::Translator::Object::Schema extends SQL::Translator::Object {
     );
     
     has 'tables' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Table],
+        isa => IxHash, #TableHash,
         handles => {
-            exists_table => 'exists',
-            table_ids    => 'keys',
-            get_tables   => 'values',
-            get_table    => 'get',
-            add_table    => 'set',
-            remove_table => 'delete',
+            exists_table => 'EXISTS',
+            table_ids    => 'Keys',
+            get_tables   => 'Values',
+            get_table    => 'FETCH',
+            add_table    => 'STORE',
+            remove_table => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
     
     has 'views' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[View],
+        isa => IxHash, #ViewHash,
         handles => {
-            exists_view => 'exists',
-            view_ids    => 'keys',
-            get_views   => 'values',
-            get_view    => 'get',
-            add_view    => 'set',
-            remove_view => 'delete',
+            exists_view => 'EXISTS',
+            view_ids    => 'Keys',
+            get_views   => 'Values',
+            get_view    => 'FETCH',
+            add_view    => 'STORE',
+            remove_view => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
     
     has 'procedures' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Procedure],
+        isa => IxHash, #ProcedureHash,
         handles => {
-            exists_procedure => 'exists',
-            procedure_ids    => 'keys',
-            get_procedures   => 'values',
-            get_procedure    => 'get',
-            add_procedure    => 'set',
-            remove_procedure => 'delete',
+            exists_procedure => 'EXISTS',
+            procedure_ids    => 'Keys',
+            get_procedures   => 'Values',
+            get_procedure    => 'FETCH',
+            add_procedure    => 'STORE',
+            remove_procedure => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
 
     has 'triggers' => (
-        traits => ['Hash'],
         is => 'rw',
-        isa => HashRef[Trigger],
+        isa => IxHash, #TriggerHash,
         handles => {
-            exists_trigger => 'exists',
-            trigger_ids    => 'keys',
-            get_triggers   => 'values',
-            get_trigger    => 'get',
-            add_trigger    => 'set',
-            remove_trigger => 'delete',
+            exists_trigger => 'EXISTS',
+            trigger_ids    => 'Keys',
+            get_triggers   => 'Values',
+            get_trigger    => 'FETCH',
+            add_trigger    => 'STORE',
+            remove_trigger => 'DELETE',
         },
-        default => sub { my %hash = (); tie %hash, 'Tie::IxHash'; return \%hash },
+        coerce => 1,
+        default => sub { Tie::IxHash->new() }
     );
 
     around add_table(Table $table does coerce) {
         die "Can't use table name " . $table->name if $self->exists_table($table->name) || $table->name eq '';
         $table->schema($self);
         $self->$orig($table->name, $table);
+        return $self->get_table($table->name);
     }
 
     around add_view(View $view does coerce) {
         die "Can't use view name " . $view->name if $self->exists_view($view->name) || $view->name eq '';
         $view->schema($self);
-        $self->$orig($view->name, $view)
+        $self->$orig($view->name, $view);
+        return $self->get_view($view->name);
     }
 
     around add_procedure(Procedure $procedure does coerce) {
         $procedure->schema($self);
-        $self->$orig($procedure->name, $procedure) 
+        $self->$orig($procedure->name, $procedure);
+        return $self->get_procedure($procedure->name);
     }
 
     around add_trigger(Trigger $trigger does coerce) {
         $trigger->schema($self);
-        $self->$orig($trigger->name, $trigger);;
+        $self->$orig($trigger->name, $trigger);
+        return $self->get_trigger($trigger->name);
     }
 
     method is_valid { return $self->get_tables ? 1 : undef }
