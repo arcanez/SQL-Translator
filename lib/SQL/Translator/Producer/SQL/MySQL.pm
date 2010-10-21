@@ -208,9 +208,7 @@ role SQL::Translator::Producer::SQL::MySQL {
                                              });
           }
         }
-    
-    
-        #warn "@table_defs\n";
+   
         push @table_defs, "SET foreign_key_checks=1";
         return wantarray ? ($create ? $create : (), @create, @table_defs) : ($create . join('', map { $_ ? "$_;\n\n" : () } (@create, @table_defs)));
     }
