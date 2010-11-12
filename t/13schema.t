@@ -646,7 +646,7 @@ TODO: {
 
 
 
-	my $s2                   = SQL::Translator::Object::Schema->new(name => 'TrigTest2');
+    my $s2                   = SQL::Translator::Object::Schema->new(name => 'TrigTest2');
     $s2->add_table({ name => 'foo' }) or die "Couldn't create table: ", $s2->error;
     my $t2                   = $s2->add_trigger({
         name                => 'foo_trigger',
@@ -657,36 +657,36 @@ TODO: {
     }) or die $s2->error;
     $t2->add_database_event('insert');
     $t2->add_database_event('update');
-	isa_ok( $t2, 'SQL::Translator::Object::Trigger', 'Trigger' );
+    isa_ok( $t2, 'SQL::Translator::Object::Trigger', 'Trigger' );
     isa_ok( $t2->schema, 'SQL::Translator::Object::Schema', 'Schema' );
     is( $t2->schema->name, 'TrigTest2', qq[Schema name is "'TrigTest2'"] );
     is( $t2->name, 'foo_trigger', qq[Name is "foo_trigger"] );
-	is_deeply(
+    is_deeply(
         [$t2->database_events],
         [qw/insert update/],
         "Database events are [qw/insert update/] "
     );
 
-	#isa_ok($t2->database_events,'ARRAY','Database events');
-	
-	#
-	# Trigger equal tests
-	#
-#	isnt(
+    #isa_ok($t2->database_events,'ARRAY','Database events');
+    
+    #
+    # Trigger equal tests
+    #
+#    isnt(
 #        $t1->equals($t2),
 #        1,
 #        'Compare two Triggers with database_event and database_events'
 #    );
 
-	$t1->database_events($database_events);
-	$t2->database_events($database_events);
-#	is($t1->equals($t2),1,'Compare two Triggers with database_event');
+    $t1->database_events($database_events);
+    $t2->database_events($database_events);
+#    is($t1->equals($t2),1,'Compare two Triggers with database_event');
 
-	$t2->database_events('');
-	$t1->database_events([qw/update insert/]);
-	$t2->database_events([qw/insert update/]);
-#	is($t1->equals($t2),1,'Compare two Triggers with database_events');
-	
+    $t2->database_events('');
+    $t1->database_events([qw/update insert/]);
+    $t2->database_events([qw/insert update/]);
+#    is($t1->equals($t2),1,'Compare two Triggers with database_events');
+    
     #
     # $schema-> drop_trigger
     #
