@@ -1,35 +1,34 @@
-use inc::Module::Install 0.91;
+use strict;
+use warnings FATAL => 'all';
+use ExtUtils::MakeMaker;
 
-name            'SQL-Translator';
-author          'Justin Hunter <justin.d.hunter@gmail.com>';
-license         'perl';
-
-all_from        'lib/SQL/Translator.pm';
-readme_from     ('lib/SQL/Translator.pm');
-
-tests           't/*.t';
-
-requires        'aliased',                      '0.30';
-requires        'FindBin';
-requires        'Moose',                        '0.90';
-requires        'MooseX::Aliases',              '0.08';
-requires        'MooseX::Declare',              '0.31';
-requires        'MooseX::Types',                '0.20';
-requires        'MooseX::Method::Signatures',   '0.29';
-requires        'MooseX::MultiMethods',         '0.09';
-requires        'Parse::RecDescent',            '1.94';
-requires        'Tie::IxHash',                  '1.21';
-requires        'TryCatch',                     '1.002000';
-
-test_requires   'Test::More',                   '0.92';
-test_requires   'Test::Output',                 '0.12';
-test_requires   'FindBin';
-
-repository      'http://github.com/arcanez/sql-translator/tree/master';
-bugtracker      'http://github.com/arcanez/sql-translator/issues';
-
-auto_manifest;
-auto_provides_class;
-auto_install;
-
-WriteAll;
+WriteMakefile(
+  NAME => 'SQL-Translator',
+  VERSION_FROM => 'lib/SQL/Translator.pm',
+  PREREQ_PM => {
+    'aliased'                        => '0.30',
+    'FindBin'                        => '0',
+    'Moose'                          => '0.93',
+    'MooseX::Aliases'                => '0.08',
+    'MooseX::Declare'                => '0.31',
+    'MooseX::Types'                  => '0.20',
+    'MooseX::Method::Signatures'     => '0.29',
+    'MooseX::MultiMethods'           => '0.09',
+    'Parse::RecDescent'              => '1.94',
+    'Tie::IxHash'                    => '1.21',
+    'Try::Tiny'                      => '0',
+    'MooseX::Types::Parameterizable' => '0',
+  },
+  BUILD_REQUIRES => {
+    'Test::More'                     => '0.92',
+    'Test::Output'                   => '0.12',
+    'FindBin'                        => '0',
+  },
+  META_MERGE => {
+    resources => {
+      license     => 'http://dev.perl.org/licenses/',
+      bugtracker  => 'http://github.com/arcanez/sql-translator/issues',
+      repository  => 'http://github.com/arcanez/sql-translator/tree/master',
+    },
+  },
+);
