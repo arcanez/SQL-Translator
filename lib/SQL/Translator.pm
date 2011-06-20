@@ -1,6 +1,6 @@
 use MooseX::Declare;
 class SQL::Translator {
-    use TryCatch;
+    use Try::Tiny;
     use MooseX::Types::Moose qw(Bool HashRef Int Str Undef);
     use MooseX::Aliases;
     use SQL::Translator::Types qw(DBIHandle Parser Producer Schema);
