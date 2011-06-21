@@ -99,6 +99,10 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
         isa => Int,
     );
 
+    around get_column(Column $column does coerce) {
+        $self->$orig($column->name);
+    }
+
     around add_column(Column $column does coerce) {
         die "Can't use column name " . $column->name if $self->exists_column($column->name) || $column->name eq '';
         $column->table($self);
