@@ -208,9 +208,11 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     around BUILDARGS(ClassName $self: @args) {
         my $args = $self->$orig(@args);
 
-        my $fields = delete $args->{fields};
-
-        $args->{columns}{$_} = SQL::Translator::Object::Column->new( name => $_ ) for @$fields;
+        my $fields = delete $args->{fields} || [];
+        $fields = ref($fields) eq 'ARRAY' ? $fields : [ $fields ];
+        my $ix_hash = Tie::IxHash->new();
+        $ix_hash->STORE($_, SQL::Translator::Object::Column->new( name => $_ )) for @$fields;
+        $args->{columns} = $ix_hash;
 
         return $args;
     }
