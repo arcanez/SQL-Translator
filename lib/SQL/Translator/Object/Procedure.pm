@@ -37,6 +37,7 @@ class SQL::Translator::Object::Procedure extends SQL::Translator::Object {
     has 'owner' => (
         is => 'rw',
         isa => Str,
+        default => 'owner',
         required => 1
     );
 
