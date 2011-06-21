@@ -111,6 +111,14 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
     }
 
     around add_constraint(Constraint $constraint does coerce) {
+        if ($constraint->type eq 'FOREIGN KEY') {
+            my @columns = $constraint->get_columns;
+            die "There are no columns associated with this foreign key constraint." unless scalar @columns;
+            for my $column (@columns) {
+                die "Can't use column " . $column->name . ". It doesn't exist!" unless $self->exists_column($column);
+            }
+            die "Reference table " . $constraint->reference_table . " does not exist!" unless $self->schema->exists_table($constraint->reference_table);
+        }
         my $name = $constraint->name;
         if ($name eq '') {
             my $idx = 0;
