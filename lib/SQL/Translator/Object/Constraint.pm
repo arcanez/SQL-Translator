@@ -89,6 +89,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
         if ($self->has_type && $self->type eq 'PRIMARY KEY') {
             $column->is_primary_key(1);
         }
+        $column->table($self->table);
         $self->$orig($column->name, $column);
         return $self->get_column($column->name);
     }
