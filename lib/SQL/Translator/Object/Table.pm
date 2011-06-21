@@ -152,10 +152,11 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
 
     multi method primary_key {
         my $constraints = $self->constraints;
-        for my $key (keys %$constraints) {
-            return $constraints->{$key} if $constraints->{$key}{type} eq 'PRIMARY KEY';
+        for my $key ($constraints->Keys) {
+            my $val = $constraints->FETCH($key);
+            return $val if $val->type eq 'PRIMARY KEY';
         }
-        return undef;
+        return;
     }
 
     multi method primary_key(Str $column) {
