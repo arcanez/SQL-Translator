@@ -104,4 +104,17 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     }
 
     method is_valid { return $self->has_type && scalar $self->column_ids ? 1 : undef }
+
+    around BUILDARGS(ClassName $self: @args) {
+        my $args = $self->$orig(@args);
+
+        my $fields = delete $args->{fields} || [];
+
+        $fields = ref($fields) eq 'ARRAY' ? $fields : [ $fields ];
+        my $ix_hash = Tie::IxHash->new();
+        $ix_hash->STORE($_, SQL::Translator::Object::Column->new( name => $_ )) for @$fields;
+        $args->{columns} = $ix_hash;
+
+        return $args;
+     }
 }
