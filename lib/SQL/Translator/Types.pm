@@ -25,7 +25,8 @@ class SQL::Translator::Types {
     class_type Producer, { class => 'SQL::Translator::Producer' };
     class_type Translator, { class => 'SQL::Translator' };
 
-    coerce Column, from HashRef, via { SQL::Translator::Object::Column->new($_) };
+    coerce Column, from HashRef, via { SQL::Translator::Object::Column->new($_) },
+                   from Str,     via { SQL::Translator::Object::Column->new( name => $_ ) };
     coerce Constraint, from HashRef, via { SQL::Translator::Object::Constraint->new($_) };
     coerce ForeignKey, from HashRef, via { SQL::Translator::Object::ForeignKey->new($_) };
     coerce Index, from HashRef, via { SQL::Translator::Object::Index->new($_) };
