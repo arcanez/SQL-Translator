@@ -28,6 +28,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
             get_column    => 'FETCH',
             add_column    => 'STORE',
             remove_column => 'DELETE',
+            has_columns   => 'Length',
             clear_columns => 'CLEAR',
         },
         coerce => 1,
