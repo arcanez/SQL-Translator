@@ -398,11 +398,14 @@ require_ok( 'SQL::Translator::Object::View' );
 TODO: {
     local $TODO = 'patch Moose Native::Trait';
     dies_ok( sub { my $bad_table = $schema->get_table }, 'Error on no arg to get_table' );
+}
     is($schema->get_table('baz'), undef, 'Nonexistant table returns undef');
 
+TODO: {
+    local $TODO = 'patch Moose Native::Trait';
     dies_ok( sub { my $bad_view = $schema->get_view }, 'Error on no arg to get_view' );
-    is($schema->get_view('baz'), undef, 'Nonexistant view returns undef');
 }
+    is($schema->get_view('baz'), undef, 'Nonexistant view returns undef');
 
     my $good_table = $schema->get_table('foo');
     isa_ok( $good_table, 'SQL::Translator::Object::Table', 'Table "foo"' );
@@ -511,7 +514,7 @@ TODO: {
     #like( $c->error, qr/non-existent field/i,
     #    q[...because there's no "pet_id" field in "pet"]);
 
-    my $pet_id = $t2->add_field({ name => 'pet_id' });
+    my $pet_id = $t2->add_column({ name => 'pet_id' });
     is( $pet_id->name, 'pet_id', 'Added field "pet_id"' );
     
 ##    is( $c->is_valid, 1, 'Constraint now valid' );
@@ -655,8 +658,7 @@ TODO: {
         on_table            => 'foo',
         action              => 'update modified=timestamp();',
     }) or die $s2->error;
-    $t2->add_database_event('insert');
-    $t2->add_database_event('update');
+
     isa_ok( $t2, 'SQL::Translator::Object::Trigger', 'Trigger' );
     isa_ok( $t2->schema, 'SQL::Translator::Object::Schema', 'Schema' );
     is( $t2->schema->name, 'TrigTest2', qq[Schema name is "'TrigTest2'"] );
