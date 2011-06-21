@@ -54,7 +54,7 @@ class SQL::Translator::Object::Constraint extends SQL::Translator::Object {
     );
 
     has 'reference_table' => (
-        isa => Maybe[Str],
+        isa => Str,
         is => 'rw',
     );
 
