@@ -2,7 +2,7 @@ use MooseX::Declare;
 class SQL::Translator::Object with SQL::Translator::Object::Compat {
     use Tie::IxHash;
     use MooseX::MultiMethods;
-    use MooseX::Types::Moose qw(Any ArrayRef HashRef Str);
+    use MooseX::Types::Moose qw(ArrayRef HashRef Str);
 
     has '_comments' => (
         traits => ['Array'],
