@@ -168,7 +168,7 @@ class SQL::Translator::Object::Table extends SQL::Translator::Object is dirty {
             $primary_key = SQL::Translator::Object::Constraint->new( type => 'PRIMARY KEY' );
             $self->add_constraint($primary_key);
         }
-        $primary_key->add_column( name => $column ) unless $primary_key->exists_column($column);
+        $primary_key->add_column({ name => $column }) unless $primary_key->exists_column($column);
         return $primary_key;
     }
 
