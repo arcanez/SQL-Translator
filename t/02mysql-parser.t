@@ -246,6 +246,16 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
               phone                     varchar(255),
               PRIMARY KEY (address_id)
             ) TYPE=INNODB;
+
+            CREATE TABLE store (
+              id                        int NOT NULL auto_increment,
+              name                      varchar(255) NOT NULL
+            ) TYPE=INNODB;
+
+            CREATE TABLE order_status (
+              id                        int NOT NULL,
+              status                    varchar(255) NOT NULL
+            ) TYPE=INNODB;
         ]
     ) or die $tr->error;
 
