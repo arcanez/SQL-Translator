@@ -262,7 +262,7 @@ use SQL::Translator::Constants qw(:sqlt_types :sqlt_constants);
     my $schema = $tr->schema;
     is( $schema->is_valid, 1, 'Schema is valid' );
     my @tables = $schema->get_tables;
-    is( scalar @tables, 2, 'Right number of tables (2)' );
+    is( scalar @tables, 4, 'Right number of tables (4)' );
 
     my $t1  = shift @tables;
     is( $t1->name, 'orders', 'Found "orders" table' );
