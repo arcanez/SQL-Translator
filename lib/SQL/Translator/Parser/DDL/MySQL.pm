@@ -126,7 +126,26 @@ role SQL::Translator::Parser::DDL::MySQL {
                 }
                 $table->options( \@cleaned_options ); # or die $table->error;
             }
+        }
+        
+        for my $proc_name ( keys %{ $result->{procedures} } ) {
+            my $procedure = Procedure->new({ name  => $proc_name,
+                                             owner => $result->{procedures}->{$proc_name}->{owner},
+                                             sql   => $result->{procedures}->{$proc_name}->{sql}
+            });
+            $schema->add_procedure($procedure);
+        }
     
+        for my $view_name ( keys %{ $result->{'views'} } ) {
+            my $view = View->new({ 
+                name => $view_name,
+                sql  => $result->{'views'}->{$view_name}->{sql},
+            });
+            $schema->add_view($view);
+        }
+        for my $table_name (@tables) {
+            my $table = $schema->get_table($table_name);
+            my $tdata = $result->{tables}{ $table_name };
             for my $cdata ( @{ $tdata->{constraints} || [] } ) {
                 my $constraint;
                 if (uc $cdata->{type} eq 'PRIMARY_KEY') {
@@ -147,22 +166,6 @@ role SQL::Translator::Parser::DDL::MySQL {
                 $constraint->add_column($table->get_column($_)) for @{$cdata->{fields}};
                 $table->add_constraint($constraint);
             }
-        }
-        
-        for my $proc_name ( keys %{ $result->{procedures} } ) {
-            my $procedure = Procedure->new({ name  => $proc_name,
-                                             owner => $result->{procedures}->{$proc_name}->{owner},
-                                             sql   => $result->{procedures}->{$proc_name}->{sql}
-            });
-            $schema->add_procedure($procedure);
-        }
-    
-        for my $view_name ( keys %{ $result->{'views'} } ) {
-            my $view = View->new({ 
-                name => $view_name,
-                sql  => $result->{'views'}->{$view_name}->{sql},
-            });
-            $schema->add_view($view);
         }
         return 1;
     }
