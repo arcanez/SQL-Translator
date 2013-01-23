@@ -1,0 +1,16 @@
+This project was an early attempt to modernize the internals of
+SQL::Translator. It is currently mothballed.
+
+If you want to contribute changes and improvements to what is currently
+known as SQL::Translator on CPAN please go to
+https://github.com/dbsrgits/sql-translator
+
+The later-dated convert-in-place approach taken on the original codebase
+turned out to be much more workable. Also the availability of Moo (which
+happened way after the rewrite effort in this branch started) allowed
+for a much nicer and performant codebase.
+
+This particular codebase may eventually be picked up by someone else,
+but it will *NOT* be a successor to what is currently known as
+SQL::Translator on CPAN. It does not follow a direction any of the
+current SQL::Translator maintainers is comfortable with.
